@@ -3,124 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SDN RANCA TALES</title>
+    <title>Admin Panel - SDN RANCA TALES</title>
+    <!-- CSS: Bootstrap, FontAwesome (Ikon), Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        body { background: #f8fafc; font-family: 'Inter', sans-serif; }
-        .sidebar { background: #0f172a; min-height: 100vh; color: white; padding: 20px; }
-        .card { border: none; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        :root { --primary-dark: #0f172a; --accent-color: #3b82f6; --sidebar-width: 260px; }
+        body { background: #f1f5f9; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* Sidebar Styles */
+        #sidebar { 
+            width: var(--sidebar-width); height: 100vh; position: fixed; 
+            background: var(--primary-dark); color: white; transition: 0.3s; z-index: 1000;
+        }
+        #sidebar.active { margin-left: calc(-1 * var(--sidebar-width)); }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #1e293b; }
+        .nav-link { color: #94a3b8; padding: 12px 20px; display: flex; align-items: center; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #1e293b; color: white; border-left: 4px solid var(--accent-color); }
+        .nav-link i { width: 30px; }
+
+        /* Content Styles */
+        #content { width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width); transition: 0.3s; padding: 20px; }
+        #content.active { width: 100%; margin-left: 0; }
+        
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 20px; }
+        .modal-xl { max-width: 90%; }
+        .nav-tabs .nav-link { border: none; color: #64748b; }
+        .nav-tabs .nav-link.active { color: var(--accent-color); border-bottom: 3px solid var(--accent-color); font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Navigasi -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm mb-4">
-                <span class="navbar-brand fw-bold">ADMIN: SDN RANCA TALES</span>
-                <div class="ms-auto">
-                    <span class="text-light me-3 small" id="adminName">Admin</span>
-                    <button onclick="logout()" class="btn btn-outline-danger btn-sm">Keluar</button>
-                </div>
-            </nav>
 
-            <div class="container">
-                <div class="row g-4 mb-4">
-                    <!-- Widget Info Cepat -->
-                    <div class="col-md-3">
-                        <div class="card p-3 text-center">
-                            <div class="text-muted small">Total Murid</div>
-                            <div class="stat-value" id="totSiswa">0</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card p-3 text-center">
-                            <div class="text-muted small">Total Guru</div>
-                            <div class="stat-value" id="totGuru">0</div>
-                        </div>
-                    </div>
-                </div>
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="fw-bold mb-0">HKMT OFFICIAL</h5>
+            <small class="text-muted">SDN Ranca Tales</small>
+        </div>
+        <div class="py-4">
+            <a href="#" class="nav-link active" onclick="showSection('dash')"><i class="fa fa-home"></i> Dashboard</a>
+            <a href="#" class="nav-link" onclick="showSection('siswa')"><i class="fa fa-user-graduate"></i> Data Murid</a>
+            <a href="#" class="nav-link" onclick="showSection('guru')"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a>
+            <a href="#" class="nav-link" onclick="showSection('inventaris')"><i class="fa fa-boxes"></i> Inventaris</a>
+            <hr class="mx-3 border-secondary">
+            <a href="#" class="nav-link text-danger" onclick="logout()"><i class="fa fa-sign-out-alt"></i> Keluar</a>
+        </div>
+    </nav>
 
-                <div class="row g-4">
-                    <!-- Grafik-grafik -->
-                    <div class="col-md-6">
-                        <div class="card p-4">
-                            <h6 class="fw-bold text-muted mb-3">Statistik Agama Murid</h6>
-                            <canvas id="chartAgama"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card p-4">
-                            <h6 class="fw-bold text-muted mb-3">Pekerjaan Wali Murid</h6>
-                            <canvas id="chartKerja"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="card p-4">
-                            <h6 class="fw-bold text-muted mb-3">Inventaris Sekolah (Baru 5 Data)</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead class="table-light"><tr><th>Nama Barang</th><th>Jumlah</th><th>Kondisi</th></tr></thead>
-                                    <tbody id="tabelInventaris"><tr><td colspan="3" class="text-center">Memuat...</td></tr></tbody>
-                                </table>
+    <!-- MAIN CONTENT -->
+    <div id="content">
+        <!-- Topbar -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-dark" id="sidebarCollapse"><i class="fa fa-bars"></i></button>
+            <div class="fw-bold" id="adminDisplayName">Pa Hikmat</div>
+        </div>
+
+        <!-- Section: Dashboard -->
+        <div id="sec-dash" class="section-page">
+            <h4 class="fw-bold mb-4">Ringkasan Sekolah</h4>
+            <div class="row g-3">
+                <div class="col-md-3"><div class="card-custom p-3"><h6>Total Murid</h6><h3 id="stat-murid">0</h3></div></div>
+                <div class="col-md-3"><div class="card-custom p-3"><h6>Total Guru</h6><h3 id="stat-guru">0</h3></div></div>
+                <div class="col-md-6"><div class="card-custom p-3"><h6>Status Bangunan</h6><p class="mb-0 text-success">Baik</p></div></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6"><div class="card-custom p-4"><canvas id="chartAgama"></canvas></div></div>
+                <div class="col-md-6"><div class="card-custom p-4"><canvas id="chartUmur"></canvas></div></div>
+            </div>
+        </div>
+
+        <!-- Section: Data Siswa (Tabel) -->
+        <div id="sec-siswa" class="section-page d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">Data Induk Murid</h4>
+                <button class="btn btn-primary" onclick="openModalSiswa()"><i class="fa fa-plus"></i> Tambah Murid</button>
+            </div>
+            <div class="card-custom p-0 overflow-hidden">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr><th>Nama</th><th>NISN</th><th>JK</th><th>Rombel</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="listSiswaTable">
+                        <!-- Data dari Apps Script -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM SISWA (Sangat Detail) -->
+    <div class="modal fade" id="modalSiswa" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Formulir Data Murid</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Nav Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="siswaTab">
+                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tpribadi">Pribadi</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#ttinggal">Tinggal</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tkeadaan">Keadaan</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tortua">Orang Tua</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tperiodik">Periodik</a></li>
+                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tkontak">Kontak</a></li>
+                    </ul>
+
+                    <form id="formSiswa">
+                        <div class="tab-content">
+                            <!-- 1. DATA PRIBADI -->
+                            <div class="tab-pane fade show active" id="tpribadi">
+                                <div class="row g-3">
+                                    <div class="col-md-4"><label>Nama Lengkap</label><input type="text" name="nama" class="form-control"></div>
+                                    <div class="col-md-2"><label>NIS</label><input type="text" name="nis" class="form-control"></div>
+                                    <div class="col-md-2"><label>NISN</label><input type="text" name="nisn" class="form-control"></div>
+                                    <div class="col-md-2"><label>JK</label><select name="jk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
+                                    <div class="col-md-2"><label>Agama</label><input type="text" name="agama" class="form-control"></div>
+                                    <div class="col-md-3"><label>NIK</label><input type="text" name="nik" class="form-control"></div>
+                                    <div class="col-md-3"><label>Tempat Lahir</label><input type="text" name="tmp_lahir" class="form-control"></div>
+                                    <div class="col-md-3"><label>Tgl Lahir</label><input type="date" name="tgl_lahir" class="form-control"></div>
+                                    <div class="col-md-3"><label>No KK</label><input type="text" name="no_kk" class="form-control"></div>
+                                </div>
                             </div>
+                            
+                            <!-- 2. DATA TINGGAL -->
+                            <div class="tab-pane fade" id="ttinggal">
+                                <div class="row g-3">
+                                    <div class="col-md-6"><label>Alamat Jalan</label><input type="text" name="alamat" class="form-control"></div>
+                                    <div class="col-md-1"><label>RT</label><input type="text" name="rt" class="form-control"></div>
+                                    <div class="col-md-1"><label>RW</label><input type="text" name="rw" class="form-control"></div>
+                                    <div class="col-md-4"><label>Kelurahan</label><input type="text" name="kelurahan" class="form-control"></div>
+                                    <div class="col-md-3"><label>Kecamatan</label><input type="text" name="kecamatan" class="form-control"></div>
+                                    <div class="col-md-2"><label>Kode Pos</label><input type="text" name="kodepos" class="form-control"></div>
+                                    <div class="col-md-3"><label>Jarak (Km)</label><input type="number" name="jarak" class="form-control"></div>
+                                </div>
+                            </div>
+
+                            <!-- 3. DATA KEADAAN -->
+                            <div class="tab-pane fade" id="tkeadaan">
+                                <div class="row g-3">
+                                    <div class="col-md-2"><label>Anak Ke-</label><input type="number" name="anak_ke" class="form-control"></div>
+                                    <div class="col-md-2"><label>Saudara</label><input type="number" name="saudara" class="form-control"></div>
+                                    <div class="col-md-4"><label>Transportasi</label><input type="text" name="transport" class="form-control"></div>
+                                    <div class="col-md-4"><label>Alasan Layak PIP</label><input type="text" name="alasan_pip" class="form-control"></div>
+                                </div>
+                            </div>
+
+                            <!-- DATA LAINNYA LANJUT DISINI (ORTUA, PERIODIK, KONTAK) -->
                         </div>
-                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="simpanDataSiswa()">Simpan Data</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+        // Sidebar Toggle
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('content').classList.toggle('active');
+        });
 
-        window.onload = async () => {
-            const sess = JSON.parse(localStorage.getItem('session_sdnrt'));
-            if (!sess || sess.role !== 'admin') window.location.href = 'index.html';
-            document.getElementById('adminName').innerText = sess.user;
-
-            // 1. Ambil Statistik
-            try {
-                const resStats = await fetch(`${API_URL}?action=getStats`);
-                const s = await resStats.json();
-                
-                if(s.status === "success") {
-                    renderCharts(s.stats);
-                } else {
-                    console.log("Stats masih kosong");
-                }
-            } catch(e) {}
-
-            // 2. Ambil Inventaris
-            try {
-                const resInv = await fetch(`${API_URL}?action=getInventaris`);
-                const inv = await resInv.json();
-                let html = "";
-                if(inv.status === "success") {
-                    inv.data.slice(0, 5).forEach(item => {
-                        html += `<tr><td>${item.nama_barang || '-'}</td><td>${item.jumlah || '-'}</td><td>${item.kondisi || '-'}</td></tr>`;
-                    });
-                    document.getElementById('tabelInventaris').innerHTML = html;
-                } else {
-                    document.getElementById('tabelInventaris').innerHTML = "<tr><td colspan='3' class='text-center'>Data inventaris kosong</td></tr>";
-                }
-            } catch(e) {}
-        };
-
-        function renderCharts(data) {
-            new Chart(document.getElementById('chartAgama'), { 
-                type: 'pie', 
-                data: { labels: Object.keys(data.agama), datasets: [{ data: Object.values(data.agama), backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'] }] } 
-            });
-            new Chart(document.getElementById('chartKerja'), { 
-                type: 'bar', 
-                data: { labels: Object.keys(data.pekerjaanAyah), datasets: [{ label: 'Jumlah', data: Object.values(data.pekerjaanAyah), backgroundColor: '#6366f1' }] } 
-            });
+        function showSection(name) {
+            document.querySelectorAll('.section-page').forEach(s => s.classList.add('d-none'));
+            document.getElementById('sec-' + name).classList.remove('d-none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        // Fungsi Load Data & Grafik
+        async function loadDashboard() {
+            const API = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+            const resp = await fetch(API + "?action=getStats");
+            const res = await resp.json();
+            
+            if(res.status === "success") {
+                renderCharts(res.stats);
+            }
+        }
+
+        function openModalSiswa() {
+            var myModal = new bootstrap.Modal(document.getElementById('modalSiswa'));
+            myModal.show();
+        }
+
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+
+        window.onload = loadDashboard;
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
