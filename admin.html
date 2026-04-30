@@ -3,202 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - SDN RANCA TALES</title>
-    <!-- CSS: Bootstrap, FontAwesome (Ikon), Google Fonts -->
+    <title>Admin Panel Pro - SDN RANCA TALES</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
-        :root { --primary-dark: #0f172a; --accent-color: #3b82f6; --sidebar-width: 260px; }
-        body { background: #f1f5f9; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        :root { --primary-dark: #0f172a; --accent: #3b82f6; }
+        body { background: #f8fafc; font-family: 'Inter', sans-serif; font-size: 0.85rem; }
         
-        /* Sidebar Styles */
-        #sidebar { 
-            width: var(--sidebar-width); height: 100vh; position: fixed; 
-            background: var(--primary-dark); color: white; transition: 0.3s; z-index: 1000;
-        }
-        #sidebar.active { margin-left: calc(-1 * var(--sidebar-width)); }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #1e293b; }
-        .nav-link { color: #94a3b8; padding: 12px 20px; display: flex; align-items: center; transition: 0.2s; }
-        .nav-link:hover, .nav-link.active { background: #1e293b; color: white; border-left: 4px solid var(--accent-color); }
-        .nav-link i { width: 30px; }
-
-        /* Content Styles */
-        #content { width: calc(100% - var(--sidebar-width)); margin-left: var(--sidebar-width); transition: 0.3s; padding: 20px; }
+        /* Sidebar Toggle Logic */
+        #sidebar { width: 250px; height: 100vh; position: fixed; background: var(--primary-dark); color: white; transition: 0.3s; z-index: 1000; }
+        #sidebar.active { margin-left: -250px; }
+        #content { width: calc(100% - 250px); margin-left: 250px; transition: 0.3s; min-height: 100vh; }
         #content.active { width: 100%; margin-left: 0; }
+
+        /* Professional Table Styling */
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; }
+        .table-responsive { max-height: 700px; overflow-y: auto; }
         
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 20px; }
-        .modal-xl { max-width: 90%; }
-        .nav-tabs .nav-link { border: none; color: #64748b; }
-        .nav-tabs .nav-link.active { color: var(--accent-color); border-bottom: 3px solid var(--accent-color); font-weight: bold; }
+        /* Mengunci Kolom Nama agar tidak hilang saat scroll kanan */
+        .sticky-col { position: sticky; left: 0; background-color: white !important; z-index: 2; border-right: 2px solid #dee2e6 !important; }
+        .table dark thead th.sticky-col { background-color: #212529 !important; z-index: 3; }
+
+        .nav-link { color: #94a3b8; padding: 12px 20px; border-left: 4px solid transparent; }
+        .nav-link.active { background: #1e293b; color: white; border-left-color: var(--accent); }
+        .form-control-sm, .form-select-sm { border-radius: 6px; }
     </style>
 </head>
 <body>
 
     <!-- SIDEBAR -->
     <nav id="sidebar">
-        <div class="sidebar-header">
+        <div class="p-4 text-center border-bottom border-secondary">
             <h5 class="fw-bold mb-0">HKMT OFFICIAL</h5>
-            <small class="text-muted">SDN Ranca Tales</small>
+            <small class="text-muted text-uppercase">SDN Ranca Tales</small>
         </div>
-        <div class="py-4">
-            <a href="#" class="nav-link active" onclick="showSection('dash')"><i class="fa fa-home"></i> Dashboard</a>
-            <a href="#" class="nav-link" onclick="showSection('siswa')"><i class="fa fa-user-graduate"></i> Data Murid</a>
-            <a href="#" class="nav-link" onclick="showSection('guru')"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a>
-            <a href="#" class="nav-link" onclick="showSection('inventaris')"><i class="fa fa-boxes"></i> Inventaris</a>
-            <hr class="mx-3 border-secondary">
-            <a href="#" class="nav-link text-danger" onclick="logout()"><i class="fa fa-sign-out-alt"></i> Keluar</a>
+        <div class="py-3">
+            <a href="#" class="nav-link active" onclick="switchTab('siswa')"><i class="fa fa-user-graduate me-2"></i> Data Murid</a>
+            <a href="#" class="nav-link" onclick="switchTab('guru')"><i class="fa fa-chalkboard-teacher me-2"></i> Data Guru</a>
+            <a href="#" class="nav-link text-danger mt-5" onclick="logout()"><i class="fa fa-power-off me-2"></i> Keluar</a>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
+    <!-- CONTENT -->
     <div id="content">
-        <!-- Topbar -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <button class="btn btn-dark" id="sidebarCollapse"><i class="fa fa-bars"></i></button>
-            <div class="fw-bold" id="adminDisplayName">Pa Hikmat</div>
-        </div>
+        <nav class="navbar navbar-white bg-white border-bottom px-4 py-3 shadow-sm">
+            <button class="btn btn-sm btn-dark" id="btnToggle"><i class="fa fa-bars"></i></button>
+            <span class="fw-bold text-uppercase ms-3">Manajemen Data Digital</span>
+            <div class="ms-auto fw-bold text-primary">Pa Hikmat, S. Pd., Gr.</div>
+        </nav>
 
-        <!-- Section: Dashboard -->
-        <div id="sec-dash" class="section-page">
-            <h4 class="fw-bold mb-4">Ringkasan Sekolah</h4>
-            <div class="row g-3">
-                <div class="col-md-3"><div class="card-custom p-3"><h6>Total Murid</h6><h3 id="stat-murid">0</h3></div></div>
-                <div class="col-md-3"><div class="card-custom p-3"><h6>Total Guru</h6><h3 id="stat-guru">0</h3></div></div>
-                <div class="col-md-6"><div class="card-custom p-3"><h6>Status Bangunan</h6><p class="mb-0 text-success">Baik</p></div></div>
-            </div>
-            <div class="row">
-                <div class="col-md-6"><div class="card-custom p-4"><canvas id="chartAgama"></canvas></div></div>
-                <div class="col-md-6"><div class="card-custom p-4"><canvas id="chartUmur"></canvas></div></div>
-            </div>
-        </div>
-
-        <!-- Section: Data Siswa (Tabel) -->
-        <div id="sec-siswa" class="section-page d-none">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold">Data Induk Murid</h4>
-                <button class="btn btn-primary" onclick="openModalSiswa()"><i class="fa fa-plus"></i> Tambah Murid</button>
-            </div>
-            <div class="card-custom p-0 overflow-hidden">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr><th>Nama</th><th>NISN</th><th>JK</th><th>Rombel</th><th>Aksi</th></tr>
-                    </thead>
-                    <tbody id="listSiswaTable">
-                        <!-- Data dari Apps Script -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL FORM SISWA (Sangat Detail) -->
-    <div class="modal fade" id="modalSiswa" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Formulir Data Murid</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <!-- Nav Tabs -->
-                    <ul class="nav nav-tabs mb-4" id="siswaTab">
-                        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tpribadi">Pribadi</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#ttinggal">Tinggal</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tkeadaan">Keadaan</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tortua">Orang Tua</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tperiodik">Periodik</a></li>
-                        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tkontak">Kontak</a></li>
-                    </ul>
-
-                    <form id="formSiswa">
-                        <div class="tab-content">
-                            <!-- 1. DATA PRIBADI -->
-                            <div class="tab-pane fade show active" id="tpribadi">
-                                <div class="row g-3">
-                                    <div class="col-md-4"><label>Nama Lengkap</label><input type="text" name="nama" class="form-control"></div>
-                                    <div class="col-md-2"><label>NIS</label><input type="text" name="nis" class="form-control"></div>
-                                    <div class="col-md-2"><label>NISN</label><input type="text" name="nisn" class="form-control"></div>
-                                    <div class="col-md-2"><label>JK</label><select name="jk" class="form-select"><option value="L">L</option><option value="P">P</option></select></div>
-                                    <div class="col-md-2"><label>Agama</label><input type="text" name="agama" class="form-control"></div>
-                                    <div class="col-md-3"><label>NIK</label><input type="text" name="nik" class="form-control"></div>
-                                    <div class="col-md-3"><label>Tempat Lahir</label><input type="text" name="tmp_lahir" class="form-control"></div>
-                                    <div class="col-md-3"><label>Tgl Lahir</label><input type="date" name="tgl_lahir" class="form-control"></div>
-                                    <div class="col-md-3"><label>No KK</label><input type="text" name="no_kk" class="form-control"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- 2. DATA TINGGAL -->
-                            <div class="tab-pane fade" id="ttinggal">
-                                <div class="row g-3">
-                                    <div class="col-md-6"><label>Alamat Jalan</label><input type="text" name="alamat" class="form-control"></div>
-                                    <div class="col-md-1"><label>RT</label><input type="text" name="rt" class="form-control"></div>
-                                    <div class="col-md-1"><label>RW</label><input type="text" name="rw" class="form-control"></div>
-                                    <div class="col-md-4"><label>Kelurahan</label><input type="text" name="kelurahan" class="form-control"></div>
-                                    <div class="col-md-3"><label>Kecamatan</label><input type="text" name="kecamatan" class="form-control"></div>
-                                    <div class="col-md-2"><label>Kode Pos</label><input type="text" name="kodepos" class="form-control"></div>
-                                    <div class="col-md-3"><label>Jarak (Km)</label><input type="number" name="jarak" class="form-control"></div>
-                                </div>
-                            </div>
-
-                            <!-- 3. DATA KEADAAN -->
-                            <div class="tab-pane fade" id="tkeadaan">
-                                <div class="row g-3">
-                                    <div class="col-md-2"><label>Anak Ke-</label><input type="number" name="anak_ke" class="form-control"></div>
-                                    <div class="col-md-2"><label>Saudara</label><input type="number" name="saudara" class="form-control"></div>
-                                    <div class="col-md-4"><label>Transportasi</label><input type="text" name="transport" class="form-control"></div>
-                                    <div class="col-md-4"><label>Alasan Layak PIP</label><input type="text" name="alasan_pip" class="form-control"></div>
-                                </div>
-                            </div>
-
-                            <!-- DATA LAINNYA LANJUT DISINI (ORTUA, PERIODIK, KONTAK) -->
+        <div class="p-4">
+            <!-- FILTER & TOOLS -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="small text-muted">Tampilkan</label>
+                            <select id="pageSize" class="form-select form-select-sm" onchange="loadData()">
+                                <option value="10">10 Baris</option>
+                                <option value="50">50 Baris</option>
+                                <option value="100">100 Baris</option>
+                                <option value="all">Semua</option>
+                            </select>
                         </div>
-                    </form>
+                        <div class="col-md-2">
+                            <label class="small text-muted">Filter Rombel</label>
+                            <select id="filterKelas" class="form-select form-select-sm" onchange="loadData()">
+                                <option value="">Semua Kelas</option>
+                                <option value="1">Kelas 1</option>
+                                <option value="2">Kelas 2</option>
+                                <option value="3">Kelas 3</option> <!-- Kelas Binaan Pa Hikmat -->
+                                <option value="4">Kelas 4</option>
+                                <option value="5">Kelas 5</option>
+                                <option value="6">Kelas 6</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="small text-muted">Cari Nama Murid</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white"><i class="fa fa-search"></i></span>
+                                <input type="text" id="searchName" class="form-control" placeholder="Ketik nama murid..." onkeyup="loadData()">
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end justify-content-end">
+                            <button class="btn btn-primary btn-sm me-2" onclick="openModalTambah()"><i class="fa fa-plus me-1"></i> Tambah</button>
+                            <button class="btn btn-success btn-sm" onclick="exportExcel()"><i class="fa fa-file-excel me-1"></i> Export</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="simpanDataSiswa()">Simpan Data</button>
+            </div>
+
+            <!-- DATA TABLE -->
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr id="tableHeader">
+                                <!-- Kolom akan di-render otomatis oleh JS agar sesuai sheet -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="10" class="text-center py-5">Menghubungkan ke database SDN Ranca Tales...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Sidebar Toggle
-        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+        let rawData = [];
+
+        // Toggle Sidebar
+        document.getElementById('btnToggle').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('content').classList.toggle('active');
         });
 
-        function showSection(name) {
-            document.querySelectorAll('.section-page').forEach(s => s.classList.add('d-none'));
-            document.getElementById('sec-' + name).classList.remove('d-none');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        // Fungsi Load Data & Grafik
-        async function loadDashboard() {
-            const API = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-            const resp = await fetch(API + "?action=getStats");
-            const res = await resp.json();
-            
-            if(res.status === "success") {
-                renderCharts(res.stats);
+        // Load Data dari Apps Script
+        async function loadData() {
+            try {
+                const response = await fetch(`${API_URL}?action=getStats`); // Menarik data siswa
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    rawData = result.data || [];
+                    renderTable();
+                }
+            } catch (err) {
+                console.error("Gagal sinkronisasi data.");
             }
         }
 
-        function openModalSiswa() {
-            var myModal = new bootstrap.Modal(document.getElementById('modalSiswa'));
-            myModal.show();
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const thead = document.getElementById('tableHeader');
+            const search = document.getElementById('searchName').value.toLowerCase();
+            const kelas = document.getElementById('filterKelas').value;
+            const size = document.getElementById('pageSize').value;
+
+            // 1. Definisikan Header (Hanya tampilkan beberapa kolom utama + Sisanya scroll)
+            const headers = ["Aksi", "Nama Lengkap", "NISN", "JK", "Tempat Lahir", "Tgl Lahir", "NIK", "Agama", "Alamat", "Rombel", "Status"];
+            thead.innerHTML = headers.map((h, i) => `<th class="${i === 1 ? 'sticky-col' : ''} text-nowrap p-3">${h}</th>`).join('');
+
+            // 2. Filter Data
+            let filtered = rawData.filter(d => 
+                (d.nama.toLowerCase().includes(search)) && 
+                (kelas === "" || d.rombel.toString() === kelas)
+            );
+
+            // 3. Pagination
+            let limit = size === 'all' ? filtered.length : parseInt(size);
+            let displayData = filtered.slice(0, limit);
+
+            // 4. Render Rows
+            tbody.innerHTML = displayData.map(d => `
+                <tr>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <button class="btn btn-xs btn-outline-primary" onclick="editData('${d.nisn}')"><i class="fa fa-edit"></i></button>
+                            <button class="btn btn-xs btn-outline-danger" onclick="hapusData('${d.nisn}')"><i class="fa fa-trash"></i></button>
+                        </div>
+                    </td>
+                    <td class="sticky-col fw-bold text-primary">${d.nama}</td>
+                    <td>${d.nisn}</td>
+                    <td>${d.jk}</td>
+                    <td>${d.tmp_lahir}</td>
+                    <td>${d.tgl_lahir}</td>
+                    <td>${d.nik}</td>
+                    <td>${d.agama}</td>
+                    <td class="text-nowrap">${d.alamat}</td>
+                    <td><span class="badge bg-info text-dark">${d.rombel}</span></td>
+                    <td><span class="badge bg-success">Aktif</span></td>
+                </tr>
+            `).join('');
+
+            if(displayData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center py-5 text-muted">Data murid tidak ditemukan.</td></tr>`;
+            }
         }
 
-        function logout() { localStorage.clear(); window.location.href = "index.html"; }
-
-        window.onload = loadDashboard;
+        window.onload = loadData;
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
