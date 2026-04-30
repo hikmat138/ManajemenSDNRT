@@ -4,246 +4,174 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MANAJEMEN KELAS - SDN RANCA TALES</title>
-  <!-- Bootstrap 5 & Google Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
   <style>
-    :root { --primary: #1e293b; --accent: #3b82f6; --bg: #f8fafc; }
-    body { font-family: 'Inter', sans-serif; background-color: var(--bg); overflow-x: hidden; }
+    :root { --primary: #1e293b; --accent: #3b82f6; }
+    body { background-color: #f8fafc; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
     
-    /* Sidebar Mobile Friendly */
-    #sidebar { width: 260px; height: 100vh; position: fixed; background: var(--primary); color: white; transition: 0.3s; z-index: 1050; }
-    #sidebar.active { margin-left: -260px; }
-    #content { margin-left: 260px; padding: 20px; transition: 0.3s; width: calc(100% - 260px); }
-    
-    .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 8px; margin: 4px 15px; cursor: pointer; transition: 0.2s; }
-    .nav-link:hover, .nav-link.active { background: var(--accent); color: white; }
-    
-    /* Card Styles */
-    .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-    .stat-card { border-left: 4px solid var(--accent); }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      #sidebar { margin-left: -260px; }
-      #sidebar.active { margin-left: 0; }
-      #content { margin-left: 0; width: 100%; }
-      .main-title { font-size: 1.2rem; }
+    /* LAYAR LOGIN (Full Screen) */
+    #login-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
     }
+
+    /* APLIKASI UTAMA (Hidden by default) */
+    #main-app { display: none; } 
     
+    #sidebar { width: 260px; height: 100vh; position: fixed; background: var(--primary); color: white; z-index: 1000; }
+    #content { margin-left: 260px; padding: 20px; min-height: 100vh; }
+    
+    .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 8px; margin: 4px 15px; cursor: pointer; }
+    .nav-link.active, .nav-link:hover { background: var(--accent); color: white; }
     .hidden { display: none !important; }
-    .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--accent); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      #sidebar { margin-left: -260px; transition: 0.3s; }
+      #sidebar.active { margin-left: 0; }
+      #content { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div class="p-4 border-bottom border-secondary text-center">
-    <h5 class="fw-bold mb-0">MANAJEMEN KELAS</h5>
-    <small class="text-info">HKMT OFFICIAL</small>
-  </div>
-  <div class="mt-3">
-    <div class="nav-link active" onclick="showSection('dash')">📊 Dashboard</div>
-    <div class="nav-link" onclick="showSection('siswa')">👥 Data Siswa</div>
-    <div class="nav-link" onclick="showSection('mutasi')">🔄 Mutasi & Cohort</div>
-    <div class="nav-link admin-only" onclick="showSection('guru')">👨‍🏫 Data Guru</div>
-    <div class="nav-link admin-only" onclick="showSection('inv')">📦 Inventaris</div>
-    <hr class="mx-3">
-    <div class="nav-link text-danger" onclick="location.reload()">🚪 Keluar</div>
-  </div>
-</div>
-
-<!-- CONTENT -->
-<div id="content">
-  <!-- Top Navbar Mobile -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <button class="btn btn-dark d-md-none" onclick="toggleSidebar()">☰ Menu</button>
-    <h4 class="fw-bold main-title mb-0">Selamat Datang, <span id="user-display">User</span></h4>
-    <div id="loading-top" class="loader hidden"></div>
-  </div>
-
-  <!-- SECTION: DASHBOARD (GRAFIK) -->
-  <div id="sec-dash" class="section">
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="card p-3 stat-card">
-          <small class="text-muted">Total Murid</small>
-          <h3 id="stat-total-murid">0</h3>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card p-3 stat-card border-success">
-          <small class="text-muted">Layak PIP</small>
-          <h3 id="stat-pip">0</h3>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="card p-4 h-100">
-          <h6 class="fw-bold mb-3">Distribusi Agama</h6>
-          <canvas id="chartAgama"></canvas>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-4 h-100">
-          <h6 class="fw-bold mb-3">Profil Pekerjaan Orang Tua</h6>
-          <canvas id="chartKerja"></canvas>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-4 h-100">
-          <h6 class="fw-bold mb-3">Rentang Penghasilan Wali</h6>
-          <canvas id="chartGaji"></canvas>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card p-4 h-100">
-          <h6 class="fw-bold mb-3">Sebaran Umur Siswa</h6>
-          <canvas id="chartUmur"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SECTION: DATA SISWA -->
-  <div id="sec-siswa" class="section hidden">
-    <div class="card p-4 shadow-sm">
-      <div class="d-flex justify-content-between mb-3 align-items-center">
-        <h5 class="fw-bold">Database Murid Aktif</h5>
-        <button class="btn btn-primary btn-sm" onclick="openModalSiswa()">+ Tambah Murid</button>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle" id="tableSiswa">
-          <thead class="table-light text-secondary">
-            <tr>
-              <th>NAMA MURID</th>
-              <th>NISN</th>
-              <th>KELAS</th>
-              <th>UMUR</th>
-              <th class="text-center">AKSI</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- MODAL INPUT DATA LENGKAP -->
-<div class="modal fade" id="modalSiswa" tabindex="-1">
-  <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="fw-bold">Input Data Detail Murid</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body bg-light">
-        <!-- Tab Navigation -->
-        <ul class="nav nav-pills mb-3" id="pills-tab">
-          <li class="nav-item"><button class="nav-link active btn-sm" data-bs-toggle="pill" data-bs-target="#t-pribadi">Pribadi</button></li>
-          <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#t-alamat">Alamat</button></li>
-          <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#t-ortu">Orang Tua</button></li>
-          <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#t-periodik">Periodik & Kontak</button></li>
-        </ul>
+  <!-- 1. LAYAR LOGIN -->
+  <div id="login-screen">
+    <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px;">
+      <div class="card-body p-5 text-center">
+        <h4 class="fw-bold mb-2">MANAJEMEN KELAS</h4>
+        <p class="text-muted small mb-4">SDN RANCA TALES - HKMT OFFICIAL</p>
         
-        <div class="tab-content card p-4 shadow-sm border-0">
-          <!-- Form fields ditata di sini mengikuti 64 kolom yang telah kita bahas -->
-          <div class="tab-pane fade show active" id="t-pribadi">
-            <div class="row g-3">
-              <div class="col-md-6"><label class="small fw-bold">Nama Lengkap</label><input type="text" class="form-control form-control-sm"></div>
-              <div class="col-md-3"><label class="small fw-bold">NISN</label><input type="text" class="form-control form-control-sm"></div>
-              <div class="col-md-3"><label class="small fw-bold">JK</label><select class="form-control form-control-sm"><option>L</option><option>P</option></select></div>
-            </div>
-          </div>
-          <!-- Tab lainnya akan menyusul mengikuti pola yang sama -->
+        <div class="text-start">
+          <label class="small fw-bold">Username</label>
+          <input type="text" id="user" class="form-control mb-3" placeholder="Masukkan username">
+          
+          <label class="small fw-bold">Password</label>
+          <input type="password" id="pass" class="form-control mb-4" placeholder="Masukkan password">
+          
+          <button id="btn-login" class="btn btn-primary w-100 py-2 fw-bold" onclick="prosesLogin()">
+            MASUK KE SISTEM
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="button" class="btn btn-primary">Simpan Data Murid</button>
+        <div id="login-msg" class="text-danger mt-3 small"></div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  let session = {};
+  <!-- 2. APLIKASI UTAMA -->
+  <div id="main-app">
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="p-4 text-center border-bottom border-secondary">
+        <h6 class="fw-bold mb-0">MANAJEMEN KELAS</h6>
+        <span id="role-badge" class="badge bg-info mt-2" style="font-size: 10px;"></span>
+      </div>
+      <div class="mt-3">
+        <div class="nav-link active" onclick="nav('dash')">📊 Dashboard</div>
+        <div class="nav-link" onclick="nav('siswa')">👥 Data Murid</div>
+        <div class="nav-link" onclick="nav('mutasi')">🔄 Mutasi & Cohort</div>
+        <div id="menu-admin" class="hidden">
+          <div class="nav-link" onclick="nav('guru')">👨‍🏫 Data Guru</div>
+          <div class="nav-link" onclick="nav('inv')">📦 Inventaris Kelas</div>
+        </div>
+        <hr class="mx-3 opacity-25">
+        <div class="nav-link text-danger" onclick="location.reload()">🚪 Keluar</div>
+      </div>
+    </div>
 
-  // Fungsi saat Apps Script mengirim data ke halaman ini
-  window.onload = function() {
-    // Di sini logika inisialisasi session jika diperlukan
-  };
+    <!-- Main Content -->
+    <div id="content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <button class="btn btn-dark d-md-none" onclick="document.getElementById('sidebar').classList.toggle('active')">☰</button>
+        <h5 class="fw-bold mb-0">Halo, <span id="display-name">User</span>!</h5>
+      </div>
 
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-  }
+      <!-- Dashboard Section -->
+      <div id="sec-dash" class="section">
+        <div class="row g-4">
+          <div class="col-md-6"><div class="card p-4"><h6>Agama</h6><canvas id="chartAgama"></canvas></div></div>
+          <div class="col-md-6"><div class="card p-4"><h6>Pekerjaan Orang Tua</h6><canvas id="chartKerja"></canvas></div></div>
+          <div class="col-md-6"><div class="card p-4"><h6>Ekonomi Ortu</h6><canvas id="chartGaji"></canvas></div></div>
+          <div class="col-md-6"><div class="card p-4"><h6>Sebaran Umur</h6><canvas id="chartUmur"></canvas></div></div>
+        </div>
+      </div>
 
-  function showSection(name) {
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-    document.getElementById('sec-' + name).classList.remove('hidden');
-    
-    // Update active nav
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    if(name === 'dash') loadDashboard();
-    if(name === 'siswa') loadDataSiswa();
-  }
+      <!-- Section lainnya (Siswa, Mutasi, dll) di sini -->
+    </div>
+  </div>
 
-  function loadDashboard() {
-    google.script.run.withSuccessHandler(stats => {
-      // Update Statistik Angka
-      document.getElementById('stat-total-murid').innerText = Object.values(stats.kelas).reduce((a,b)=>a+b, 0);
+  <script>
+    let currentUser = {};
+
+    function prosesLogin() {
+      const u = document.getElementById('user').value;
+      const p = document.getElementById('pass').value;
+      const btn = document.getElementById('btn-login');
+      const msg = document.getElementById('login-msg');
+
+      btn.disabled = true;
+      btn.innerText = "Mengecek Akun...";
+
+      google.script.run.withSuccessHandler(res => {
+        if (res.success) {
+          currentUser = res;
+          
+          // 1. Sembunyikan Login, Munculkan App
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('main-app').style.display = 'block';
+          
+          // 2. Set Informasi User
+          document.getElementById('display-name').innerText = res.user;
+          document.getElementById('role-badge').innerText = res.role.toUpperCase();
+          
+          // 3. Cek Role Admin
+          if (res.role === 'admin') {
+            document.getElementById('menu-admin').classList.remove('hidden');
+          }
+
+          // 4. Load Data Awal
+          loadDashboard();
+        } else {
+          msg.innerText = "Username atau password salah!";
+          btn.disabled = false;
+          btn.innerText = "MASUK KE SISTEM";
+        }
+      }).checkLogin(u, p);
+    }
+
+    function nav(page) {
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+      document.getElementById('sec-' + page)?.classList.remove('hidden');
       
-      // Render Grafik Agama
-      renderChart('chartAgama', 'pie', stats.agama);
-      // Render Grafik Pekerjaan
-      renderChart('chartKerja', 'bar', stats.pekerjaanAyah, true);
-      // Render Grafik Penghasilan
-      renderChart('chartGaji', 'doughnut', stats.penghasilan);
-      // Render Grafik Umur
-      renderChart('chartUmur', 'bar', stats.umur);
-      
-    }).getDetailedStats();
-  }
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      event.target.classList.add('active');
+    }
 
-  function renderChart(id, type, dataObj, horizontal = false) {
-    const ctx = document.getElementById(id).getContext('2d');
-    
-    // Hancurkan chart lama jika ada agar tidak tumpang tindih
-    const existingChart = Chart.getChart(id);
-    if (existingChart) existingChart.destroy();
+    function loadDashboard() {
+      google.script.run.withSuccessHandler(stats => {
+        // Render grafik menggunakan Chart.js (sama seperti sebelumnya)
+        renderChart('chartAgama', 'pie', stats.agama);
+        renderChart('chartKerja', 'bar', stats.pekerjaanAyah, true);
+        renderChart('chartGaji', 'doughnut', stats.penghasilan);
+        renderChart('chartUmur', 'bar', stats.umur);
+      }).getDetailedStats();
+    }
 
-    new Chart(ctx, {
-      type: type,
-      data: {
-        labels: Object.keys(dataObj),
-        datasets: [{
-          data: Object.values(dataObj),
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        indexAxis: horizontal ? 'y' : 'x',
-        responsive: true,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    });
-  }
-
-  function loadDataSiswa() {
-    // Fungsi memanggil getSiswa dari Code.gs
-  }
-</script>
+    function renderChart(id, type, dataObj, horizontal = false) {
+      const ctx = document.getElementById(id).getContext('2d');
+      new Chart(ctx, {
+        type: type,
+        data: {
+          labels: Object.keys(dataObj),
+          datasets: [{
+            data: Object.values(dataObj),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+          }]
+        },
+        options: { indexAxis: horizontal ? 'y' : 'x', responsive: true }
+      });
+    }
+  </script>
 </body>
 </html>
