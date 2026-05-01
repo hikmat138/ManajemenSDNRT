@@ -11,126 +11,82 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
-        :root {
-            --brand-blue: #0066FF;
-            --brand-blue-soft: rgba(0, 102, 255, 0.08);
-            --airbnb-dark: #222222;
-            --airbnb-gray: #717171;
-            --border-light: #EBEBEB;
-        }
-
-        body { background: #FFFFFF; font-family: 'Inter', sans-serif; color: var(--airbnb-dark); overflow-x: hidden; }
-
-        /* --- SIDEBAR CUSTOM --- */
-        #sidebar { 
-            width: 280px; height: 100vh; position: fixed; background: #FFFFFF; 
-            border-right: 1px solid var(--border-light); transition: 0.3s; z-index: 1000; 
-        }
+        :root { --brand-blue: #0066FF; --brand-blue-soft: rgba(0, 102, 255, 0.08); --airbnb-dark: #222222; --airbnb-gray: #717171; --border-light: #EBEBEB; }
+        body { background: #FFFFFF; font-family: 'Inter', sans-serif; color: var(--airbnb-dark); margin: 0; }
+        #sidebar { width: 280px; height: 100vh; position: fixed; background: #FFFFFF; border-right: 1px solid var(--border-light); transition: 0.3s; z-index: 1000; overflow-y: auto; }
+        #content { margin-left: 280px; min-height: 100vh; transition: 0.3s; }
         .sidebar-header { padding: 30px 24px; border-bottom: 1px solid var(--border-light); }
-        .nav-section { padding: 20px 0; }
-        .nav-label { padding: 0 24px; font-size: 0.7rem; font-weight: 700; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .nav-link { 
-            color: var(--airbnb-gray); padding: 12px 24px; font-weight: 500; display: flex; align-items: center; transition: 0.2s; border-left: 4px solid transparent;
-        }
-        .nav-link i { width: 25px; font-size: 1.1rem; }
+        .nav-link { color: var(--airbnb-gray); padding: 12px 24px; font-weight: 500; display: flex; align-items: center; border-left: 4px solid transparent; text-decoration: none; }
         .nav-link:hover { background: #F7F7F7; color: var(--airbnb-dark); }
         .nav-link.active { background: var(--brand-blue-soft); color: var(--brand-blue); border-left-color: var(--brand-blue); font-weight: 600; }
-
-        /* --- MAIN CONTENT --- */
-        #content { margin-left: 280px; min-height: 100vh; }
-        .navbar { background: #FFFFFF; padding: 15px 40px; border-bottom: 1px solid var(--border-light); }
-
-        /* --- CARDS & GRAPH --- */
-        .stat-card { border: 1px solid var(--border-light); border-radius: 16px; padding: 24px; transition: 0.3s; }
-        .stat-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-
-        /* --- TAB NAVIGATION FOR DATA --- */
-        .data-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); }
+        .nav-label { padding: 20px 24px 10px; font-size: 0.7rem; font-weight: 700; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px; }
+        .navbar { background: #FFFFFF; padding: 15px 40px; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 999; }
+        .stat-card { border: 1px solid var(--border-light); border-radius: 16px; padding: 24px; }
+        .data-tabs { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); }
         .tab-item { cursor: pointer; padding: 10px 20px; white-space: nowrap; font-size: 0.85rem; font-weight: 600; color: var(--airbnb-gray); border-radius: 8px; }
         .tab-item.active { background: var(--brand-blue); color: white; }
-
-        /* --- TABLE --- */
         .table-container { background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 16px; overflow: hidden; }
-        .table thead th { background: #F9F9F9; font-size: 0.7rem; text-transform: uppercase; padding: 15px; color: var(--airbnb-gray); }
-        .sticky-name { position: sticky; left: 0; background: white !important; z-index: 2; border-right: 1px solid var(--border-light) !important; }
+        .table thead th { background: #F9F9F9; font-size: 0.7rem; text-transform: uppercase; padding: 15px; color: var(--airbnb-gray); white-space: nowrap; }
+        .sticky-col { position: sticky; left: 0; background: white !important; z-index: 2; border-right: 1px solid var(--border-light) !important; }
     </style>
 </head>
 <body>
 
     <nav id="sidebar">
-        <div class="sidebar-header text-center">
-            <h4 class="fw-extrabold m-0" style="letter-spacing: -1px; color: var(--brand-blue);">PANEL ADMIN</h4>
+        <div class="sidebar-header">
+            <h4 class="fw-bold m-0" style="color: var(--brand-blue);">PANEL ADMIN</h4>
             <small class="text-muted">SDN RANCA TALES</small>
         </div>
         <div class="nav-section">
-            <div class="nav-label">Main Menu</div>
-            <a href="#" class="nav-link active" onclick="showPage('dashboard')"><i class="fa fa-th-large me-2"></i> Dashboard</a>
+            <div class="nav-label">Overview</div>
+            <a href="javascript:void(0)" class="nav-link active" onclick="showPage('dashboard')"><i class="fa fa-chart-line me-3"></i> Dashboard</a>
             
-            <div class="nav-label mt-4">Kesiswaan</div>
-            <a href="#" class="nav-link" onclick="showPage('murid')"><i class="fa fa-user-graduate me-2"></i> Data Murid</a>
-            <a href="#" class="nav-link"><i class="fa fa-user-plus me-2"></i> Mutasi Masuk</a>
-            <a href="#" class="nav-link"><i class="fa fa-user-minus me-2"></i> Mutasi Keluar</a>
+            <div class="nav-label">Kesiswaan</div>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('siswa')"><i class="fa fa-user-graduate me-3"></i> Data Murid</a>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('mutasi_masuk')"><i class="fa fa-sign-in-alt me-3"></i> Mutasi Masuk</a>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('mutasi_keluar')"><i class="fa fa-sign-out-alt me-3"></i> Mutasi Keluar</a>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('riwayat_cohort')"><i class="fa fa-history me-3"></i> Riwayat Cohort</a>
 
-            <div class="nav-label mt-4">Ketenagaan</div>
-            <a href="#" class="nav-link"><i class="fa fa-chalkboard-teacher me-2"></i> Data Guru</a>
-            <a href="#" class="nav-link"><i class="fa fa-exchange-alt me-2"></i> Mutasi Guru</a>
+            <div class="nav-label">Ketenagaan</div>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('guru')"><i class="fa fa-chalkboard-teacher me-3"></i> Data Guru</a>
 
-            <div class="nav-label mt-4">Sarpras</div>
-            <a href="#" class="nav-link"><i class="fa fa-boxes me-2"></i> Inventaris Barang</a>
+            <div class="nav-label">Sarpras</div>
+            <a href="javascript:void(0)" class="nav-link" onclick="showPage('inventaris')"><i class="fa fa-boxes me-3"></i> Inventaris Barang</a>
         </div>
     </nav>
 
     <div id="content">
         <nav class="navbar d-flex justify-content-between">
-            <h5 class="fw-bold m-0">Ringkasan Sistem</h5>
+            <h5 class="fw-bold m-0" id="pageTitle">Dashboard</h5>
             <div class="d-flex align-items-center">
                 <div class="text-end me-3">
-                    <span id="adminName" class="fw-bold d-block">Memuat Nama...</span>
-                    <small class="text-muted">Operator Sekolah</small>
+                    <span id="adminName" class="fw-bold d-block small">Memuat Nama...</span>
+                    <small class="text-muted" style="font-size: 0.7rem;">Operator Sekolah</small>
                 </div>
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">H</div>
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px;">P</div>
             </div>
         </nav>
 
         <div class="p-4 p-lg-5" id="mainView">
-            <!-- Dashboard Home -->
+            <!-- Dashboard Section -->
             <div id="page-dashboard">
-                <div class="row g-4 mb-5">
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <small class="text-muted fw-bold">TOTAL MURID</small>
-                            <h2 class="fw-bold m-0 mt-2" id="totalMurid">0</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <small class="text-muted fw-bold">TOTAL GURU</small>
-                            <h2 class="fw-bold m-0 mt-2">24</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="stat-card">
-                            <canvas id="chartMurid" height="100"></canvas>
-                        </div>
-                    </div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3"><div class="stat-card"><small class="text-muted fw-bold">TOTAL SISWA</small><h2 class="fw-bold m-0 mt-2" id="countSiswa">0</h2></div></div>
+                    <div class="col-md-3"><div class="stat-card"><small class="text-muted fw-bold">TOTAL GURU</small><h2 class="fw-bold m-0 mt-2" id="countGuru">0</h2></div></div>
+                    <div class="col-md-6"><div class="stat-card"><canvas id="chartUtama" height="100"></canvas></div></div>
                 </div>
             </div>
 
-            <!-- Data Murid View -->
-            <div id="page-murid" style="display:none;">
-                <div class="d-flex justify-content-between mb-4">
-                    <h4 class="fw-bold">Database Murid</h4>
-                    <button class="btn btn-primary rounded-pill px-4" onclick="syncData()">Sinkronisasi Data</button>
+            <!-- Table Section -->
+            <div id="page-table" style="display:none;">
+                <div id="siswaTabs" class="data-tabs" style="display:none;">
+                    <div class="tab-item active" onclick="switchSiswaTab('pribadi')">Data Pribadi</div>
+                    <div class="tab-item" onclick="switchSiswaTab('keluarga')">Data Keluarga</div>
+                    <div class="tab-item" onclick="switchSiswaTab('orangtua')">Data Orang Tua</div>
+                    <div class="tab-item" onclick="switchSiswaTab('periodik')">Data Periodik</div>
+                    <div class="tab-item" onclick="switchSiswaTab('lainnya')">Lainnya</div>
                 </div>
-
-                <div class="data-tabs" id="tabContainer">
-                    <div class="tab-item active" onclick="switchTab('pribadi')">Data Pribadi</div>
-                    <div class="tab-item" onclick="switchTab('keluarga')">Data Keluarga</div>
-                    <div class="tab-item" onclick="switchTab('orangtua')">Data Orang Tua</div>
-                    <div class="tab-item" onclick="switchTab('periodik')">Data Periodik</div>
-                    <div class="tab-item" onclick="switchTab('lainnya')">Lainnya</div>
-                </div>
-
+                
                 <div class="table-container">
                     <div class="table-responsive">
                         <table class="table align-middle m-0">
@@ -145,73 +101,90 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-        let rawData = [];
-        let currentTab = 'pribadi';
+        let allData = {};
+        let currentSiswaTab = 'pribadi';
 
-        // TIPE DATA KOLOM (Sesuai list Bapak)
-        const columnGroups = {
-            pribadi: ["nama", "jk", "nisn", "nik", "tmp_lahir", "tgl_lahir", "agama", "alamat", "status_aktif"],
-            keluarga: ["nama", "kk", "anak_ke", "saudara", "akte", "idnama"],
-            orangtua: ["nama", "ayah_nama", "ayah_pekerjaan", "ibu_nama", "ibu_pekerjaan", "wali_nama"],
-            periodik: ["nama", "bbtb", "lingkar_kepala", "jarak", "transportasi", "hobi", "cita_citasekolah_asal"],
-            lainnya: ["nama", "kip", "pip", "no_kip", "kks", "disabilitas", "email", "hp"]
+        // Konfigurasi Kolom Sesuai Request Bapak
+        const columns = {
+            siswa: {
+                pribadi: ["nama", "nis", "jk", "nisn", "tmpt_lahir", "tgl_lahir", "nik", "agama", "alamat", "status_aktif"],
+                keluarga: ["nama", "akte", "kk", "anak_ke", "saudara", "rt", "rw", "dusun", "kelurahan", "kecamatan"],
+                orangtua: ["nama", "ayah_nama", "ayah_nik", "ayah_pekerjaan", "ibu_nama", "ibu_nik", "ibu_pekerjaan", "wali_nama"],
+                periodik: ["nama", "kelas", "bbtb", "lingkar_kepala", "hobi", "cita_cita", "sekolah_asal"],
+                lainnya: ["nama", "kip", "pip", "no_kip", "kks", "disabilitas", "hp", "email"]
+            },
+            guru: ["nama", "ttn", "nik", "nuptk", "jabatan", "gol", "pangkat", "tmt_sekolah", "status_pegawai"],
+            mutasi_masuk: ["id", "nama", "asal_sekolah", "tgl_masuk", "kelas_tujuan", "tahun_ajaran"],
+            mutasi_keluar: ["id", "nama", "sekolah_tujuan", "tgl_keluar", "alasan"],
+            inventaris: ["id", "nama_barang", "kategori", "jumlah", "konsisi", "lokasi_kelas"],
+            riwayat_cohort: ["tahun_ajaran", "bulan", "kelas", "jml_awal", "masuk", "keluar", "jml_akhir"]
         };
 
-        async function init() {
+        async function loadAllData() {
             try {
-                const resp = await fetch(`${API_URL}?action=getStats`);
-                const res = await resp.json();
+                const response = await fetch(`${API_URL}?action=getAllData`);
+                const res = await response.json();
                 if (res.status === "success") {
-                    rawData = res.data;
-                    document.getElementById('totalMurid').innerText = rawData.length;
-                    document.getElementById('adminName').innerText = res.adminName || "Pa Hikmat, S.Pd., Gr.";
+                    allData = res.data;
+                    document.getElementById('adminName').innerText = res.adminName || "Nama Tidak Ditemukan";
+                    document.getElementById('countSiswa').innerText = allData.siswa.length;
+                    document.getElementById('countGuru').innerText = allData.guru.length;
                     renderChart();
-                    renderTable();
                 }
-            } catch (e) { console.error(e); }
-        }
-
-        function renderTable() {
-            const thead = document.getElementById('tableHeader');
-            const tbody = document.getElementById('tableBody');
-            const cols = columnGroups[currentTab];
-
-            thead.innerHTML = `<tr>${cols.map(c => `<th class="${c === 'nama' ? 'sticky-name' : ''}">${c.replace('_', ' ')}</th>`).join('')}</tr>`;
-            
-            tbody.innerHTML = rawData.map(row => `
-                <tr>
-                    ${cols.map(c => `<td class="${c === 'nama' ? 'sticky-name fw-bold' : ''}">${row[c] || '-'}</td>`).join('')}
-                </tr>
-            `).join('');
-        }
-
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            renderTable();
+            } catch (e) {
+                Swal.fire('Error', 'Gagal memuat data dari Spreadsheet', 'error');
+            }
         }
 
         function showPage(page) {
+            const views = ['dashboard', 'table'];
+            const titleMap = { dashboard: 'Ringkasan Sistem', siswa: 'Data Murid', guru: 'Data Guru', mutasi_masuk: 'Mutasi Masuk', mutasi_keluar: 'Mutasi Keluar', inventaris: 'Inventaris Barang', riwayat_cohort: 'Riwayat Cohort' };
+            
+            document.getElementById('pageTitle').innerText = titleMap[page];
             document.getElementById('page-dashboard').style.display = page === 'dashboard' ? 'block' : 'none';
-            document.getElementById('page-murid').style.display = page === 'murid' ? 'block' : 'none';
+            document.getElementById('page-table').style.display = page !== 'dashboard' ? 'block' : 'none';
+            document.getElementById('siswaTabs').style.display = page === 'siswa' ? 'flex' : 'none';
+
+            if (page !== 'dashboard') renderGeneralTable(page);
+            
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             event.currentTarget.classList.add('active');
         }
 
+        function renderGeneralTable(page) {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+            let cols = (page === 'siswa') ? columns.siswa[currentSiswaTab] : columns[page];
+            let data = allData[page] || [];
+
+            thead.innerHTML = `<tr>${cols.map(c => `<th class="${c === 'nama' ? 'sticky-col' : ''}">${c.toUpperCase()}</th>`).join('')}</tr>`;
+            tbody.innerHTML = data.map(row => `<tr>${cols.map(c => `<td class="${c === 'nama' ? 'sticky-col fw-bold' : ''}">${row[c] || '-'}</td>`).join('')}</tr>`).join('');
+        }
+
+        function switchSiswaTab(tab) {
+            currentSiswaTab = tab;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGeneralTable('siswa');
+        }
+
         function renderChart() {
-            const ctx = document.getElementById('chartMurid').getContext('2d');
+            const ctx = document.getElementById('chartUtama').getContext('2d');
             new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei'],
-                    datasets: [{ label: 'Pertumbuhan Murid', data: [120, 125, 128, 130, rawData.length], borderColor: '#0066FF', tension: 0.4 }]
+                    labels: ['Siswa', 'Guru', 'Mutasi Masuk', 'Mutasi Keluar'],
+                    datasets: [{
+                        label: 'Statistik Sekolah',
+                        data: [allData.siswa.length, allData.guru.length, allData.mutasi_masuk.length, allData.mutasi_keluar.length],
+                        backgroundColor: '#0066FF'
+                    }]
                 },
-                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+                options: { responsive: true, plugins: { legend: { display: false } } }
             });
         }
 
-        window.onload = init;
+        window.onload = loadAllData;
     </script>
 </body>
 </html>
