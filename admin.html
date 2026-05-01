@@ -3,107 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel Pro - SDN RANCA TALES</title>
+    <title>Admin Panel - SDN RANCA TALES</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --primary-dark: #0f172a; --accent: #3b82f6; }
-        body { background: #f8fafc; font-family: 'Inter', sans-serif; font-size: 0.85rem; }
-        
-        /* Sidebar Toggle Logic */
-        #sidebar { width: 250px; height: 100vh; position: fixed; background: var(--primary-dark); color: white; transition: 0.3s; z-index: 1000; }
-        #sidebar.active { margin-left: -250px; }
-        #content { width: calc(100% - 250px); margin-left: 250px; transition: 0.3s; min-height: 100vh; }
+        :root {
+            --brand-blue: #0066FF;
+            --brand-blue-soft: rgba(0, 102, 255, 0.08);
+            --airbnb-gray: #717171;
+            --airbnb-dark: #222222;
+            --bg-light: #F7F7F7;
+        }
+
+        body { 
+            background: #FFFFFF; 
+            font-family: 'Inter', sans-serif; 
+            color: var(--airbnb-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- SIDEBAR MINIMALIS --- */
+        #sidebar { 
+            width: 260px; 
+            height: 100vh; 
+            position: fixed; 
+            background: #FFFFFF; 
+            border-right: 1px solid #EBEBEB;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03);
+            transition: 0.3s; 
+            z-index: 1000; 
+        }
+        #sidebar.active { margin-left: -260px; }
+
+        .sidebar-header { padding: 32px 24px; }
+        .sidebar-header h5 { font-weight: 800; color: var(--brand-blue); letter-spacing: -0.5px; }
+
+        .nav-link { 
+            color: var(--airbnb-gray); 
+            padding: 14px 24px; 
+            font-weight: 500;
+            border-radius: 0;
+            border-left: 4px solid transparent;
+            transition: 0.2s;
+        }
+        .nav-link:hover { background: var(--bg-light); color: var(--airbnb-dark); }
+        .nav-link.active { 
+            background: var(--brand-blue-soft); 
+            color: var(--brand-blue); 
+            border-left-color: var(--brand-blue); 
+            font-weight: 600;
+        }
+
+        /* --- CONTENT AREA --- */
+        #content { width: calc(100% - 260px); margin-left: 260px; transition: 0.3s; min-height: 100vh; background: #FFFFFF; }
         #content.active { width: 100%; margin-left: 0; }
 
-        /* Professional Table Styling */
-        .table-container { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; }
-        .table-responsive { max-height: 700px; overflow-y: auto; }
+        .navbar { background: #FFFFFF !important; padding: 20px 40px; border-bottom: 1px solid #EBEBEB !important; }
         
-        /* Mengunci Kolom Nama agar tidak hilang saat scroll kanan */
-        .sticky-col { position: sticky; left: 0; background-color: white !important; z-index: 2; border-right: 2px solid #dee2e6 !important; }
-        .table dark thead th.sticky-col { background-color: #212529 !important; z-index: 3; }
+        /* --- PROFESSIONAL TABLE --- */
+        .table-container { 
+            background: #FFFFFF; 
+            border-radius: 16px; 
+            border: 1px solid #EBEBEB;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-top: 24px;
+            overflow: hidden;
+        }
+        .table-responsive { max-height: 650px; }
+        
+        table { margin-bottom: 0 !important; }
+        thead th { 
+            background-color: #FFFFFF !important; 
+            color: var(--airbnb-gray) !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            padding: 20px !important;
+            border-bottom: 1px solid #EBEBEB !important;
+        }
+        tbody td { padding: 18px 20px !important; font-size: 0.85rem; border-bottom: 1px solid #F7F7F7 !important; transition: 0.2s; }
+        tbody tr:hover { background-color: #F9F9F9 !important; cursor: pointer; }
+        
+        /* Zebra Striping Tipis */
+        tbody tr:nth-child(even) { background-color: #FCFCFC; }
 
-        .nav-link { color: #94a3b8; padding: 12px 20px; border-left: 4px solid transparent; }
-        .nav-link.active { background: #1e293b; color: white; border-left-color: var(--accent); }
-        .form-control-sm, .form-select-sm { border-radius: 6px; }
+        /* Sticky Column Nama */
+        .sticky-col { 
+            position: sticky; 
+            left: 0; 
+            background-color: white !important; 
+            z-index: 2; 
+            border-right: 1px solid #EBEBEB !important; 
+        }
+
+        /* --- FORM & BUTTONS --- */
+        .form-select, .form-control { 
+            border-radius: 10px; 
+            border: 1px solid #B0B0B0; 
+            padding: 10px 15px; 
+            font-size: 0.85rem;
+        }
+        .form-control:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 4px var(--brand-blue-soft); }
+
+        .btn-brand { 
+            background: var(--brand-blue); 
+            color: white; 
+            border-radius: 10px; 
+            padding: 10px 20px; 
+            font-weight: 600; 
+            border: none; 
+            transition: 0.2s;
+        }
+        .btn-brand:hover { background: #0052CC; color: white; transform: translateY(-1px); }
+
+        /* --- SWEETALERT2 AIRBNB STYLE --- */
+        .swal2-popup { border-radius: 20px !important; padding: 2rem !important; }
+        .swal2-confirm { background-color: var(--brand-blue) !important; border-radius: 12px !important; padding: 12px 30px !important; }
     </style>
 </head>
 <body>
 
     <!-- SIDEBAR -->
     <nav id="sidebar">
-        <div class="p-4 text-center border-bottom border-secondary">
-            <h5 class="fw-bold mb-0">HKMT OFFICIAL</h5>
-            <small class="text-muted text-uppercase">SDN Ranca Tales</small>
+        <div class="sidebar-header">
+            <h5>HKMT OFFICIAL</h5>
+            <div class="text-muted" style="font-size: 0.7rem; font-weight: 600;">SDN RANCA TALES</div>
         </div>
-        <div class="py-3">
-            <a href="#" class="nav-link active" onclick="switchTab('siswa')"><i class="fa fa-user-graduate me-2"></i> Data Murid</a>
-            <a href="#" class="nav-link" onclick="switchTab('guru')"><i class="fa fa-chalkboard-teacher me-2"></i> Data Guru</a>
-            <a href="#" class="nav-link text-danger mt-5" onclick="logout()"><i class="fa fa-power-off me-2"></i> Keluar</a>
+        <div class="mt-2">
+            <a href="#" class="nav-link active"><i class="fa fa-user-graduate me-3"></i> Data Murid</a>
+            <a href="#" class="nav-link"><i class="fa fa-chalkboard-teacher me-3"></i> Data Guru</a>
+            <a href="#" class="nav-link"><i class="fa fa-file-invoice me-3"></i> Laporan</a>
+            <div style="margin-top: 100px;">
+                <a href="#" class="nav-link text-danger" onclick="logout()"><i class="fa fa-power-off me-3"></i> Keluar</a>
+            </div>
         </div>
     </nav>
 
     <!-- CONTENT -->
     <div id="content">
-        <nav class="navbar navbar-white bg-white border-bottom px-4 py-3 shadow-sm">
-            <button class="btn btn-sm btn-dark" id="btnToggle"><i class="fa fa-bars"></i></button>
-            <span class="fw-bold text-uppercase ms-3">Manajemen Data Digital</span>
-            <div class="ms-auto fw-bold text-primary">Pa Hikmat, S. Pd., Gr.</div>
+        <nav class="navbar shadow-none">
+            <button class="btn btn-light border-0" id="btnToggle" style="border-radius: 50%; width: 40px; height: 40px;">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="ms-auto d-flex align-items-center">
+                <div class="text-end me-3">
+                    <div class="fw-bold small">Pa Hikmat, S. Pd., Gr.</div>
+                    <div class="text-muted" style="font-size: 0.7rem;">Administrator Utama</div>
+                </div>
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 700;">H</div>
+            </div>
         </nav>
 
-        <div class="p-4">
-            <!-- FILTER & TOOLS -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="small text-muted">Tampilkan</label>
-                            <select id="pageSize" class="form-select form-select-sm" onchange="loadData()">
-                                <option value="10">10 Baris</option>
-                                <option value="50">50 Baris</option>
-                                <option value="100">100 Baris</option>
-                                <option value="all">Semua</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="small text-muted">Filter Rombel</label>
-                            <select id="filterKelas" class="form-select form-select-sm" onchange="loadData()">
-                                <option value="">Semua Kelas</option>
-                                <option value="1">Kelas 1</option>
-                                <option value="2">Kelas 2</option>
-                                <option value="3">Kelas 3</option> <!-- Kelas Binaan Pa Hikmat -->
-                                <option value="4">Kelas 4</option>
-                                <option value="5">Kelas 5</option>
-                                <option value="6">Kelas 6</option>
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label class="small text-muted">Cari Nama Murid</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white"><i class="fa fa-search"></i></span>
-                                <input type="text" id="searchName" class="form-control" placeholder="Ketik nama murid..." onkeyup="loadData()">
-                            </div>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end justify-content-end">
-                            <button class="btn btn-primary btn-sm me-2" onclick="openModalTambah()"><i class="fa fa-plus me-1"></i> Tambah</button>
-                            <button class="btn btn-success btn-sm" onclick="exportExcel()"><i class="fa fa-file-excel me-1"></i> Export</button>
-                        </div>
+        <div class="p-5">
+            <h4 class="fw-bold mb-4">Manajemen Data Murid</h4>
+            
+            <!-- FILTER TOOLS -->
+            <div class="row g-3 align-items-end mb-4">
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">TAMPILKAN</label>
+                    <select id="pageSize" class="form-select" onchange="loadData()">
+                        <option value="10">10 Baris</option>
+                        <option value="50">50 Baris</option>
+                        <option value="100">100 Baris</option>
+                        <option value="all">Semua</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label text-muted small fw-bold">ROMBEL</label>
+                    <select id="filterKelas" class="form-select" onchange="loadData()">
+                        <option value="">Semua Kelas</option>
+                        <option value="1">Kelas 1</option>
+                        <option value="2">Kelas 2</option>
+                        <option value="3">Kelas 3</option>
+                        <option value="4">Kelas 4</option>
+                        <option value="5">Kelas 5</option>
+                        <option value="6">Kelas 6</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-muted small fw-bold">PENCARIAN</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fa fa-search text-muted"></i></span>
+                        <input type="text" id="searchName" class="form-control border-start-0" placeholder="Cari nama murid..." onkeyup="loadData()" style="border-radius: 0 10px 10px 0;">
                     </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-brand" onclick="openModalTambah()"><i class="fa fa-plus me-2"></i> Tambah Murid</button>
+                    <button class="btn btn-outline-success ms-2" style="border-radius: 10px; font-weight: 600;" onclick="exportExcel()"><i class="fa fa-file-excel"></i></button>
                 </div>
             </div>
 
             <!-- DATA TABLE -->
             <div class="table-container">
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0 align-middle">
-                        <thead class="table-dark">
+                    <table class="table align-middle">
+                        <thead>
                             <tr id="tableHeader">
-                                <!-- Kolom akan di-render otomatis oleh JS agar sesuai sheet -->
+                                <!-- Render Header via JS -->
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <tr><td colspan="10" class="text-center py-5">Menghubungkan ke database SDN Ranca Tales...</td></tr>
+                            <tr>
+                                <td colspan="11" class="text-center py-5">
+                                    <div class="spinner-border text-primary spinner-border-sm me-2"></div> Memuat data SDN Ranca Tales...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -115,24 +222,21 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
         let rawData = [];
 
-        // Toggle Sidebar
         document.getElementById('btnToggle').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('content').classList.toggle('active');
         });
 
-        // Load Data dari Apps Script
         async function loadData() {
             try {
-                const response = await fetch(`${API_URL}?action=getStats`); // Menarik data siswa
+                const response = await fetch(`${API_URL}?action=getStats`);
                 const result = await response.json();
-                
                 if (result.status === "success") {
                     rawData = result.data || [];
                     renderTable();
                 }
             } catch (err) {
-                console.error("Gagal sinkronisasi data.");
+                Swal.fire({ icon: 'error', title: 'Gagal Sinkronisasi', text: 'Koneksi ke server terputus.', confirmButtonColor: '#0066FF' });
             }
         }
 
@@ -143,44 +247,40 @@
             const kelas = document.getElementById('filterKelas').value;
             const size = document.getElementById('pageSize').value;
 
-            // 1. Definisikan Header (Hanya tampilkan beberapa kolom utama + Sisanya scroll)
             const headers = ["Aksi", "Nama Lengkap", "NISN", "JK", "Tempat Lahir", "Tgl Lahir", "NIK", "Agama", "Alamat", "Rombel", "Status"];
-            thead.innerHTML = headers.map((h, i) => `<th class="${i === 1 ? 'sticky-col' : ''} text-nowrap p-3">${h}</th>`).join('');
+            thead.innerHTML = headers.map((h, i) => `<th class="${i === 1 ? 'sticky-col' : ''} text-nowrap">${h}</th>`).join('');
 
-            // 2. Filter Data
             let filtered = rawData.filter(d => 
                 (d.nama.toLowerCase().includes(search)) && 
                 (kelas === "" || d.rombel.toString() === kelas)
             );
 
-            // 3. Pagination
             let limit = size === 'all' ? filtered.length : parseInt(size);
             let displayData = filtered.slice(0, limit);
 
-            // 4. Render Rows
             tbody.innerHTML = displayData.map(d => `
                 <tr>
-                    <td class="text-center">
-                        <div class="btn-group">
-                            <button class="btn btn-xs btn-outline-primary" onclick="editData('${d.nisn}')"><i class="fa fa-edit"></i></button>
-                            <button class="btn btn-xs btn-outline-danger" onclick="hapusData('${d.nisn}')"><i class="fa fa-trash"></i></button>
+                    <td>
+                        <div class="d-flex">
+                            <button class="btn btn-sm btn-light text-primary me-2" onclick="editData('${d.nisn}')"><i class="fa fa-edit"></i></button>
+                            <button class="btn btn-sm btn-light text-danger" onclick="hapusData('${d.nisn}')"><i class="fa fa-trash"></i></button>
                         </div>
                     </td>
-                    <td class="sticky-col fw-bold text-primary">${d.nama}</td>
-                    <td>${d.nisn}</td>
+                    <td class="sticky-col fw-bold text-dark">${d.nama}</td>
+                    <td class="text-muted">${d.nisn}</td>
                     <td>${d.jk}</td>
                     <td>${d.tmp_lahir}</td>
                     <td>${d.tgl_lahir}</td>
-                    <td>${d.nik}</td>
+                    <td class="text-muted small">${d.nik}</td>
                     <td>${d.agama}</td>
-                    <td class="text-nowrap">${d.alamat}</td>
-                    <td><span class="badge bg-info text-dark">${d.rombel}</span></td>
-                    <td><span class="badge bg-success">Aktif</span></td>
+                    <td class="text-nowrap text-muted">${d.alamat}</td>
+                    <td><span class="badge" style="background: var(--brand-blue-soft); color: var(--brand-blue); border-radius: 6px;">Kls ${d.rombel}</span></td>
+                    <td><span class="text-success fw-bold" style="font-size: 0.75rem;"><i class="fa fa-circle me-1" style="font-size: 0.5rem;"></i> Aktif</span></td>
                 </tr>
             `).join('');
 
             if(displayData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center py-5 text-muted">Data murid tidak ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-5 text-muted">Tidak ada data murid yang sesuai.</td></tr>`;
             }
         }
 
