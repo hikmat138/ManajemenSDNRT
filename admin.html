@@ -3,146 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - SDN RANCA TALES</title>
-    <!-- Fonts & Icons -->
+    <title>PANEL ADMIN - SDN RANCA TALES</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         :root {
             --brand-blue: #0066FF;
             --brand-blue-soft: rgba(0, 102, 255, 0.08);
-            --airbnb-gray: #717171;
             --airbnb-dark: #222222;
+            --airbnb-gray: #717171;
             --border-light: #EBEBEB;
         }
 
-        body { 
-            background: #FFFFFF; 
-            font-family: 'Inter', sans-serif; 
-            color: var(--airbnb-dark);
-            overflow-x: hidden;
-            margin: 0;
-        }
+        body { background: #FFFFFF; font-family: 'Inter', sans-serif; color: var(--airbnb-dark); overflow-x: hidden; }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR CUSTOM --- */
         #sidebar { 
-            width: 260px; height: 100vh; position: fixed; 
-            background: #FFFFFF; border-right: 1px solid var(--border-light);
-            box-shadow: 4px 0 15px rgba(0,0,0,0.02); transition: 0.3s; z-index: 1000; 
+            width: 280px; height: 100vh; position: fixed; background: #FFFFFF; 
+            border-right: 1px solid var(--border-light); transition: 0.3s; z-index: 1000; 
         }
-        #sidebar.active { margin-left: -260px; }
-
-        .sidebar-header { padding: 32px 24px; border-bottom: 1px solid var(--border-light); }
-        .sidebar-header h5 { font-weight: 800; color: var(--brand-blue); margin: 0; }
-
+        .sidebar-header { padding: 30px 24px; border-bottom: 1px solid var(--border-light); }
+        .nav-section { padding: 20px 0; }
+        .nav-label { padding: 0 24px; font-size: 0.7rem; font-weight: 700; color: #B0B0B0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
         .nav-link { 
-            color: var(--airbnb-gray); padding: 14px 24px; font-weight: 500;
-            border-left: 4px solid transparent; transition: 0.2s;
+            color: var(--airbnb-gray); padding: 12px 24px; font-weight: 500; display: flex; align-items: center; transition: 0.2s; border-left: 4px solid transparent;
         }
+        .nav-link i { width: 25px; font-size: 1.1rem; }
         .nav-link:hover { background: #F7F7F7; color: var(--airbnb-dark); }
-        .nav-link.active { 
-            background: var(--brand-blue-soft); color: var(--brand-blue); 
-            border-left-color: var(--brand-blue); font-weight: 600;
-        }
+        .nav-link.active { background: var(--brand-blue-soft); color: var(--brand-blue); border-left-color: var(--brand-blue); font-weight: 600; }
 
-        /* --- CONTENT --- */
-        #content { width: calc(100% - 260px); margin-left: 260px; transition: 0.3s; min-height: 100vh; }
-        #content.active { width: 100%; margin-left: 0; }
-
+        /* --- MAIN CONTENT --- */
+        #content { margin-left: 280px; min-height: 100vh; }
         .navbar { background: #FFFFFF; padding: 15px 40px; border-bottom: 1px solid var(--border-light); }
-        
-        /* --- TABLE --- */
-        .table-container { 
-            background: #FFFFFF; border-radius: 16px; border: 1px solid var(--border-light);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; margin-top: 20px;
-        }
-        .table-responsive { max-height: 600px; }
-        thead th { 
-            background: #FFFFFF !important; color: var(--airbnb-gray);
-            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
-            padding: 15px 20px !important; border-bottom: 2px solid var(--border-light) !important;
-        }
-        tbody td { padding: 15px 20px !important; border-bottom: 1px solid #F7F7F7; font-size: 0.85rem; }
-        tbody tr:hover { background-color: #F9F9F9; }
-        
-        .sticky-col { 
-            position: sticky; left: 0; background: white !important; 
-            z-index: 2; border-right: 1px solid var(--border-light) !important; 
-        }
 
-        /* --- UI ELEMENTS --- */
-        .btn-brand { background: var(--brand-blue); color: white; border-radius: 10px; font-weight: 600; padding: 10px 20px; border: none; }
-        .btn-brand:hover { background: #0052CC; color: white; }
-        .form-select, .form-control { border-radius: 10px; border: 1px solid #B0B0B0; font-size: 0.85rem; }
-        .badge-kls { background: var(--brand-blue-soft); color: var(--brand-blue); padding: 5px 10px; border-radius: 6px; font-weight: 600; }
+        /* --- CARDS & GRAPH --- */
+        .stat-card { border: 1px solid var(--border-light); border-radius: 16px; padding: 24px; transition: 0.3s; }
+        .stat-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        /* --- TAB NAVIGATION FOR DATA --- */
+        .data-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); }
+        .tab-item { cursor: pointer; padding: 10px 20px; white-space: nowrap; font-size: 0.85rem; font-weight: 600; color: var(--airbnb-gray); border-radius: 8px; }
+        .tab-item.active { background: var(--brand-blue); color: white; }
+
+        /* --- TABLE --- */
+        .table-container { background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 16px; overflow: hidden; }
+        .table thead th { background: #F9F9F9; font-size: 0.7rem; text-transform: uppercase; padding: 15px; color: var(--airbnb-gray); }
+        .sticky-name { position: sticky; left: 0; background: white !important; z-index: 2; border-right: 1px solid var(--border-light) !important; }
     </style>
 </head>
 <body>
 
     <nav id="sidebar">
-        <div class="sidebar-header">
-            <h5>HKMT OFFICIAL</h5>
-            <small class="text-muted fw-bold">SDN RANCA TALES</small>
+        <div class="sidebar-header text-center">
+            <h4 class="fw-extrabold m-0" style="letter-spacing: -1px; color: var(--brand-blue);">PANEL ADMIN</h4>
+            <small class="text-muted">SDN RANCA TALES</small>
         </div>
-        <div class="mt-3">
-            <a href="#" class="nav-link active"><i class="fa fa-user-graduate me-3"></i> Data Murid</a>
-            <a href="#" class="nav-link"><i class="fa fa-chalkboard-teacher me-3"></i> Data Guru</a>
-            <div style="margin-top: 50px;">
-                <a href="#" class="nav-link text-danger" onclick="logout()"><i class="fa fa-power-off me-3"></i> Keluar</a>
-            </div>
+        <div class="nav-section">
+            <div class="nav-label">Main Menu</div>
+            <a href="#" class="nav-link active" onclick="showPage('dashboard')"><i class="fa fa-th-large me-2"></i> Dashboard</a>
+            
+            <div class="nav-label mt-4">Kesiswaan</div>
+            <a href="#" class="nav-link" onclick="showPage('murid')"><i class="fa fa-user-graduate me-2"></i> Data Murid</a>
+            <a href="#" class="nav-link"><i class="fa fa-user-plus me-2"></i> Mutasi Masuk</a>
+            <a href="#" class="nav-link"><i class="fa fa-user-minus me-2"></i> Mutasi Keluar</a>
+
+            <div class="nav-label mt-4">Ketenagaan</div>
+            <a href="#" class="nav-link"><i class="fa fa-chalkboard-teacher me-2"></i> Data Guru</a>
+            <a href="#" class="nav-link"><i class="fa fa-exchange-alt me-2"></i> Mutasi Guru</a>
+
+            <div class="nav-label mt-4">Sarpras</div>
+            <a href="#" class="nav-link"><i class="fa fa-boxes me-2"></i> Inventaris Barang</a>
         </div>
     </nav>
 
     <div id="content">
-        <nav class="navbar d-flex align-items-center">
-            <button class="btn btn-light rounded-circle" id="btnToggle"><i class="fa fa-bars"></i></button>
-            <div class="ms-auto text-end">
-                <span class="fw-bold d-block">Pa Hikmat, S. Pd., Gr.</span>
-                <small class="text-muted">Administrator Utama</small>
+        <nav class="navbar d-flex justify-content-between">
+            <h5 class="fw-bold m-0">Ringkasan Sistem</h5>
+            <div class="d-flex align-items-center">
+                <div class="text-end me-3">
+                    <span id="adminName" class="fw-bold d-block">Memuat Nama...</span>
+                    <small class="text-muted">Operator Sekolah</small>
+                </div>
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">H</div>
             </div>
         </nav>
 
-        <div class="p-4 p-lg-5">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold m-0">Manajemen Data Murid</h4>
-                <div>
-                    <button class="btn btn-brand" onclick="openModalTambah()"><i class="fa fa-plus me-2"></i> Tambah Murid</button>
-                    <button class="btn btn-outline-success ms-2" onclick="exportExcel()"><i class="fa fa-file-excel"></i></button>
+        <div class="p-4 p-lg-5" id="mainView">
+            <!-- Dashboard Home -->
+            <div id="page-dashboard">
+                <div class="row g-4 mb-5">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <small class="text-muted fw-bold">TOTAL MURID</small>
+                            <h2 class="fw-bold m-0 mt-2" id="totalMurid">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <small class="text-muted fw-bold">TOTAL GURU</small>
+                            <h2 class="fw-bold m-0 mt-2">24</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <canvas id="chartMurid" height="100"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <label class="small fw-bold text-muted">FILTER ROMBEL</label>
-                    <select id="filterKelas" class="form-select" onchange="renderTable()">
-                        <option value="">Semua Kelas</option>
-                        <option value="1">Kelas 1</option>
-                        <option value="2">Kelas 2</option>
-                        <option value="3">Kelas 3</option>
-                        <option value="4">Kelas 4</option>
-                        <option value="5">Kelas 5</option>
-                        <option value="6">Kelas 6</option>
-                    </select>
+            <!-- Data Murid View -->
+            <div id="page-murid" style="display:none;">
+                <div class="d-flex justify-content-between mb-4">
+                    <h4 class="fw-bold">Database Murid</h4>
+                    <button class="btn btn-primary rounded-pill px-4" onclick="syncData()">Sinkronisasi Data</button>
                 </div>
-                <div class="col-md-6">
-                    <label class="small fw-bold text-muted">CARI NAMA</label>
-                    <input type="text" id="searchName" class="form-control" placeholder="Ketik nama murid..." onkeyup="renderTable()">
-                </div>
-            </div>
 
-            <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr id="tableHeader"></tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <tr><td colspan="11" class="text-center py-5">Memuat data dari sistem...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="data-tabs" id="tabContainer">
+                    <div class="tab-item active" onclick="switchTab('pribadi')">Data Pribadi</div>
+                    <div class="tab-item" onclick="switchTab('keluarga')">Data Keluarga</div>
+                    <div class="tab-item" onclick="switchTab('orangtua')">Data Orang Tua</div>
+                    <div class="tab-item" onclick="switchTab('periodik')">Data Periodik</div>
+                    <div class="tab-item" onclick="switchTab('lainnya')">Lainnya</div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table align-middle m-0">
+                            <thead id="tableHeader"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,67 +146,72 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
         let rawData = [];
+        let currentTab = 'pribadi';
 
-        document.getElementById('btnToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('content').classList.toggle('active');
-        });
+        // TIPE DATA KOLOM (Sesuai list Bapak)
+        const columnGroups = {
+            pribadi: ["nama", "jk", "nisn", "nik", "tmp_lahir", "tgl_lahir", "agama", "alamat", "status_aktif"],
+            keluarga: ["nama", "kk", "anak_ke", "saudara", "akte", "idnama"],
+            orangtua: ["nama", "ayah_nama", "ayah_pekerjaan", "ibu_nama", "ibu_pekerjaan", "wali_nama"],
+            periodik: ["nama", "bbtb", "lingkar_kepala", "jarak", "transportasi", "hobi", "cita_citasekolah_asal"],
+            lainnya: ["nama", "kip", "pip", "no_kip", "kks", "disabilitas", "email", "hp"]
+        };
 
-        async function loadData() {
+        async function init() {
             try {
                 const resp = await fetch(`${API_URL}?action=getStats`);
                 const res = await resp.json();
                 if (res.status === "success") {
-                    rawData = res.data || [];
+                    rawData = res.data;
+                    document.getElementById('totalMurid').innerText = rawData.length;
+                    document.getElementById('adminName').innerText = res.adminName || "Pa Hikmat, S.Pd., Gr.";
+                    renderChart();
                     renderTable();
                 }
-            } catch (e) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal terhubung ke database.' });
-            }
+            } catch (e) { console.error(e); }
         }
 
         function renderTable() {
-            const tbody = document.getElementById('tableBody');
             const thead = document.getElementById('tableHeader');
-            const search = document.getElementById('searchName').value.toLowerCase();
-            const kelas = document.getElementById('filterKelas').value;
+            const tbody = document.getElementById('tableBody');
+            const cols = columnGroups[currentTab];
 
-            const headers = ["Aksi", "Nama Lengkap", "NISN", "JK", "Tempat Lahir", "Tgl Lahir", "NIK", "Agama", "Alamat", "Rombel", "Status"];
-            thead.innerHTML = headers.map((h, i) => `<th class="${i === 1 ? 'sticky-col' : ''}">${h}</th>`).join('');
-
-            let filtered = rawData.filter(d => 
-                (d.nama && d.nama.toLowerCase().includes(search)) && 
-                (kelas === "" || d.rombel.toString() === kelas)
-            );
-
-            tbody.innerHTML = filtered.map(d => `
+            thead.innerHTML = `<tr>${cols.map(c => `<th class="${c === 'nama' ? 'sticky-name' : ''}">${c.replace('_', ' ')}</th>`).join('')}</tr>`;
+            
+            tbody.innerHTML = rawData.map(row => `
                 <tr>
-                    <td>
-                        <button class="btn btn-sm btn-light text-primary" onclick="editData('${d.nisn}')"><i class="fa fa-edit"></i></button>
-                        <button class="btn btn-sm btn-light text-danger" onclick="hapusData('${d.nisn}')"><i class="fa fa-trash"></i></button>
-                    </td>
-                    <td class="sticky-col fw-bold">${d.nama}</td>
-                    <td class="text-muted">${d.nisn}</td>
-                    <td>${d.jk}</td>
-                    <td>${d.tmp_lahir}</td>
-                    <td>${d.tgl_lahir}</td>
-                    <td class="small text-muted">${d.nik}</td>
-                    <td>${d.agama}</td>
-                    <td class="text-nowrap text-muted">${d.alamat}</td>
-                    <td><span class="badge-kls">Kls ${d.rombel}</span></td>
-                    <td><span class="text-success fw-bold">Aktif</span></td>
+                    ${cols.map(c => `<td class="${c === 'nama' ? 'sticky-name fw-bold' : ''}">${row[c] || '-'}</td>`).join('')}
                 </tr>
             `).join('');
-
-            if(filtered.length === 0) tbody.innerHTML = `<tr><td colspan="11" class="text-center py-5">Data murid tidak ditemukan.</td></tr>`;
         }
 
-        function logout() {
-            localStorage.removeItem('session_sdnrt');
-            window.location.href = 'index.html';
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTable();
         }
 
-        window.onload = loadData;
+        function showPage(page) {
+            document.getElementById('page-dashboard').style.display = page === 'dashboard' ? 'block' : 'none';
+            document.getElementById('page-murid').style.display = page === 'murid' ? 'block' : 'none';
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('chartMurid').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei'],
+                    datasets: [{ label: 'Pertumbuhan Murid', data: [120, 125, 128, 130, rawData.length], borderColor: '#0066FF', tension: 0.4 }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }
+            });
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
