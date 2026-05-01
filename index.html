@@ -12,20 +12,21 @@
     
     <style>
         :root {
-            --airbnb-coral: #FF385C;
-            --airbnb-dark: #222222;
-            --airbnb-gray: #717171;
-            --airbnb-border: #DDDDDD;
+            --brand-blue: #0066FF; /* Biru Profesional */
+            --brand-blue-dark: #0052CC;
+            --dark-text: #222222;
+            --gray-text: #717171;
+            --border-color: #DDDDDD;
         }
 
         body { 
-            background: #FFFFFF; 
+            background: #F8FAFC; 
             height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-family: 'Inter', sans-serif; 
-            color: var(--airbnb-dark);
+            color: var(--dark-text);
             margin: 0;
         }
 
@@ -39,23 +40,24 @@
             background: #FFFFFF; 
             padding: 3rem; 
             border-radius: 20px; 
-            box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 28px;
-            border: 1px solid var(--airbnb-border); 
+            box-shadow: rgba(0, 0, 0, 0.06) 0px 10px 30px;
+            border: 1px solid var(--border-color); 
         }
 
         .brand-title {
             font-weight: 800;
-            font-size: 1.8rem;
-            letter-spacing: -0.8px;
-            color: var(--airbnb-coral);
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            color: var(--brand-blue);
             margin-bottom: 4px;
+            text-transform: uppercase;
         }
 
         .brand-subtitle {
-            color: var(--airbnb-gray);
+            color: var(--gray-text);
             font-size: 0.9rem;
             margin-bottom: 2.5rem;
-            font-weight: 400;
+            font-weight: 500;
         }
 
         /* Label & Input Styling */
@@ -82,10 +84,9 @@
         }
 
         .form-control:focus { 
-            border-color: var(--airbnb-dark);
-            box-shadow: none; 
-            outline: 2px solid var(--airbnb-dark);
-            outline-offset: -2px;
+            border-color: var(--brand-blue);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1); 
+            outline: none;
         }
 
         /* Password Toggle */
@@ -93,7 +94,7 @@
             position: absolute;
             right: 16px;
             cursor: pointer;
-            color: var(--airbnb-gray);
+            color: var(--gray-text);
             font-size: 1.1rem;
             z-index: 10;
             background: none;
@@ -101,45 +102,46 @@
             padding: 0;
         }
 
-        .password-toggle:hover { color: var(--airbnb-dark); }
+        .password-toggle:hover { color: var(--brand-blue); }
 
-        /* Button Airbnb Style */
+        /* Button Blue Style */
         .btn-primary { 
-            background: linear-gradient(to right, #E31C5F 0%, #D70466 100%);
+            background: var(--brand-blue);
             border: none; 
             padding: 14px; 
             border-radius: 12px; 
-            font-weight: 600; 
+            font-weight: 700; 
             color: white;
-            transition: opacity 0.2s ease;
+            transition: all 0.2s ease;
             margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .btn-primary:hover { opacity: 0.9; color: white; }
-        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { background: var(--brand-blue-dark); color: white; transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
 
-        /* SweetAlert2 Theme Airbnb */
-        .swal2-popup { border-radius: 24px !important; font-family: 'Inter', sans-serif !important; }
+        /* SweetAlert2 Theme Blue */
+        .swal2-popup { border-radius: 20px !important; }
         .swal2-confirm { 
-            background-color: var(--airbnb-dark) !important; 
-            border-radius: 12px !important; 
-            padding: 12px 32px !important; 
+            background-color: var(--brand-blue) !important; 
+            border-radius: 10px !important; 
         }
 
-        .footer-text { margin-top: 2rem; color: var(--airbnb-gray); font-size: 0.75rem; }
+        .footer-text { margin-top: 2rem; color: var(--gray-text); font-size: 0.75rem; }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-card text-center">
-            <h3 class="brand-title">SDN RANCA TALES</h3>
-            <p class="brand-subtitle">Digitalisasi Manajemen Sekolah</p>
+            <h3 class="brand-title">MANAJEMAN KELAS</h3>
+            <p class="brand-subtitle">SDN RANCA TALES</p>
             
             <!-- Input Username -->
             <div class="form-group-custom">
                 <label class="form-label">Username</label>
                 <div class="input-wrapper">
-                    <input type="text" id="username" class="form-control" placeholder="ID Murid / NUPTK">
+                    <input type="text" id="username" class="form-control" placeholder="Masukkan username">
                 </div>
             </div>
             
@@ -147,14 +149,14 @@
             <div class="form-group-custom">
                 <label class="form-label">Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" class="form-control" placeholder="Kata sandi anda">
+                    <input type="password" id="password" class="form-control" placeholder="Masukkan password">
                     <button type="button" class="password-toggle" onclick="togglePassword()">
                         <i id="toggleIcon" class="fa-regular fa-eye"></i>
                     </button>
                 </div>
             </div>
             
-            <button id="btnLogin" onclick="prosesLogin()" class="btn btn-primary w-100">Lanjutkan</button>
+            <button id="btnLogin" onclick="prosesLogin()" class="btn btn-primary w-100">LOGIN</button>
             
             <p class="footer-text">
                 &copy; 2026 SDN Ranca Tales — Serang, Banten
@@ -163,10 +165,8 @@
     </div>
 
     <script>
-        // API URL sesuai deployment Apps Script Pa Hikmat
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
-        // Fitur Lihat/Sembunyi Password
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggleIcon');
@@ -188,17 +188,16 @@
             if (!u || !p) {
                 return Swal.fire({ 
                     icon: 'warning', 
-                    title: 'Data Belum Lengkap', 
+                    title: 'Perhatian', 
                     text: 'Username dan password wajib diisi.',
-                    confirmButtonColor: '#222222'
+                    confirmButtonColor: '#0066FF'
                 });
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Memverifikasi...`;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> MEMVERIFIKASI...`;
 
             try {
-                // Melakukan request ke Google Apps Script
                 const resp = await fetch(`${API_URL}?action=login&u=${u}&p=${p}`);
                 const res = await resp.json();
 
@@ -206,7 +205,7 @@
                     localStorage.setItem('session_sdnrt', JSON.stringify(res));
                     Swal.fire({ 
                         icon: 'success', 
-                        title: 'Akses Berhasil', 
+                        title: 'Berhasil', 
                         text: 'Selamat datang, ' + res.user, 
                         timer: 1500, 
                         showConfirmButton: false 
@@ -216,21 +215,21 @@
                 } else {
                     Swal.fire({ 
                         icon: 'error', 
-                        title: 'Gagal Masuk', 
+                        title: 'Gagal', 
                         text: res.message || 'Username atau password salah.',
-                        confirmButtonColor: '#FF385C'
+                        confirmButtonColor: '#0066FF'
                     });
                 }
             } catch (e) {
                 Swal.fire({ 
                     icon: 'error', 
-                    title: 'Kesalahan Sistem', 
-                    text: 'Gagal terhubung ke database. Cek koneksi internet.',
-                    confirmButtonColor: '#222222'
+                    title: 'Error', 
+                    text: 'Gagal terhubung ke database.',
+                    confirmButtonColor: '#0066FF'
                 });
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Lanjutkan";
+                btn.innerText = "LOGIN";
             }
         }
     </script>
