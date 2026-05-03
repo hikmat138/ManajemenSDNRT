@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding: 0.5rem 0; }
+        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding: 0.6rem 0; }
         .submenu-link:hover { color: #2563eb; }
         .hidden { display: none; }
         .overflow-x-auto::-webkit-scrollbar { height: 6px; }
@@ -28,11 +28,11 @@
             </div>
             
             <nav class="flex-1 px-4 space-y-1">
-                <a href="#" onclick="showSection('dashboard')" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+                <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
                     <i class="fas fa-home mr-3 w-5"></i> Dashboard
                 </a>
 
-                <!-- Menu Data Murid -->
+                <!-- Data Murid -->
                 <div>
                     <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
                         <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i> Data Murid</span>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <!-- Menu Mutasi (Dipisah) -->
+                <!-- Mutasi -->
                 <div>
                     <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
                         <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
@@ -60,14 +60,10 @@
                         <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                     </div>
                 </div>
-
-                <a href="#" onclick="showSection('ketenagaan')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-chalkboard-teacher mr-3 w-5"></i> Ketenagaan
-                </a>
             </nav>
         </aside>
 
-        <!-- Main -->
+        <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-y-auto">
             <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
                 <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
@@ -85,23 +81,23 @@
                 <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
-                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600">0</h4>
+                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 leading-none mt-2">Memuat...</h4>
                     </div>
                     <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
-                        <h4 id="stat-guru" class="text-2xl font-bold text-green-600">0</h4>
+                        <h4 id="stat-guru" class="text-2xl font-bold text-green-600 leading-none mt-2">0</h4>
                     </div>
                     <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
-                        <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600">0</h4>
+                        <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 leading-none mt-2">0</h4>
                     </div>
                     <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
-                        <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600">0</h4>
+                        <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 leading-none mt-2">0</h4>
                     </div>
                     <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
-                        <h4 id="stat-keluar" class="text-2xl font-bold text-red-600">0</h4>
+                        <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 leading-none mt-2">0</h4>
                     </div>
                 </div>
 
@@ -109,11 +105,12 @@
                 <div id="section-tabel-container" class="hidden space-y-4 mt-6">
                     <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
                         <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA</h3>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Baris:</span>
                             <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
-                                <option value="10">10 Baris</option>
-                                <option value="50">50 Baris</option>
-                                <option value="100">100 Baris</option>
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
                             </select>
                             <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
                                 <option value="">Semua Kelas</option>
@@ -135,12 +132,11 @@
                                 <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
                             </table>
                         </div>
-                        <!-- Pagination Control -->
                         <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
-                            <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase"></div>
+                            <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider"></div>
                             <div class="flex gap-2">
-                                <button onclick="prevPage()" class="px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-100 text-xs">Prev</button>
-                                <button onclick="nextPage()" class="px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-100 text-xs">Next</button>
+                                <button onclick="prevPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Prev</button>
+                                <button onclick="nextPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Next</button>
                             </div>
                         </div>
                     </div>
@@ -159,7 +155,7 @@
 
         const colMap = {
             'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Kebutuhan Khusus',
+            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
             'nomor_kk': 'No KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
             'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
             'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
@@ -170,13 +166,13 @@
         };
 
         function formatTanggalIndo(dateStr) {
-            if (!dateStr || dateStr === '-') return '-';
+            if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
             let date = dateStr.includes('T') || dateStr.includes('-') ? new Date(dateStr) : null;
             if (!date || isNaN(date.getTime())) {
                 const parts = dateStr.split('/');
                 if (parts.length === 3) date = new Date(parts[2], parts[0] - 1, parts[1]);
             }
-            if (date instanceof Date && !isNaN(date)) {
+            if (date instanceof Date && !isNaN(date.getTime())) {
                 const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
             }
@@ -192,13 +188,20 @@
                     updateStats();
                     filterData();
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                document.getElementById('stat-murid').innerText = "Gagal";
+            }
         }
 
         function updateStats() {
-            document.getElementById('stat-murid').innerText = masterData.filter(s => s.status_aktif === 'Aktif').length;
-            document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-            document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+            const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+            const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+            const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+            
+            document.getElementById('stat-murid').innerText = aktif;
+            document.getElementById('stat-masuk').innerText = masuk;
+            document.getElementById('stat-keluar').innerText = keluar;
         }
 
         function filterData() {
@@ -207,7 +210,7 @@
             
             filteredData = masterData.filter(s => {
                 const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-                const matchKelas = kls === "" || (s.kelas || "").toString() === kls;
+                const matchKelas = kls === "" || String(s.kelas) === kls;
                 
                 if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
                 if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
@@ -235,16 +238,16 @@
             }
 
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
-            tbody.innerHTML = list.map(s => `
+            tbody.innerHTML = list.length > 0 ? list.map(s => `
                 <tr class="hover:bg-blue-50 border-b">
                     ${cols.map(c => {
                         let val = s[c] || '-';
                         if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
-                        const color = c === 'status_aktif' && val === 'Aktif' ? 'text-green-600 font-bold' : '';
-                        return `<td class="p-3 border-r whitespace-nowrap ${color}">${val}</td>`;
+                        const isAktif = String(val).toLowerCase() === 'aktif';
+                        return `<td class="p-3 border-r whitespace-nowrap ${isAktif ? 'text-green-600 font-bold' : ''}">${val}</td>`;
                     }).join('')}
                 </tr>
-            `).join('');
+            `).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</td></tr>`;
         }
 
         function updatePagination() {
@@ -256,12 +259,13 @@
             const end = start + rowsPerPage;
             renderTable(filteredData.slice(start, end));
             
-            document.getElementById('pagination-info').innerText = `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid`;
+            document.getElementById('pagination-info').innerText = total > 0 ? `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid` : `0 Murid ditemukan`;
         }
 
         function showSection(id) {
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
             if (id === 'dashboard') {
+                document.getElementById('link-dashboard').classList.add('active');
                 document.getElementById('section-dashboard').classList.remove('hidden');
                 document.getElementById('section-tabel-container').classList.add('hidden');
                 updateStats();
