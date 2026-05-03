@@ -300,7 +300,21 @@
         function resetAndFilter() { currentPage = 1; filterData(); }
         function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
         function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
+// Fungsi untuk Muncul/Tutup Menu Logout
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('hidden');
+        }
 
+        // Tutup menu jika klik di luar area profil
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.getElementById('userMenuBtn');
+            
+            if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
         window.onload = loadData;
     </script>
 </body>
