@@ -48,6 +48,59 @@
     .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 </style>
 </head>
+    <!-- Modal Mutasi/Lulus -->
+<div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center">
+            <!-- Judul Modal Dinamis -->
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
+                    <p id="m-nama" class="font-bold text-gray-700">-</p>
+                </div>
+                <div>
+                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
+                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
+                </div>
+            </div>
+            
+            <div id="form-mutasi" class="hidden space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
+                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
+                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+            </div>
+
+            <div id="form-lulus" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
+                        <p id="m-nis" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
+                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
+                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
+</div>
 <body class="bg-gray-50 text-gray-800">
 
     <div class="flex h-screen">
@@ -294,14 +347,15 @@
         tbody.innerHTML = list.length > 0 ? list.map(s => `
             <tr class="hover:bg-blue-50 border-b">
                 ${cols.map(c => {
-                    if (c === 'aksi') {
-                        return `<td class="p-3 border-r">
-                            <div class="flex space-x-2">
-                                <button onclick="alert('Keluar: ${s.nama}')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
-                                <button onclick="alert('Lulus: ${s.nama}')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
-                            </div>
-                        </td>`;
-                    }
+                    // Di dalam renderTable, bagian c === 'aksi'
+if (c === 'aksi') {
+    return `<td class="p-3 border-r">
+        <div class="flex space-x-2">
+            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
+            <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
+        </div>
+    </td>`;
+}
                     let val = s[c] || '-';
                     if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
                     const isAktif = String(val).toLowerCase() === 'aktif';
@@ -351,7 +405,83 @@
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
     function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
     function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
+let selectedMuridId = null;
+let currentActionType = '';
 
+function openModal(id, tipe) {
+    selectedMuridId = id;
+    currentActionType = tipe;
+    
+    // Cari data murid di masterData
+    const s = masterData.find(item => item.id == id);
+    if (!s) return;
+
+    // Isi data dasar
+    document.getElementById('m-nama').innerText = s.nama;
+    document.getElementById('m-kelas').innerText = s.kelas;
+    document.getElementById('modalAction').classList.remove('hidden');
+
+    const header = document.getElementById('modalHeader');
+    const formMutasi = document.getElementById('form-mutasi');
+    const formLulus = document.getElementById('form-lulus');
+    const btn = document.getElementById('btnKonfirmasi');
+
+    if (tipe === 'keluar') {
+        header.innerText = 'Konfirmasi Mutasi Keluar';
+        header.className = 'p-4 text-white font-bold uppercase text-center bg-orange-500';
+        btn.className = 'flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600';
+        formMutasi.classList.remove('hidden');
+        formLulus.classList.add('hidden');
+    } else {
+        header.innerText = 'Konfirmasi Kelulusan Murid';
+        header.className = 'p-4 text-white font-bold uppercase text-center bg-green-600';
+        btn.className = 'flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700';
+        document.getElementById('m-nis').innerText = s.nis || '-';
+        document.getElementById('m-nisn').innerText = s.nisn || '-';
+        formMutasi.classList.add('hidden');
+        formLulus.classList.remove('hidden');
+    }
+
+    // Set aksi tombol konfirmasi
+    btn.onclick = () => eksekusiAksi(tipe);
+}
+
+function closeModal() {
+    document.getElementById('modalAction').classList.add('hidden');
+    // Reset Input
+    document.getElementById('m-tujuan').value = '';
+    document.getElementById('m-tgl-keluar').value = '';
+    document.getElementById('m-ijazah').value = '';
+}
+
+function eksekusiAksi(tipe) {
+    const dataKirim = {
+        id: selectedMuridId,
+        tipe: tipe,
+        tujuan: document.getElementById('m-tujuan').value,
+        tgl: document.getElementById('m-tgl-keluar').value,
+        ijazah: document.getElementById('m-ijazah').value
+    };
+
+    if (tipe === 'keluar' && (!dataKirim.tujuan || !dataKirim.tgl)) {
+        alert('Mohon isi sekolah tujuan dan tanggal mutasi!');
+        return;
+    }
+    if (tipe === 'lulus' && !dataKirim.ijazah) {
+        alert('Mohon isi nomor ijazah!');
+        return;
+    }
+
+    // Tampilkan Loading (Jika pakai library seperti Swal) atau alert biasa
+    console.log("Mengirim data ke GS:", dataKirim);
+    
+    // Panggil fungsi Google Apps Script
+    google.script.run.withSuccessHandler(function(res) {
+        alert('Data Murid Berhasil Diupdate!');
+        closeModal();
+        loadData(); // Refresh tabel
+    }).prosesMutasiRow(dataKirim);
+}
     window.onload = loadData;
 </script>
 </body>
