@@ -77,6 +77,8 @@
                         <div onclick="showSection('siswa-keadaan')" class="submenu-link">Data Keadaan</div>
                         <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
                         <div onclick="showSection('siswa-kontak')" class="submenu-link">Data Kontak</div>
+                        <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
+                        <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
                     </div>
                 </div>
 
@@ -210,7 +212,11 @@
             'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
             'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
             'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-            'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan'
+            'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan':'asal_sekolah': 'Asal Sekolah',
+    'tgl_masuk': 'Tgl Masuk',
+    'tgl_keluar': 'Tgl Keluar',
+    'thn_ajaran_lulus': 'Tahun Lulus',
+    'aksi': 'Aksi'
         };
 
         function formatTanggalIndo(dateStr) {
@@ -274,6 +280,15 @@
             let cols = [];
             
             switch(currentMenu) {
+                    case 'siswa-registrasi':
+            cols = ['nama', 'jk', 'kelas', 'asal_sekolah', 'tgl_masuk', 'tgl_keluar', 'aksi'];
+            break;
+        case 'siswa-lulus':
+            cols = ['nama', 'jk', 'thn_ajaran_lulus', 'asal_sekolah', 'status_aktif'];
+            // Tampilkan filter tahun ajaran jika di menu Siswa Lulus
+            document.getElementById('filter-lulus-container').classList.remove('hidden');
+            break;
+    }
                 case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'akte', 'disabilitas', 'status_aktif']; break;
                 case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; break;
                 case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ayah_nik', 'ayah_pekerjaan', 'ayah_pendidikan', 'ayah_penghasilan', 'ayah_thn_lahir', 'ayah_disabilitas', 'ibu_nama', 'ibu_nik', 'ibu_pekerjaan', 'ibu_pendidikan', 'ibu_penghasilan', 'ibu_thn_lahir', 'ibu_disablilitas', 'wali_nama', 'status_aktif']; break;
@@ -284,6 +299,14 @@
                 case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
                 case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
             }
+        if (col === 'aksi') {
+        td.innerHTML = `
+            <div class="flex space-x-2">
+                <button onclick="prosesMutasi('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Keluar</button>
+                <button onclick="prosesMutasi('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
+            </div>
+        `;
+    }
 
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
             tbody.innerHTML = list.length > 0 ? list.map(s => `
