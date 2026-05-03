@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; }
+        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .submenu-link:hover { color: #2563eb; background-color: #f8fafc; }
         .hidden { display: none; }
         .overflow-x-auto::-webkit-scrollbar { height: 6px; }
@@ -38,13 +38,12 @@
                         <i class="fas fa-chevron-down text-[10px]"></i>
                     </button>
                     <div id="sub-murid" class="hidden space-y-1 mt-1">
-                        <div onclick="showSection('siswa-pribadi')" class="submenu-link block py-2 rounded-md">Data Pribadi</div>
-                        <div onclick="showSection('siswa-keluarga')" class="submenu-link block py-2 rounded-md">Data Keluarga</div>
-                        <div onclick="showSection('siswa-ortu')" class="submenu-link block py-2 rounded-md">Data Orang Tua</div>
-                        <div onclick="showSection('siswa-alamat')" class="submenu-link block py-2 rounded-md">Data Alamat</div>
-                        <div onclick="showSection('siswa-keadaan')" class="submenu-link block py-2 rounded-md">Data Keadaan</div>
-                        <div onclick="showSection('siswa-periodik')" class="submenu-link block py-2 rounded-md">Data Periodik</div>
-                        <div onclick="showSection('siswa-kontak')" class="submenu-link block py-2 rounded-md">Data Kontak</div>
+                        <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Pribadi</div>
+                        <div onclick="showSection('siswa-keluarga')" class="submenu-link">Data Keluarga</div>
+                        <div onclick="showSection('siswa-alamat')" class="submenu-link">Data Alamat</div>
+                        <div onclick="showSection('siswa-keadaan')" class="submenu-link">Data Keadaan</div>
+                        <div onclick="showSection('siswa-mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
+                        <div onclick="showSection('siswa-mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                     </div>
                 </div>
 
@@ -54,7 +53,7 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main -->
         <main class="flex-1 flex flex-col overflow-y-auto">
             <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
                 <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
@@ -68,9 +67,34 @@
             </header>
 
             <div class="p-6">
-                <div id="section-siswa-container" class="hidden space-y-4">
+                <!-- Dashboard Section -->
+                <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Murid</p>
+                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Guru</p>
+                        <h4 id="stat-guru" class="text-2xl font-bold text-green-600">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+                        <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+                        <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-xs text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+                        <h4 id="stat-keluar" class="text-2xl font-bold text-red-600">0</h4>
+                    </div>
+                </div>
+
+                <!-- Table Section Container -->
+                <div id="section-siswa-container" class="hidden space-y-4 mt-6">
                     <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                        <h3 id="siswa-table-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
+                        <h3 id="siswa-table-title" class="font-bold text-blue-600 uppercase text-sm">DATA</h3>
                         <div class="flex gap-2">
                             <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm outline-none bg-gray-50">
                                 <option value="">Semua Kelas</option>
@@ -81,7 +105,7 @@
                                 <option value="5A">5A</option><option value="5B">5B</option>
                                 <option value="6A">6A</option><option value="6B">6B</option>
                             </select>
-                            <input type="text" id="search-siswa" onkeyup="resetAndFilter()" placeholder="Cari Nama Murid..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
+                            <input type="text" id="search-siswa" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
                         </div>
                     </div>
 
@@ -92,13 +116,6 @@
                                 <tbody id="table-siswa-body" class="divide-y divide-gray-100 text-gray-700"></tbody>
                             </table>
                         </div>
-                        <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
-                            <div id="pagination-info" class="text-xs text-gray-500"></div>
-                            <div class="flex gap-1">
-                                <button onclick="prevPage()" class="p-2 hover:bg-gray-200 rounded-lg"><i class="fas fa-chevron-left text-xs"></i></button>
-                                <button onclick="nextPage()" class="p-2 hover:bg-gray-200 rounded-lg"><i class="fas fa-chevron-right text-xs"></i></button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -107,38 +124,29 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-        
         let masterSiswa = [];
         let filteredSiswa = [];
-        let currentPage = 1;
-        let rowsPerPage = 15;
         let currentSiswaSubMenu = 'siswa-pribadi';
 
         const colMap = {
-            'nama': 'Nama Murid', 'kelas': 'Kls', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No. Akte',
-            'disabilitas': 'Kebutuhan Khusus', 'nomor_kk': 'No. KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Saudara',
-            'jns_tinggal': 'Jenis Tinggal', 'transportasi': 'Transportasi', 'jarak': 'Jarak', 'status_aktif': 'Status',
-            'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-            'ayah_nama': 'Ayah', 'ibu_nama': 'Ibu', 'wali_nama': 'Wali',
-            'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kodepos',
-            'lintang': 'Lintang', 'bujur': 'Bujur', 'berat_badan': 'BB', 'tinggi_badan': 'TB', 'lingkar_kepala': 'Lingkar Kepala',
-            'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal', 'hp': 'No HP', 'telp': 'Telp', 'email': 'Email'
+            'nama': 'Nama Murid', 'kelas': 'Kelas', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'nomor_kk': 'Nomor KK', 'jumlah_saudara': 'Jml Saudara',
+            'lintang': 'Lintang', 'bujur': 'Bujur', 'status_aktif': 'Status', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar',
+            'alasan': 'Alasan', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW'
         };
 
         function formatTanggalIndo(dateStr) {
             if (!dateStr || dateStr === '-') return '-';
-            const parts = dateStr.split('/');
-            if (parts.length !== 3) return dateStr; 
-
-            const bulanIndo = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
-            const bln = bulanIndo[parseInt(parts[0]) - 1];
-            const tgl = parts[1];
-            const thn = parts[2];
-            return `${tgl} ${bln} ${thn}`;
+            let date = dateStr.includes('T') || dateStr.includes('-') ? new Date(dateStr) : null;
+            if (!date || isNaN(date.getTime())) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) date = new Date(parts[2], parts[0] - 1, parts[1]);
+            }
+            if (date instanceof Date && !isNaN(date)) {
+                const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                return `${date.getDate()} ${bulanIndo[date.getMonth()]} ${date.getFullYear()}`;
+            }
+            return dateStr;
         }
 
         async function loadData() {
@@ -147,27 +155,29 @@
                 const result = await res.json();
                 if (result.status === "success") {
                     masterSiswa = result.data.siswa || [];
+                    // Update Dashboard Stats
+                    document.getElementById('stat-murid').innerText = masterSiswa.filter(s => s.status_aktif === 'Aktif').length;
+                    document.getElementById('stat-masuk').innerText = masterSiswa.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+                    document.getElementById('stat-keluar').innerText = masterSiswa.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
                     filterSiswa();
                 }
-            } catch (e) { console.error("Error load data:", e); }
+            } catch (e) { console.error(e); }
         }
 
         function filterSiswa() {
             const keyword = document.getElementById('search-siswa').value.toLowerCase();
             const kls = document.getElementById('filter-kelas').value;
-            
             filteredSiswa = masterSiswa.filter(s => {
                 const matchNama = (s.nama || "").toLowerCase().includes(keyword);
                 const matchKelas = kls === "" || (s.kelas || "").toString() === kls;
+                
+                // Logika Filter Tab Mutasi
+                if (currentSiswaSubMenu === 'siswa-mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+                if (currentSiswaSubMenu === 'siswa-mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+                
                 return matchNama && matchKelas;
             });
-            updatePagination();
-        }
-
-        function updatePagination() {
-            const start = (currentPage - 1) * rowsPerPage;
-            renderTableSiswa(filteredSiswa.slice(start, start + rowsPerPage));
-            document.getElementById('pagination-info').innerText = `Total: ${filteredSiswa.length} Murid`;
+            renderTableSiswa(filteredSiswa);
         }
 
         function renderTableSiswa(list) {
@@ -176,63 +186,43 @@
             let cols = [];
             
             switch(currentSiswaSubMenu) {
-                case 'siswa-pribadi': 
-                    cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'akte', 'disabilitas', 'status_aktif']; 
-                    break;
-                case 'siswa-keluarga': 
-                    cols = ['nama', 'kelas', 'nomor_kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; 
-                    break;
-                case 'siswa-ortu': 
-                    cols = ['nama', 'kelas', 'ayah_nama', 'ibu_nama', 'status_aktif']; 
-                    break;
-                case 'siswa-alamat': 
-                    cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'status_aktif']; 
-                    break;
-                case 'siswa-keadaan': 
-                    cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'pip', 'status_aktif']; 
-                    break;
-                case 'siswa-periodik': 
-                    cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'hobi', 'cita_cita', 'status_aktif']; 
-                    break;
-                case 'siswa-kontak': 
-                    cols = ['nama', 'kelas', 'hp', 'email', 'status_aktif']; 
-                    break;
+                case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'jk', 'tmpt_lahir', 'tgl_lahir', 'status_aktif']; break;
+                case 'siswa-keluarga': cols = ['nama', 'kelas', 'nomor_kk', 'jumlah_saudara', 'status_aktif']; break;
+                case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'lintang', 'bujur', 'status_aktif']; break;
+                case 'siswa-mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
+                case 'siswa-mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
+                default: cols = ['nama', 'kelas', 'status_aktif'];
             }
 
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
-            
-            tbody.innerHTML = list.map(s => {
-                const rowContent = cols.map(c => {
-                    let val = s[c] || '-';
-                    if (c === 'tgl_lahir') val = formatTanggalIndo(val);
-                    
-                    if (c === 'status_aktif') {
-                        const color = val.toLowerCase() === 'aktif' ? 'text-green-600' : 'text-red-500';
-                        return `<td class="p-3 font-bold ${color}">${val}</td>`;
-                    }
-                    return `<td class="p-3 border-r whitespace-nowrap">${val}</td>`;
-                }).join('');
-                return `<tr class="hover:bg-blue-50 border-b">${rowContent}</tr>`;
-            }).join('');
+            tbody.innerHTML = list.map(s => `
+                <tr class="hover:bg-blue-50 border-b">
+                    ${cols.map(c => {
+                        let val = s[c] || '-';
+                        if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
+                        const color = c === 'status_aktif' && val === 'Aktif' ? 'text-green-600 font-bold' : '';
+                        return `<td class="p-3 border-r whitespace-nowrap ${color}">${val}</td>`;
+                    }).join('')}
+                </tr>
+            `).join('');
         }
 
         function showSection(id) {
-            if (id.startsWith('siswa-')) {
-                currentSiswaSubMenu = id;
-                document.getElementById('section-siswa-container').classList.remove('hidden');
-                document.getElementById('siswa-table-title').innerText = id.replace(/-/g, ' ').toUpperCase();
-                resetAndFilter();
-            } else {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if (id === 'dashboard') {
+                document.getElementById('section-dashboard').classList.remove('hidden');
                 document.getElementById('section-siswa-container').classList.add('hidden');
+            } else {
+                document.getElementById('section-dashboard').classList.add('hidden');
+                document.getElementById('section-siswa-container').classList.remove('hidden');
+                currentSiswaSubMenu = id;
+                filterSiswa();
             }
             document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
         }
 
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function resetAndFilter() { currentPage = 1; filterSiswa(); }
-        function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
-        function nextPage() { if (currentPage * rowsPerPage < filteredSiswa.length) { currentPage++; updatePagination(); } }
-
+        function resetAndFilter() { filterSiswa(); }
         window.onload = loadData;
     </script>
 </body>
