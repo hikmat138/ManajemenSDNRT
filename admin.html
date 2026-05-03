@@ -10,17 +10,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .hidden { display: none; }
+        .mobile-menu-open { transform: translateX(0) !important; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-            <div class="p-6">
-                <h1 class="text-xl font-bold text-blue-600">SDN RANCA TALES</h1>
-                <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Digitalisasi Sekolah</p>
+        <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-50 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 flex flex-col">
+            <div class="p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-blue-600">SDN RANCA TALES</h1>
+                    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Digitalisasi Sekolah</p>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-500"><i class="fas fa-times"></i></button>
             </div>
             <nav class="flex-1 px-4 space-y-1">
                 <a href="#" onclick="showSection('dashboard')" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
@@ -32,37 +35,32 @@
                 <a href="#" onclick="showSection('ketenagaan')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
                     <i class="fas fa-chalkboard-teacher mr-3 w-5"></i> Ketenagaan
                 </a>
-                <a href="#" onclick="showSection('inventaris')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-boxes mr-3 w-5"></i> Inventaris
+                <a href="#" onclick="showSection('mutasi')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi Murid
                 </a>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-y-auto">
-            <!-- Top Header -->
+            <!-- Header -->
             <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-30">
-                <button class="md:hidden text-gray-600"><i class="fas fa-bars text-xl"></i></button>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 p-2"><i class="fas fa-bars text-xl"></i></button>
                 <div class="flex-1 px-4 hidden md:block">
                     <h2 id="section-title" class="text-lg font-semibold">Dashboard Utama</h2>
                 </div>
 
-                <!-- Profile Dropdown -->
+                <!-- User Profile (Data dari Sheet Users Kolom E) -->
                 <div class="relative">
                     <div onclick="toggleDropdown()" class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition">
                         <div class="text-right hidden sm:block">
-                            <p id="adminNameDisplay" class="text-sm font-bold text-gray-800">HIKMATULLAH, S.Pd., Gr.</p>
-                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Operator Sekolah</p>
+                            <p id="adminNameDisplay" class="text-sm font-bold text-gray-800 italic uppercase">Memuat nama...</p>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Administrator</p>
                         </div>
-                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-sm">H</div>
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-sm" id="initialName">?</div>
                     </div>
-                    <!-- Dropdown Menu -->
                     <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-50">
                         <div class="p-2 space-y-1">
-                            <button onclick="openPassModal()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition">
-                                <i class="fas fa-key mr-2 text-blue-400"></i> Ubah Password
-                            </button>
-                            <hr class="border-gray-100 mx-2">
                             <button onclick="handleLogout()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition">
                                 <i class="fas fa-sign-out-alt mr-2"></i> Keluar (Logout)
                             </button>
@@ -71,165 +69,151 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
-            <div id="section-dashboard" class="p-6 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-gray-500 text-sm">Total Murid</p>
-                        <h3 id="stat-siswa" class="text-3xl font-bold text-blue-600">0</h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-gray-500 text-sm">Total Guru</p>
-                        <h3 id="stat-guru" class="text-3xl font-bold text-green-600">0</h3>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                        <p class="text-gray-500 text-sm">Tendik</p>
-                        <h3 id="stat-tendik" class="text-3xl font-bold text-orange-600">0</h3>
+            <!-- Sections Container -->
+            <div class="p-6">
+                <!-- Dashboard Section -->
+                <div id="section-dashboard" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                            <p class="text-gray-500 text-sm">Total Murid</p>
+                            <h3 id="stat-siswa" class="text-3xl font-bold">0</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                            <p class="text-gray-500 text-sm">Total Guru</p>
+                            <h3 id="stat-guru" class="text-3xl font-bold">0</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
+                            <p class="text-gray-500 text-sm">Total Tendik</p>
+                            <h3 id="stat-tendik" class="text-3xl font-bold">0</h3>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Ketenagaan Content -->
-            <div id="section-ketenagaan" class="p-6 space-y-8 hidden">
-                <div>
-                    <h3 class="text-lg font-bold mb-4 text-blue-700 border-l-4 border-blue-600 pl-3">Data Guru</h3>
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+                <!-- Siswa Section -->
+                <div id="section-siswa" class="hidden space-y-4">
+                    <h3 class="text-lg font-bold">Data Murid Aktif</h3>
+                    <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                            <thead class="bg-gray-50 border-b">
                                 <tr>
-                                    <th class="p-4 text-left">Nama Lengkap</th>
-                                    <th class="p-4 text-left">Jabatan</th>
-                                    <th class="p-4 text-left">Status</th>
+                                    <th class="p-4 text-left">Nama</th>
+                                    <th class="p-4 text-left">NISN</th>
+                                    <th class="p-4 text-left">Kelas</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-guru"></tbody>
+                            <tbody id="table-siswa"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <div>
-                    <h3 class="text-lg font-bold mb-4 text-green-700 border-l-4 border-green-600 pl-3">Tenaga Kependidikan (Tendik)</h3>
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-                        <table class="w-full text-sm">
-                            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-                                <tr>
-                                    <th class="p-4 text-left">Nama Lengkap</th>
-                                    <th class="p-4 text-left">Tugas Pokok</th>
-                                    <th class="p-4 text-left">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-tendik"></tbody>
-                        </table>
+                <!-- Ketenagaan Section (Filter Berdasarkan Kolom U) -->
+                <div id="section-ketenagaan" class="hidden space-y-8">
+                    <div>
+                        <h3 class="text-md font-bold mb-3 text-blue-600">Tabel Guru</h3>
+                        <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50"><tr><th class="p-4 text-left">Nama Lengkap</th><th class="p-4 text-left">Jabatan</th></tr></thead>
+                                <tbody id="table-guru"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold mb-3 text-orange-600">Tabel Tenaga Kependidikan</h3>
+                        <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50"><tr><th class="p-4 text-left">Nama Lengkap</th><th class="p-4 text-left">Tugas Pokok</th></tr></thead>
+                                <tbody id="table-tendik"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mutasi Section -->
+                <div id="section-mutasi" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl border">
+                        <h3 class="font-bold mb-4 text-green-600">Mutasi Masuk</h3>
+                        <div id="list-mutasi-masuk" class="text-sm text-gray-500 italic">Belum ada data...</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border">
+                        <h3 class="font-bold mb-4 text-red-600">Mutasi Keluar</h3>
+                        <div id="list-mutasi-keluar" class="text-sm text-gray-500 italic">Belum ada data...</div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modal Ubah Password -->
-    <div id="passModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[100] px-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4">Ubah Password</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-semibold text-gray-500">Password Lama</label>
-                    <input type="password" id="oldPass" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-gray-500">Password Baru</label>
-                    <input type="password" id="newPass" class="w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div class="flex space-x-3 mt-6">
-                    <button onclick="closePassModal()" class="flex-1 bg-gray-100 text-gray-600 py-2 rounded-lg font-semibold hover:bg-gray-200">Batal</button>
-                    <button onclick="saveNewPassword()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700">Simpan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-        let allData = {};
-
-        async function loadAllData() {
+        
+        async function loadData() {
             try {
                 const res = await fetch(`${API_URL}?action=getAllData`);
                 const result = await res.json();
+                
                 if (result.status === "success") {
-                    allData = result.data;
-                    document.getElementById('adminNameDisplay').innerText = result.adminName;
-                    renderKetenagaan();
-                    updateStats();
+                    const data = result.data;
+                    
+                    // 1. Tampilkan Nama dari kolom E sheet users
+                    const namaAdmin = result.adminName || "ADMIN";
+                    document.getElementById('adminNameDisplay').innerText = namaAdmin;
+                    document.getElementById('initialName').innerText = namaAdmin.charAt(0);
+
+                    // 2. Render Guru & Tendik (Filter Kolom U: Jenis Pegawai)
+                    const tGuru = document.getElementById('table-guru');
+                    const tTendik = document.getElementById('table-tendik');
+                    let gCount = 0, tCount = 0;
+
+                    data.guru.forEach(item => {
+                        const row = `<tr class="border-b"><td class="p-4 font-medium">${item.nama_lengkap}</td><td class="p-4">${item.jabatan || item.tugas_pokok}</td></tr>`;
+                        // Cek jenis_pegawai (Kolom U)
+                        if (item.jenis_pegawai && item.jenis_pegawai.toLowerCase().includes('guru')) {
+                            tGuru.innerHTML += row;
+                            gCount++;
+                        } else {
+                            tTendik.innerHTML += row;
+                            tCount++;
+                        }
+                    });
+
+                    // 3. Render Siswa
+                    const tSiswa = document.getElementById('table-siswa');
+                    data.siswa.forEach(s => {
+                        tSiswa.innerHTML += `<tr class="border-b"><td class="p-4">${s.nama}</td><td class="p-4">${s.nisn}</td><td class="p-4">${s.rombel || '-'}</td></tr>`;
+                    });
+
+                    // 4. Stats
+                    document.getElementById('stat-siswa').innerText = data.siswa.length;
+                    document.getElementById('stat-guru').innerText = gCount;
+                    document.getElementById('stat-tendik').innerText = tCount;
                 }
             } catch (e) {
-                console.error("Gagal memuat data", e);
+                console.error("Error load data:", e);
             }
         }
 
-        function updateStats() {
-            document.getElementById('stat-siswa').innerText = allData.siswa ? allData.siswa.length : 0;
-            const guruCount = allData.guru ? allData.guru.filter(g => g.jabatan.toLowerCase().includes('guru')).length : 0;
-            const tendikCount = allData.guru ? (allData.guru.length - guruCount) : 0;
-            document.getElementById('stat-guru').innerText = guruCount;
-            document.getElementById('stat-tendik').innerText = tendikCount;
-        }
-
-        function renderKetenagaan() {
-            const tableGuru = document.getElementById('table-guru');
-            const tableTendik = document.getElementById('table-tendik');
-            tableGuru.innerHTML = ""; tableTendik.innerHTML = "";
-
-            if (!allData.guru) return;
-
-            allData.guru.forEach(g => {
-                const row = `<tr class="border-b hover:bg-gray-50 transition">
-                    <td class="p-4 font-semibold">${g.nama_lengkap}</td>
-                    <td class="p-4 text-gray-600">${g.jabatan || g.tugas_pokok || '-'}</td>
-                    <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold uppercase">Aktif</span></td>
-                </tr>`;
-
-                if (g.jabatan && g.jabatan.toLowerCase().includes('guru')) {
-                    tableGuru.innerHTML += row;
-                } else {
-                    tableTendik.innerHTML += row;
-                }
-            });
-        }
-
         function showSection(id) {
-            document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+            document.querySelectorAll('main .p-6 > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(`section-${id}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
-            if(event) event.currentTarget.classList.add('active');
-            
-            document.getElementById('section-title').innerText = id.charAt(0).toUpperCase() + id.slice(1);
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('section-title').innerText = id.toUpperCase();
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-menu-open');
         }
 
         function toggleDropdown() {
             document.getElementById('dropdownMenu').classList.toggle('hidden');
         }
 
-        function openPassModal() { 
-            toggleDropdown();
-            document.getElementById('passModal').classList.remove('hidden'); 
-        }
-        
-        function closePassModal() { document.getElementById('passModal').classList.add('hidden'); }
-
         function handleLogout() {
-            // Langsung keluar tanpa konfirmasi ke index.html
             window.location.href = "index.html";
         }
 
-        loadAllData();
-
-        window.onclick = (e) => {
-            if (!e.target.closest('.relative')) {
-                const dropdown = document.getElementById('dropdownMenu');
-                if (dropdown) dropdown.classList.add('hidden');
-            }
-        }
+        window.onload = loadData;
     </script>
 </body>
 </html>
