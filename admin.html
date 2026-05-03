@@ -127,7 +127,26 @@
             'lintang': 'Lintang', 'bujur': 'Bujur', 'berat_badan': 'BB', 'tinggi_badan': 'TB', 'lingkar_kepala': 'Lingkar Kepala',
             'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal', 'hp': 'No HP', 'telp': 'Telp', 'email': 'Email'
         };
+// Fungsi konversi m/dd/yyyy -> d mmmm yyyy
+function formatTanggalIndo(dateStr) {
+    if (!dateStr || dateStr === '-') return '-';
+    
+    // Pecah data berdasarkan "/" (asumsi format m/d/yyyy)
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return dateStr; 
 
+    const bulanIndo = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // dateStr m/d/yyyy -> parts[0]=bulan, parts[1]=tanggal, parts[2]=tahun
+    const bln = bulanIndo[parseInt(parts[0]) - 1];
+    const tgl = parts[1];
+    const thn = parts[2];
+
+    return `${tgl} ${bln} ${thn}`;
+}
         async function loadData() {
             try {
                 const res = await fetch(`${API_URL}?action=getAllData`);
@@ -191,15 +210,21 @@
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
             tbody.innerHTML = list.map(s => `
                 <tr class="hover:bg-blue-50 border-b">
-                    ${cols.map(c => {
-                        let val = s[c] || '-';
-                        // Highlight khusus untuk status_aktif
-                        if (c === 'status_aktif') {
-                            const color = val.toLowerCase() === 'aktif' ? 'text-green-600' : 'text-red-500';
-                            return `<td class="p-3 font-bold ${color}">${val}</td>`;
-                        }
-                        return `<td class="p-3 border-r whitespace-nowrap">${val}</td>`;
-                    }).join('')}
+                    // Di dalam tbody.innerHTML = list.map(s => ...
+${cols.map(c => {
+    let val = s[c] || '-';
+    
+    // KHUSUS UNTUK TANGGAL LAHIR
+    if (c === 'tgl_lahir') {
+        val = formatTanggalIndo(val);
+    }
+    
+    if (c === 'status_aktif') {
+        const color = val.toLowerCase() === 'aktif' ? 'text-green-600' : 'text-red-500';
+        return `<td class="p-3 font-bold ${color}">${val}</td>`;
+    }
+    return `<td class="p-3 border-r whitespace-nowrap">${val}</td>`;
+}).join('')}
                 </tr>
             `).join('');
         }
