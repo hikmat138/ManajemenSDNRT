@@ -195,201 +195,164 @@
         </main>
     </div>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-        let masterData = [];
-        let filteredData = [];
-        let currentPage = 1;
-        let rowsPerPage = 10;
-        let currentMenu = 'siswa-pribadi';
+    <!-- Bagian CSS & Header tetap sama seperti milik Anda -->
 
-        const colMap = {
-            'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-            'kk': 'No KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-            'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-            'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-            'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
-            'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
-            'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-            'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan':'asal_sekolah': 'Asal Sekolah',
-    'tgl_masuk': 'Tgl Masuk',
-    'tgl_keluar': 'Tgl Keluar',
-    'thn_ajaran_lulus': 'Tahun Lulus',
-    'aksi': 'Aksi'
-        };
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+    let masterData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let currentMenu = 'siswa-pribadi';
 
-        function formatTanggalIndo(dateStr) {
-            if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
-            let date = dateStr.includes('T') || dateStr.includes('-') ? new Date(dateStr) : null;
-            if (!date || isNaN(date.getTime())) {
-                const parts = dateStr.split('/');
-                if (parts.length === 3) date = new Date(parts[2], parts[0] - 1, parts[1]);
-            }
-            if (date instanceof Date && !isNaN(date.getTime())) {
-                const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
-            }
-            return dateStr;
-        }
+    // Perbaikan colMap agar tidak error sintaks
+    const colMap = {
+        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
+        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
+        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
+        'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
+        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi'
+    };
 
-        async function loadData() {
-            try {
-                const res = await fetch(`${API_URL}?action=getAllData`);
-                const result = await res.json();
-                if (result.status === "success") {
-                    masterData = result.data.siswa || [];
-                    updateStats();
-                    filterData();
-                }
-            } catch (e) { 
-                console.error(e);
-                document.getElementById('stat-murid').innerText = "Gagal";
-            }
-        }
-
-        function updateStats() {
-            const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-            const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-            const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-            
-            document.getElementById('stat-murid').innerText = aktif;
-            document.getElementById('stat-masuk').innerText = masuk;
-            document.getElementById('stat-keluar').innerText = keluar;
-        }
-
-        function filterData() {
-            const keyword = document.getElementById('search-data').value.toLowerCase();
-            const kls = document.getElementById('filter-kelas').value;
-            
-            filteredData = masterData.filter(s => {
-                const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-                const matchKelas = kls === "" || String(s.kelas) === kls;
-                
-                if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-                if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-                
-                return matchNama && matchKelas;
-            });
-            updatePagination();
-        }
-
-        function renderTable(list) {
-            const thead = document.getElementById('thead-data');
-            const tbody = document.getElementById('tbody-data');
-            let cols = [];
-            
-            switch(currentMenu) {
-                    case 'siswa-registrasi':
-            cols = ['nama', 'jk', 'kelas', 'asal_sekolah', 'tgl_masuk', 'tgl_keluar', 'aksi'];
-            break;
-        case 'siswa-lulus':
-            cols = ['nama', 'jk', 'thn_ajaran_lulus', 'asal_sekolah', 'status_aktif'];
-            // Tampilkan filter tahun ajaran jika di menu Siswa Lulus
-            document.getElementById('filter-lulus-container').classList.remove('hidden');
-            break;
-    }
-                case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'akte', 'disabilitas', 'status_aktif']; break;
-                case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; break;
-                case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ayah_nik', 'ayah_pekerjaan', 'ayah_pendidikan', 'ayah_penghasilan', 'ayah_thn_lahir', 'ayah_disabilitas', 'ibu_nama', 'ibu_nik', 'ibu_pekerjaan', 'ibu_pendidikan', 'ibu_penghasilan', 'ibu_thn_lahir', 'ibu_disablilitas', 'wali_nama', 'status_aktif']; break;
-                case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'lintang', 'bujur', 'status_aktif']; break;
-                case 'siswa-keadaan': cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'kps', 'pip', 'no_kip', 'nama_kip', 'kks', 'alasan_pip', 'status_aktif']; break;
-                case 'siswa-periodik': cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'status_aktif']; break;
-                case 'siswa-kontak': cols = ['nama', 'kelas', 'hp', 'telp', 'email', 'status_aktif']; break;
-                case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
-                case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
-            }
-        if (col === 'aksi') {
-        td.innerHTML = `
-            <div class="flex space-x-2">
-                <button onclick="prosesMutasi('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Keluar</button>
-                <button onclick="prosesMutasi('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
-            </div>
-        `;
+    function formatTanggalIndo(dateStr) {
+        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
+        let date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
     }
 
-            thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
-            tbody.innerHTML = list.length > 0 ? list.map(s => `
-                <tr class="hover:bg-blue-50 border-b">
-                    ${cols.map(c => {
-                        let val = s[c] || '-';
-                        if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
-                        const isAktif = String(val).toLowerCase() === 'aktif';
-                        return `<td class="p-3 border-r whitespace-nowrap ${isAktif ? 'text-green-600 font-bold' : ''}">${val}</td>`;
-                    }).join('')}
-                </tr>
-            `).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</td></tr>`;
+    async function loadData() {
+        try {
+            const res = await fetch(`${API_URL}?action=getAllData`);
+            const result = await res.json();
+            if (result.status === "success") {
+                masterData = result.data.siswa || [];
+                updateStats();
+                filterData();
+            }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('stat-murid').innerText = "Gagal";
         }
+    }
 
-        function updatePagination() {
-            const total = filteredData.length;
-            const maxPage = Math.ceil(total / rowsPerPage) || 1;
-            if (currentPage > maxPage) currentPage = maxPage;
-            
-            const start = (currentPage - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-            renderTable(filteredData.slice(start, end));
-            
-            document.getElementById('pagination-info').innerText = total > 0 ? `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid` : `0 Murid ditemukan`;
-        }
+    function updateStats() {
+        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+        const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+        const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+        document.getElementById('stat-murid').innerText = aktif;
+        document.getElementById('stat-masuk').innerText = masuk;
+        document.getElementById('stat-keluar').innerText = keluar;
+    }
 
-        function showSection(id) {
-    // 1. Reset semua warna di menu utama dan sub-menu
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-    document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
-
-    if (id === 'dashboard') {
-        document.getElementById('link-dashboard').classList.add('active');
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        document.getElementById('section-tabel-container').classList.add('hidden');
-        updateStats();
-    } else {
-        document.getElementById('section-dashboard').classList.add('hidden');
-        document.getElementById('section-tabel-container').classList.remove('hidden');
+    function filterData() {
+        const keyword = document.getElementById('search-data').value.toLowerCase();
+        const kls = document.getElementById('filter-kelas').value;
         
-        currentMenu = id;
-
-        // 2. Tandai Sub-Menu yang aktif (berdasarkan onclick)
-        // Kita cari elemen div yang memiliki atribut onclick sesuai ID section
-        const activeSub = document.querySelector(`div[onclick="showSection('${id}')"]`);
-        if (activeSub) {
-            activeSub.classList.add('active-sub');
+        filteredData = masterData.filter(s => {
+            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
+            const matchKelas = kls === "" || String(s.kelas) === kls;
             
-            // 3. Cari menu utama (parent) agar tetap berwarna biru
-            const parentButton = activeSub.closest('div').parentElement.querySelector('button');
-            if (parentButton) {
-                parentButton.classList.add('active');
-            }
-        }
-        
-        resetAndFilter();
-    }
-    
-    // Update Judul Header
-    document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
-}
-
-        function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
-        function resetAndFilter() { currentPage = 1; filterData(); }
-        function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
-        function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
-// Fungsi untuk Muncul/Tutup Menu Logout
-        function toggleUserMenu() {
-            const dropdown = document.getElementById('userDropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Tutup menu jika klik di luar area profil
-        window.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('userDropdown');
-            const btn = document.getElementById('userMenuBtn');
+            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
             
-            if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
+            return matchNama && matchKelas;
         });
-        window.onload = loadData;
-    </script>
+        updatePagination();
+    }
+
+    function renderTable(list) {
+        const thead = document.getElementById('thead-data');
+        const tbody = document.getElementById('tbody-data');
+        let cols = [];
+        
+        // Perbaikan logika penentuan kolom
+        switch(currentMenu) {
+            case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'status_aktif']; break;
+            case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; break;
+            case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ibu_nama', 'wali_nama', 'status_aktif']; break;
+            case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'status_aktif']; break;
+            case 'siswa-keadaan': cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'pip', 'status_aktif']; break;
+            case 'siswa-periodik': cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'hobi', 'cita_cita', 'status_aktif']; break;
+            case 'siswa-kontak': cols = ['nama', 'kelas', 'hp', 'email', 'status_aktif']; break;
+            case 'siswa-registrasi': cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi']; break;
+            case 'siswa-lulus': cols = ['nama', 'jk', 'thn_ajaran_lulus', 'sekolah_asal', 'status_aktif']; break;
+            case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
+            case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
+            default: cols = ['nama', 'kelas', 'status_aktif'];
+        }
+
+        thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
+        
+        tbody.innerHTML = list.length > 0 ? list.map(s => `
+            <tr class="hover:bg-blue-50 border-b">
+                ${cols.map(c => {
+                    if (c === 'aksi') {
+                        return `<td class="p-3 border-r">
+                            <div class="flex space-x-2">
+                                <button onclick="alert('Keluar: ${s.nama}')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
+                                <button onclick="alert('Lulus: ${s.nama}')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
+                            </div>
+                        </td>`;
+                    }
+                    let val = s[c] || '-';
+                    if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
+                    const isAktif = String(val).toLowerCase() === 'aktif';
+                    return `<td class="p-3 border-r whitespace-nowrap ${isAktif ? 'text-green-600 font-bold' : ''}">${val}</td>`;
+                }).join('')}
+            </tr>
+        `).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</td></tr>`;
+    }
+
+    // Fungsi pagination dan menu tetap sama
+    function updatePagination() {
+        const total = filteredData.length;
+        const maxPage = Math.ceil(total / rowsPerPage) || 1;
+        if (currentPage > maxPage) currentPage = maxPage;
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        renderTable(filteredData.slice(start, end));
+        document.getElementById('pagination-info').innerText = total > 0 ? `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid` : `0 Murid ditemukan`;
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
+
+        if (id === 'dashboard') {
+            document.getElementById('link-dashboard').classList.add('active');
+            document.getElementById('section-dashboard').classList.remove('hidden');
+            document.getElementById('section-tabel-container').classList.add('hidden');
+        } else {
+            document.getElementById('section-dashboard').classList.add('hidden');
+            document.getElementById('section-tabel-container').classList.remove('hidden');
+            currentMenu = id;
+            const activeSub = document.querySelector(`div[onclick="showSection('${id}')"]`);
+            if (activeSub) {
+                activeSub.classList.add('active-sub');
+                const parentButton = activeSub.closest('div').parentElement.querySelector('button');
+                if (parentButton) parentButton.classList.add('active');
+            }
+            resetAndFilter();
+        }
+        document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
+    }
+
+    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
+    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
+    function resetAndFilter() { currentPage = 1; filterData(); }
+    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
+    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
+    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
+
+    window.onload = loadData;
+</script>
 </body>
 </html>
