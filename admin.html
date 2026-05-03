@@ -54,7 +54,7 @@
             </nav>
         </aside>
 
-        <!-- Main -->
+        <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-y-auto">
             <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
                 <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
@@ -68,7 +68,6 @@
             </header>
 
             <div class="p-6">
-                <!-- Section Data Murid Container -->
                 <div id="section-siswa-container" class="hidden space-y-4">
                     <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
                         <h3 id="siswa-table-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
@@ -115,10 +114,9 @@
         let rowsPerPage = 15;
         let currentSiswaSubMenu = 'siswa-pribadi';
 
-        // Mapping Kolom Berdasarkan Kebutuhan Bapak
         const colMap = {
             'nama': 'Nama Murid', 'kelas': 'Kls', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tgl Lahir', 'agama': 'Agama', 'akte': 'No. Akte',
+            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No. Akte',
             'disabilitas': 'Kebutuhan Khusus', 'nomor_kk': 'No. KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Saudara',
             'jns_tinggal': 'Jenis Tinggal', 'transportasi': 'Transportasi', 'jarak': 'Jarak', 'status_aktif': 'Status',
             'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
@@ -127,26 +125,22 @@
             'lintang': 'Lintang', 'bujur': 'Bujur', 'berat_badan': 'BB', 'tinggi_badan': 'TB', 'lingkar_kepala': 'Lingkar Kepala',
             'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal', 'hp': 'No HP', 'telp': 'Telp', 'email': 'Email'
         };
-// Fungsi konversi m/dd/yyyy -> d mmmm yyyy
-function formatTanggalIndo(dateStr) {
-    if (!dateStr || dateStr === '-') return '-';
-    
-    // Pecah data berdasarkan "/" (asumsi format m/d/yyyy)
-    const parts = dateStr.split('/');
-    if (parts.length !== 3) return dateStr; 
 
-    const bulanIndo = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
+        function formatTanggalIndo(dateStr) {
+            if (!dateStr || dateStr === '-') return '-';
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return dateStr; 
 
-    // dateStr m/d/yyyy -> parts[0]=bulan, parts[1]=tanggal, parts[2]=tahun
-    const bln = bulanIndo[parseInt(parts[0]) - 1];
-    const tgl = parts[1];
-    const thn = parts[2];
+            const bulanIndo = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            const bln = bulanIndo[parseInt(parts[0]) - 1];
+            const tgl = parts[1];
+            const thn = parts[2];
+            return `${tgl} ${bln} ${thn}`;
+        }
 
-    return `${tgl} ${bln} ${thn}`;
-}
         async function loadData() {
             try {
                 const res = await fetch(`${API_URL}?action=getAllData`);
@@ -164,7 +158,6 @@ function formatTanggalIndo(dateStr) {
             
             filteredSiswa = masterSiswa.filter(s => {
                 const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-                // Filter kelas menggunakan kolom BC (property 'kelas')
                 const matchKelas = kls === "" || (s.kelas || "").toString() === kls;
                 return matchNama && matchKelas;
             });
@@ -182,7 +175,6 @@ function formatTanggalIndo(dateStr) {
             const tbody = document.getElementById('table-siswa-body');
             let cols = [];
             
-            // Penyesuaian Kolom Sesuai Instruksi Terbaru
             switch(currentSiswaSubMenu) {
                 case 'siswa-pribadi': 
                     cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'akte', 'disabilitas', 'status_aktif']; 
@@ -191,51 +183,47 @@ function formatTanggalIndo(dateStr) {
                     cols = ['nama', 'kelas', 'nomor_kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; 
                     break;
                 case 'siswa-ortu': 
-                    cols = ['nama', 'kelas', 'ayah_nama', 'ayah_nik', 'ayah_pekerjaan', 'ibu_nama', 'ibu_nik', 'ibu_pekerjaan', 'status_aktif']; 
+                    cols = ['nama', 'kelas', 'ayah_nama', 'ibu_nama', 'status_aktif']; 
                     break;
                 case 'siswa-alamat': 
-                    cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'lintang', 'bujur', 'status_aktif']; 
+                    cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'status_aktif']; 
                     break;
                 case 'siswa-keadaan': 
-                    cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'kps', 'pip', 'no_kip', 'nama_kip', 'kks', 'alasan_pip', 'status_aktif']; 
+                    cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'pip', 'status_aktif']; 
                     break;
                 case 'siswa-periodik': 
-                    cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'status_aktif']; 
+                    cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'hobi', 'cita_cita', 'status_aktif']; 
                     break;
                 case 'siswa-kontak': 
-                    cols = ['nama', 'kelas', 'hp', 'telp', 'email', 'status_aktif']; 
+                    cols = ['nama', 'kelas', 'hp', 'email', 'status_aktif']; 
                     break;
             }
 
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
-            tbody.innerHTML = list.map(s => `
-                <tr class="hover:bg-blue-50 border-b">
-                    // Di dalam tbody.innerHTML = list.map(s => ...
-${cols.map(c => {
-    let val = s[c] || '-';
-    
-    // KHUSUS UNTUK TANGGAL LAHIR
-    if (c === 'tgl_lahir') {
-        val = formatTanggalIndo(val);
-    }
-    
-    if (c === 'status_aktif') {
-        const color = val.toLowerCase() === 'aktif' ? 'text-green-600' : 'text-red-500';
-        return `<td class="p-3 font-bold ${color}">${val}</td>`;
-    }
-    return `<td class="p-3 border-r whitespace-nowrap">${val}</td>`;
-}).join('')}
-                </tr>
-            `).join('');
+            
+            tbody.innerHTML = list.map(s => {
+                const rowContent = cols.map(c => {
+                    let val = s[c] || '-';
+                    if (c === 'tgl_lahir') val = formatTanggalIndo(val);
+                    
+                    if (c === 'status_aktif') {
+                        const color = val.toLowerCase() === 'aktif' ? 'text-green-600' : 'text-red-500';
+                        return `<td class="p-3 font-bold ${color}">${val}</td>`;
+                    }
+                    return `<td class="p-3 border-r whitespace-nowrap">${val}</td>`;
+                }).join('');
+                return `<tr class="hover:bg-blue-50 border-b">${rowContent}</tr>`;
+            }).join('');
         }
 
         function showSection(id) {
-            document.querySelectorAll('main > div > div').forEach(d => d.classList.add('hidden'));
             if (id.startsWith('siswa-')) {
                 currentSiswaSubMenu = id;
                 document.getElementById('section-siswa-container').classList.remove('hidden');
                 document.getElementById('siswa-table-title').innerText = id.replace(/-/g, ' ').toUpperCase();
                 resetAndFilter();
+            } else {
+                document.getElementById('section-siswa-container').classList.add('hidden');
             }
             document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
         }
