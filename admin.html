@@ -262,7 +262,7 @@
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
         'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
         'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
         'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
         'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
@@ -329,7 +329,7 @@
         // Perbaikan logika penentuan kolom
         switch(currentMenu) {
             case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'status_aktif']; break;
-            case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; break;
+            case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'saudara', 'jns_tinggal', 'status_aktif']; break;
             case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ibu_nama', 'wali_nama', 'status_aktif']; break;
             case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'status_aktif']; break;
             case 'siswa-keadaan': cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'pip', 'status_aktif']; break;
