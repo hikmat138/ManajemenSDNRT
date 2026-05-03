@@ -10,8 +10,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .submenu-link:hover { color: #2563eb; background-color: #f8fafc; }
+        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding: 0.5rem 0; }
+        .submenu-link:hover { color: #2563eb; }
         .hidden { display: none; }
         .overflow-x-auto::-webkit-scrollbar { height: 6px; }
         .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -24,7 +24,7 @@
         <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
             <div class="p-6">
                 <h1 class="text-xl font-bold text-blue-600 uppercase">SDN RANCA TALES</h1>
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Digitalisasi Sekolah</p>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">Digitalisasi Sekolah</p>
             </div>
             
             <nav class="flex-1 px-4 space-y-1">
@@ -32,6 +32,7 @@
                     <i class="fas fa-home mr-3 w-5"></i> Dashboard
                 </a>
 
+                <!-- Menu Data Murid -->
                 <div>
                     <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
                         <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i> Data Murid</span>
@@ -40,10 +41,23 @@
                     <div id="sub-murid" class="hidden space-y-1 mt-1">
                         <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Pribadi</div>
                         <div onclick="showSection('siswa-keluarga')" class="submenu-link">Data Keluarga</div>
+                        <div onclick="showSection('siswa-ortu')" class="submenu-link">Data Orang Tua</div>
                         <div onclick="showSection('siswa-alamat')" class="submenu-link">Data Alamat</div>
                         <div onclick="showSection('siswa-keadaan')" class="submenu-link">Data Keadaan</div>
-                        <div onclick="showSection('siswa-mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
-                        <div onclick="showSection('siswa-mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
+                        <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
+                        <div onclick="showSection('siswa-kontak')" class="submenu-link">Data Kontak</div>
+                    </div>
+                </div>
+
+                <!-- Menu Mutasi (Dipisah) -->
+                <div>
+                    <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                        <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div id="sub-mutasi" class="hidden space-y-1 mt-1">
+                        <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
+                        <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                     </div>
                 </div>
 
@@ -62,41 +76,46 @@
                         <p class="text-sm font-bold uppercase italic">HIKMATULLAH</p>
                         <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Administrator Sekolah</p>
                     </div>
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">H</div>
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase">H</div>
                 </div>
             </header>
 
             <div class="p-6">
-                <!-- Dashboard Section -->
+                <!-- Dashboard Statistics -->
                 <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="bg-white p-4 rounded-xl border shadow-sm">
-                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Murid</p>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
                         <h4 id="stat-murid" class="text-2xl font-bold text-blue-600">0</h4>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm">
-                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Guru</p>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
                         <h4 id="stat-guru" class="text-2xl font-bold text-green-600">0</h4>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm">
-                        <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
                         <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600">0</h4>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm">
-                        <p class="text-xs text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
                         <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600">0</h4>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm">
-                        <p class="text-xs text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
                         <h4 id="stat-keluar" class="text-2xl font-bold text-red-600">0</h4>
                     </div>
                 </div>
 
-                <!-- Table Section Container -->
-                <div id="section-siswa-container" class="hidden space-y-4 mt-6">
+                <!-- Table Section -->
+                <div id="section-tabel-container" class="hidden space-y-4 mt-6">
                     <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                        <h3 id="siswa-table-title" class="font-bold text-blue-600 uppercase text-sm">DATA</h3>
+                        <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA</h3>
                         <div class="flex gap-2">
-                            <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm outline-none bg-gray-50">
+                            <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
+                                <option value="10">10 Baris</option>
+                                <option value="50">50 Baris</option>
+                                <option value="100">100 Baris</option>
+                            </select>
+                            <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
                                 <option value="">Semua Kelas</option>
                                 <option value="1A">1A</option><option value="1B">1B</option>
                                 <option value="2A">2A</option><option value="2B">2B</option>
@@ -105,16 +124,24 @@
                                 <option value="5A">5A</option><option value="5B">5B</option>
                                 <option value="6A">6A</option><option value="6B">6B</option>
                             </select>
-                            <input type="text" id="search-siswa" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
+                            <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
                         </div>
                     </div>
 
                     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-[11px] text-left border-collapse">
-                                <thead id="table-siswa-head" class="bg-gray-100 border-b text-gray-600 uppercase font-bold"></thead>
-                                <tbody id="table-siswa-body" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                                <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold"></thead>
+                                <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
                             </table>
+                        </div>
+                        <!-- Pagination Control -->
+                        <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
+                            <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase"></div>
+                            <div class="flex gap-2">
+                                <button onclick="prevPage()" class="px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-100 text-xs">Prev</button>
+                                <button onclick="nextPage()" class="px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-100 text-xs">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -124,15 +151,22 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-        let masterSiswa = [];
-        let filteredSiswa = [];
-        let currentSiswaSubMenu = 'siswa-pribadi';
+        let masterData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        let rowsPerPage = 10;
+        let currentMenu = 'siswa-pribadi';
 
         const colMap = {
-            'nama': 'Nama Murid', 'kelas': 'Kelas', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'nomor_kk': 'Nomor KK', 'jumlah_saudara': 'Jml Saudara',
-            'lintang': 'Lintang', 'bujur': 'Bujur', 'status_aktif': 'Status', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar',
-            'alasan': 'Alasan', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW'
+            'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+            'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Kebutuhan Khusus',
+            'nomor_kk': 'No KK', 'anak_ke': 'Anak Ke', 'jumlah_saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+            'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+            'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+            'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
+            'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
+            'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
+            'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan'
         };
 
         function formatTanggalIndo(dateStr) {
@@ -143,8 +177,8 @@
                 if (parts.length === 3) date = new Date(parts[2], parts[0] - 1, parts[1]);
             }
             if (date instanceof Date && !isNaN(date)) {
-                const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                return `${date.getDate()} ${bulanIndo[date.getMonth()]} ${date.getFullYear()}`;
+                const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
             }
             return dateStr;
         }
@@ -154,44 +188,50 @@
                 const res = await fetch(`${API_URL}?action=getAllData`);
                 const result = await res.json();
                 if (result.status === "success") {
-                    masterSiswa = result.data.siswa || [];
-                    // Update Dashboard Stats
-                    document.getElementById('stat-murid').innerText = masterSiswa.filter(s => s.status_aktif === 'Aktif').length;
-                    document.getElementById('stat-masuk').innerText = masterSiswa.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-                    document.getElementById('stat-keluar').innerText = masterSiswa.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-                    filterSiswa();
+                    masterData = result.data.siswa || [];
+                    updateStats();
+                    filterData();
                 }
             } catch (e) { console.error(e); }
         }
 
-        function filterSiswa() {
-            const keyword = document.getElementById('search-siswa').value.toLowerCase();
+        function updateStats() {
+            document.getElementById('stat-murid').innerText = masterData.filter(s => s.status_aktif === 'Aktif').length;
+            document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+            document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+        }
+
+        function filterData() {
+            const keyword = document.getElementById('search-data').value.toLowerCase();
             const kls = document.getElementById('filter-kelas').value;
-            filteredSiswa = masterSiswa.filter(s => {
+            
+            filteredData = masterData.filter(s => {
                 const matchNama = (s.nama || "").toLowerCase().includes(keyword);
                 const matchKelas = kls === "" || (s.kelas || "").toString() === kls;
                 
-                // Logika Filter Tab Mutasi
-                if (currentSiswaSubMenu === 'siswa-mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-                if (currentSiswaSubMenu === 'siswa-mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+                if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+                if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
                 
                 return matchNama && matchKelas;
             });
-            renderTableSiswa(filteredSiswa);
+            updatePagination();
         }
 
-        function renderTableSiswa(list) {
-            const thead = document.getElementById('table-siswa-head');
-            const tbody = document.getElementById('table-siswa-body');
+        function renderTable(list) {
+            const thead = document.getElementById('thead-data');
+            const tbody = document.getElementById('tbody-data');
             let cols = [];
             
-            switch(currentSiswaSubMenu) {
-                case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'jk', 'tmpt_lahir', 'tgl_lahir', 'status_aktif']; break;
-                case 'siswa-keluarga': cols = ['nama', 'kelas', 'nomor_kk', 'jumlah_saudara', 'status_aktif']; break;
-                case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'lintang', 'bujur', 'status_aktif']; break;
-                case 'siswa-mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
-                case 'siswa-mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
-                default: cols = ['nama', 'kelas', 'status_aktif'];
+            switch(currentMenu) {
+                case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'akte', 'disabilitas', 'status_aktif']; break;
+                case 'siswa-keluarga': cols = ['nama', 'kelas', 'nomor_kk', 'anak_ke', 'jumlah_saudara', 'jns_tinggal', 'status_aktif']; break;
+                case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ayah_nik', 'ayah_pekerjaan', 'ayah_pendidikan', 'ayah_penghasilan', 'ayah_thn_lahir', 'ayah_disabilitas', 'ibu_nama', 'ibu_nik', 'ibu_pekerjaan', 'ibu_pendidikan', 'ibu_penghasilan', 'ibu_thn_lahir', 'ibu_disablilitas', 'wali_nama', 'status_aktif']; break;
+                case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'lintang', 'bujur', 'status_aktif']; break;
+                case 'siswa-keadaan': cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'kps', 'pip', 'no_kip', 'nama_kip', 'kks', 'alasan_pip', 'status_aktif']; break;
+                case 'siswa-periodik': cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'status_aktif']; break;
+                case 'siswa-kontak': cols = ['nama', 'kelas', 'hp', 'telp', 'email', 'status_aktif']; break;
+                case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
+                case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
             }
 
             thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
@@ -207,22 +247,39 @@
             `).join('');
         }
 
+        function updatePagination() {
+            const total = filteredData.length;
+            const maxPage = Math.ceil(total / rowsPerPage) || 1;
+            if (currentPage > maxPage) currentPage = maxPage;
+            
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            renderTable(filteredData.slice(start, end));
+            
+            document.getElementById('pagination-info').innerText = `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid`;
+        }
+
         function showSection(id) {
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
             if (id === 'dashboard') {
                 document.getElementById('section-dashboard').classList.remove('hidden');
-                document.getElementById('section-siswa-container').classList.add('hidden');
+                document.getElementById('section-tabel-container').classList.add('hidden');
+                updateStats();
             } else {
                 document.getElementById('section-dashboard').classList.add('hidden');
-                document.getElementById('section-siswa-container').classList.remove('hidden');
-                currentSiswaSubMenu = id;
-                filterSiswa();
+                document.getElementById('section-tabel-container').classList.remove('hidden');
+                currentMenu = id;
+                resetAndFilter();
             }
             document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
         }
 
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-        function resetAndFilter() { filterSiswa(); }
+        function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
+        function resetAndFilter() { currentPage = 1; filterData(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
+        function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
+
         window.onload = loadData;
     </script>
 </body>
