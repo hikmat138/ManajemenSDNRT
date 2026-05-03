@@ -7,15 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
-        .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-        .submenu-link { padding-left: 3rem; font-size: 0.85rem; color: #64748b; transition: all 0.2s; cursor: pointer; display: block; padding: 0.6rem 0; }
-        .submenu-link:hover { color: #2563eb; }
-        .hidden { display: none; }
-        .overflow-x-auto::-webkit-scrollbar { height: 6px; }
-        .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; overflow: hidden; }
+    
+    .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
+    
+    /* Perubahan di sini: Mengurangi padding-left agar lebih ke kiri */
+    .submenu-link { 
+        padding-left: 2.5rem; 
+        font-size: 0.8rem; 
+        color: #64748b; 
+        transition: all 0.2s; 
+        cursor: pointer; 
+        display: block; 
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-radius: 8px;
+        margin: 0 8px;
+    }
+    
+    .submenu-link:hover { 
+        color: #2563eb; 
+        background-color: #f8fafc;
+    }
+    
+    .hidden { display: none; }
+    .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+    .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
