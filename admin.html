@@ -10,7 +10,19 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; overflow: hidden; }
     
-    .sidebar-link.active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
+   /* Warna untuk Menu Utama yang Aktif */
+.sidebar-link.active { 
+    background-color: #eff6ff; 
+    color: #2563eb; 
+    border-right: 4px solid #2563eb; 
+}
+
+/* Warna untuk Sub-Menu yang Aktif */
+.submenu-link.active-sub {
+    color: #2563eb;
+    background-color: #f1f5f9;
+    font-weight: 700;
+}
     
     /* Perubahan di sini: Mengurangi padding-left agar lebih ke kiri */
     .submenu-link { 
@@ -299,20 +311,40 @@
         }
 
         function showSection(id) {
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            if (id === 'dashboard') {
-                document.getElementById('link-dashboard').classList.add('active');
-                document.getElementById('section-dashboard').classList.remove('hidden');
-                document.getElementById('section-tabel-container').classList.add('hidden');
-                updateStats();
-            } else {
-                document.getElementById('section-dashboard').classList.add('hidden');
-                document.getElementById('section-tabel-container').classList.remove('hidden');
-                currentMenu = id;
-                resetAndFilter();
+    // 1. Reset semua warna di menu utama dan sub-menu
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
+
+    if (id === 'dashboard') {
+        document.getElementById('link-dashboard').classList.add('active');
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        document.getElementById('section-tabel-container').classList.add('hidden');
+        updateStats();
+    } else {
+        document.getElementById('section-dashboard').classList.add('hidden');
+        document.getElementById('section-tabel-container').classList.remove('hidden');
+        
+        currentMenu = id;
+
+        // 2. Tandai Sub-Menu yang aktif (berdasarkan onclick)
+        // Kita cari elemen div yang memiliki atribut onclick sesuai ID section
+        const activeSub = document.querySelector(`div[onclick="showSection('${id}')"]`);
+        if (activeSub) {
+            activeSub.classList.add('active-sub');
+            
+            // 3. Cari menu utama (parent) agar tetap berwarna biru
+            const parentButton = activeSub.closest('div').parentElement.querySelector('button');
+            if (parentButton) {
+                parentButton.classList.add('active');
             }
-            document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
         }
+        
+        resetAndFilter();
+    }
+    
+    // Update Judul Header
+    document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
+}
 
         function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
         function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
