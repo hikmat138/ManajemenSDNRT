@@ -107,8 +107,8 @@
         <!-- Sidebar -->
         <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
             <div class="p-6">
-                <h1 class="text-xl font-bold text-blue-600 uppercase">SDN RANCA TALES</h1>
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">Digitalisasi Sekolah</p>
+                <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN MANAJAEMAN KELAS</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
             </div>
             
             <nav class="flex-1 px-4 space-y-1">
@@ -119,17 +119,11 @@
                 <!-- Data Murid -->
                 <div>
                     <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                        <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i> Data Murid</span>
+                        <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
                         <i class="fas fa-chevron-down text-[10px]"></i>
                     </button>
                     <div id="sub-murid" class="hidden space-y-1 mt-1">
-                        <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Pribadi</div>
-                        <div onclick="showSection('siswa-keluarga')" class="submenu-link">Data Keluarga</div>
-                        <div onclick="showSection('siswa-ortu')" class="submenu-link">Data Orang Tua</div>
-                        <div onclick="showSection('siswa-alamat')" class="submenu-link">Data Alamat</div>
-                        <div onclick="showSection('siswa-keadaan')" class="submenu-link">Data Keadaan</div>
-                        <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
-                        <div onclick="showSection('siswa-kontak')" class="submenu-link">Data Kontak</div>
+                        <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
                         <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
                         <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
                     </div>
@@ -156,8 +150,8 @@
         <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
         <div class="flex items-center space-x-3">
             <div class="text-right">
-                <p class="text-sm font-bold uppercase italic">HIKMATULLAH</p>
-                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Administrator Sekolah</p>
+                <p id= "admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
             </div>
             
             <!-- Dropdown Container -->
@@ -207,7 +201,7 @@
                 <!-- Table Section -->
                 <div id="section-tabel-container" class="hidden space-y-4 mt-6">
                     <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                        <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA</h3>
+                        <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA SISWA</h3>
                         <div class="flex gap-2 items-center">
                             <span class="text-[10px] font-bold text-gray-400 uppercase">Baris:</span>
                             <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
@@ -281,19 +275,36 @@
     }
 
     async function loadData() {
-        try {
-            const res = await fetch(`${API_URL}?action=getAllData`);
-            const result = await res.json();
-            if (result.status === "success") {
-                masterData = result.data.siswa || [];
-                updateStats();
-                filterData();
+    try {
+        const res = await fetch(`${API_URL}?action=getAllData`);
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            masterData = result.data.siswa || [];
+            
+            // MENGAMBIL NAMA DARI SHEET USERS
+            // Misal: mengambil data user pertama di array 'users'
+            const userData = result.data.users && result.data.users.length > 0 ? result.data.users[0] : null;
+            
+            if (userData && userData.nama) {
+                // Update Nama di Header
+                document.getElementById('admin-name').innerText = userData.nama;
+                
+                // Update Inisial di Lingkaran Biru (H)
+                const inisial = userData.nama.charAt(0).toUpperCase();
+                document.getElementById('userMenuBtn').innerText = inisial;
+            } else {
+                document.getElementById('admin-name').innerText = "ADMIN";
             }
-        } catch (e) { 
-            console.error(e);
-            document.getElementById('stat-murid').innerText = "Gagal";
+
+            updateStats();
+            filterData();
         }
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('admin-name').innerText = "Gagal Memuat";
     }
+}
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -328,13 +339,10 @@
         
         // Perbaikan logika penentuan kolom
         switch(currentMenu) {
-            case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'status_aktif']; break;
-            case 'siswa-keluarga': cols = ['nama', 'kelas', 'kk', 'anak_ke', 'saudara', 'jns_tinggal', 'status_aktif']; break;
-            case 'siswa-ortu': cols = ['nama', 'kelas', 'ayah_nama', 'ibu_nama', 'wali_nama', 'status_aktif']; break;
-            case 'siswa-alamat': cols = ['nama', 'kelas', 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'status_aktif']; break;
-            case 'siswa-keadaan': cols = ['nama', 'kelas', 'transportasi', 'jarak', 'kip', 'pip', 'status_aktif']; break;
-            case 'siswa-periodik': cols = ['nama', 'kelas', 'berat_badan', 'tinggi_badan', 'hobi', 'cita_cita', 'status_aktif']; break;
-            case 'siswa-kontak': cols = ['nama', 'kelas', 'hp', 'email', 'status_aktif']; break;
+            case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk', 'anak_ke', 'saudara', 'jns_tinggal',
+                                          'ayah_nama', 'ibu_nama', 'wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
+                                         'transportasi', 'jarak', 'kip', 'pip','berat_badan', 'tinggi_badan', 'hobi', 'cita_cita','hp', 'email',
+                                          'status_aktif', 'aksi']; break
             case 'siswa-registrasi': cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi']; break;
             case 'siswa-lulus': cols = ['nama', 'jk', 'thn_ajaran_lulus', 'sekolah_asal', 'status_aktif']; break;
             case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
