@@ -252,14 +252,14 @@
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
 
-    // Perbaikan colMap agar tidak error sintaks
+    // FIX: Menambahkan koma dan tanda kutip yang hilang
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
         'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
         'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
         'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah','ayah_thn_lahir':'Tahun Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu','ibu_thn_lahir':'Tahun lahir ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
+        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah','ayah_thn_lahir':'Tahun Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu','ibu_thn_lahir':'Tahun Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
         'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
         'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
@@ -267,7 +267,7 @@
     };
 
     function formatTanggalIndo(dateStr) {
-        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
+        if (!dateStr || dateStr === '-' || dateStr === 'undefined' || dateStr === "") return '-';
         let date = new Date(dateStr);
         if (isNaN(date.getTime())) return dateStr;
         const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -275,36 +275,27 @@
     }
 
     async function loadData() {
-    try {
-        const res = await fetch(`${API_URL}?action=getAllData`);
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            masterData = result.data.siswa || [];
+        try {
+            const res = await fetch(`${API_URL}?action=getAllData`);
+            const result = await res.json();
             
-            // MENGAMBIL NAMA DARI SHEET USERS
-            // Misal: mengambil data user pertama di array 'users'
-            const userData = result.data.users && result.data.users.length > 0 ? result.data.users[0] : null;
-            
-            if (userData && userData.nama) {
-                // Update Nama di Header
-                document.getElementById('admin-name').innerText = userData.nama;
+            if (result.status === "success") {
+                masterData = result.data.siswa || [];
                 
-                // Update Inisial di Lingkaran Biru (H)
-                const inisial = userData.nama.charAt(0).toUpperCase();
-                document.getElementById('userMenuBtn').innerText = inisial;
-            } else {
-                document.getElementById('admin-name').innerText = "ADMIN";
-            }
+                // Ambil Nama Admin dari response API (Sesuai kode .gs sebelumnya)
+                if (result.adminName) {
+                    document.getElementById('admin-name').innerText = result.adminName;
+                    document.getElementById('userMenuBtn').innerText = result.adminName.charAt(0).toUpperCase();
+                }
 
-            updateStats();
-            filterData();
+                updateStats();
+                filterData();
+            }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('admin-name').innerText = "Gagal Memuat";
         }
-    } catch (e) { 
-        console.error(e);
-        document.getElementById('admin-name').innerText = "Gagal Memuat";
     }
-}
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -325,7 +316,7 @@
             
             if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
             if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
+            if (currentMenu === 'siswa-lulus') return matchNama && String(s.status_aktif).toLowerCase() === 'lulus';
             
             return matchNama && matchKelas;
         });
@@ -337,18 +328,24 @@
         const tbody = document.getElementById('tbody-data');
         let cols = [];
         
-        // Perbaikan logika penentuan kolom
         switch(currentMenu) {
-            case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk', 'anak_ke', 'saudara', 'jns_tinggal',
-                                          'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' 'ibu_nama','ibu_nik','ibu_thn_lahir',
-                'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                                         'transportasi', 'jarak', 'kip', 'pip','berat_badan', 'tinggi_badan', 'hobi', 'cita_cita','hp', 'email',
-                                          'status_aktif', 'aksi']; break
-            case 'siswa-registrasi': cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi']; break;
-            case 'siswa-lulus': cols = ['nama', 'jk', 'thn_ajaran_lulus', 'sekolah_asal', 'status_aktif']; break;
-            case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
-            case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
-            default: cols = ['nama', 'kelas', 'status_aktif'];
+            case 'siswa-pribadi': 
+                cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'ayah_nama', 'ibu_nama', 'alamat', 'status_aktif', 'aksi']; 
+                break;
+            case 'siswa-registrasi': 
+                cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi']; 
+                break;
+            case 'siswa-lulus': 
+                cols = ['nama', 'jk', 'thn_ajaran_lulus', 'sekolah_asal', 'status_aktif']; 
+                break;
+            case 'mutasi-masuk': 
+                cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; 
+                break;
+            case 'mutasi-keluar': 
+                cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; 
+                break;
+            default: 
+                cols = ['nama', 'kelas', 'status_aktif'];
         }
 
         thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
@@ -356,15 +353,14 @@
         tbody.innerHTML = list.length > 0 ? list.map(s => `
             <tr class="hover:bg-blue-50 border-b">
                 ${cols.map(c => {
-                    // Di dalam renderTable, bagian c === 'aksi'
-if (c === 'aksi') {
-    return `<td class="p-3 border-r">
-        <div class="flex space-x-2">
-            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
-            <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
-        </div>
-    </td>`;
-}
+                    if (c === 'aksi') {
+                        return `<td class="p-3 border-r">
+                            <div class="flex space-x-2">
+                                <button onclick="openModal('${s.nama}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
+                                <button onclick="openModal('${s.nama}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
+                            </div>
+                        </td>`;
+                    }
                     let val = s[c] || '-';
                     if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
                     const isAktif = String(val).toLowerCase() === 'aktif';
@@ -374,7 +370,6 @@ if (c === 'aksi') {
         `).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</td></tr>`;
     }
 
-    // Fungsi pagination dan menu tetap sama
     function updatePagination() {
         const total = filteredData.length;
         const maxPage = Math.ceil(total / rowsPerPage) || 1;
@@ -398,11 +393,7 @@ if (c === 'aksi') {
             document.getElementById('section-tabel-container').classList.remove('hidden');
             currentMenu = id;
             const activeSub = document.querySelector(`div[onclick="showSection('${id}')"]`);
-            if (activeSub) {
-                activeSub.classList.add('active-sub');
-                const parentButton = activeSub.closest('div').parentElement.querySelector('button');
-                if (parentButton) parentButton.classList.add('active');
-            }
+            if (activeSub) activeSub.classList.add('active-sub');
             resetAndFilter();
         }
         document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
@@ -414,83 +405,69 @@ if (c === 'aksi') {
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
     function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
     function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
-let selectedMuridId = null;
-let currentActionType = '';
 
-function openModal(id, tipe) {
-    selectedMuridId = id;
-    currentActionType = tipe;
-    
-    // Cari data murid di masterData
-    const s = masterData.find(item => item.id == id);
-    if (!s) return;
+    let selectedMuridId = null;
 
-    // Isi data dasar
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    document.getElementById('modalAction').classList.remove('hidden');
+    function openModal(id, tipe) {
+        selectedMuridId = id;
+        const s = masterData.find(item => item.nama == id);
+        if (!s) return;
 
-    const header = document.getElementById('modalHeader');
-    const formMutasi = document.getElementById('form-mutasi');
-    const formLulus = document.getElementById('form-lulus');
-    const btn = document.getElementById('btnKonfirmasi');
+        document.getElementById('m-nama').innerText = s.nama;
+        document.getElementById('m-kelas').innerText = s.kelas;
+        document.getElementById('modalAction').classList.remove('hidden');
 
-    if (tipe === 'keluar') {
-        header.innerText = 'Konfirmasi Mutasi Keluar';
-        header.className = 'p-4 text-white font-bold uppercase text-center bg-orange-500';
-        btn.className = 'flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600';
-        formMutasi.classList.remove('hidden');
-        formLulus.classList.add('hidden');
-    } else {
-        header.innerText = 'Konfirmasi Kelulusan Murid';
-        header.className = 'p-4 text-white font-bold uppercase text-center bg-green-600';
-        btn.className = 'flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700';
-        document.getElementById('m-nis').innerText = s.nis || '-';
-        document.getElementById('m-nisn').innerText = s.nisn || '-';
-        formMutasi.classList.add('hidden');
-        formLulus.classList.remove('hidden');
+        const header = document.getElementById('modalHeader');
+        const formMutasi = document.getElementById('form-mutasi');
+        const formLulus = document.getElementById('form-lulus');
+        const btn = document.getElementById('btnKonfirmasi');
+
+        if (tipe === 'keluar') {
+            header.innerText = 'Konfirmasi Mutasi Keluar';
+            header.className = 'p-4 text-white font-bold uppercase text-center bg-orange-500';
+            btn.className = 'flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600';
+            formMutasi.classList.remove('hidden');
+            formLulus.classList.add('hidden');
+        } else {
+            header.innerText = 'Konfirmasi Kelulusan Murid';
+            header.className = 'p-4 text-white font-bold uppercase text-center bg-green-600';
+            btn.className = 'flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700';
+            document.getElementById('m-nis').innerText = s.nis || '-';
+            document.getElementById('m-nisn').innerText = s.nisn || '-';
+            formMutasi.classList.add('hidden');
+            formLulus.classList.remove('hidden');
+        }
+
+        btn.onclick = () => eksekusiAksi(tipe);
     }
 
-    // Set aksi tombol konfirmasi
-    btn.onclick = () => eksekusiAksi(tipe);
-}
-
-function closeModal() {
-    document.getElementById('modalAction').classList.add('hidden');
-    // Reset Input
-    document.getElementById('m-tujuan').value = '';
-    document.getElementById('m-tgl-keluar').value = '';
-    document.getElementById('m-ijazah').value = '';
-}
-
-function eksekusiAksi(tipe) {
-    const dataKirim = {
-        id: selectedMuridId,
-        tipe: tipe,
-        tujuan: document.getElementById('m-tujuan').value,
-        tgl: document.getElementById('m-tgl-keluar').value,
-        ijazah: document.getElementById('m-ijazah').value
-    };
-
-    if (tipe === 'keluar' && (!dataKirim.tujuan || !dataKirim.tgl)) {
-        alert('Mohon isi sekolah tujuan dan tanggal mutasi!');
-        return;
-    }
-    if (tipe === 'lulus' && !dataKirim.ijazah) {
-        alert('Mohon isi nomor ijazah!');
-        return;
+    function closeModal() {
+        document.getElementById('modalAction').classList.add('hidden');
     }
 
-    // Tampilkan Loading (Jika pakai library seperti Swal) atau alert biasa
-    console.log("Mengirim data ke GS:", dataKirim);
-    
-    // Panggil fungsi Google Apps Script
-    google.script.run.withSuccessHandler(function(res) {
-        alert('Data Murid Berhasil Diupdate!');
-        closeModal();
-        loadData(); // Refresh tabel
-    }).prosesMutasiRow(dataKirim);
-}
+    async function eksekusiAksi(tipe) {
+        const payload = {
+            id: selectedMuridId,
+            tipe: tipe,
+            tujuan: document.getElementById('m-tujuan').value,
+            tgl: document.getElementById('m-tgl-keluar').value,
+            ijazah: document.getElementById('m-ijazah').value
+        };
+
+        // Menggunakan fetch untuk mengirim data ke Apps Script
+        try {
+            const res = await fetch(`${API_URL}?action=prosesAksi&payload=${JSON.stringify(payload)}`);
+            const result = await res.json();
+            if (result.status === "success") {
+                alert('Berhasil: ' + result.message);
+                closeModal();
+                loadData();
+            }
+        } catch (e) {
+            alert('Gagal mengirim data. Pastikan API aktif.');
+        }
+    }
+
     window.onload = loadData;
 </script>
 </body>
