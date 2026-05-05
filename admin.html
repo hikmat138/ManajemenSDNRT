@@ -420,35 +420,39 @@ function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
     if (dataAktif.length === 0) return;
 
-    // --- 1. GRAFIK UMUR (Warna Beda & Persentase) ---
-    let kategoriUmur = { "< 7 Thn": 0, "7-12 Thn": 0, "> 12 Thn": 0 };
+    // --- 1. GRAFIK UMUR DETAIL ---
+    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
     dataAktif.forEach(s => {
-        const tahun = parseInt((s.umur || "0").split(' ')[0]);
-        if (tahun < 7) kategoriUmur["< 7 Thn"]++;
-        else if (tahun <= 12) kategoriUmur["7-12 Thn"]++;
-        else kategoriUmur["> 12 Thn"]++;
+        const thn = parseInt((s.umur || "0").split(' ')[0]);
+        if (thn < 7) katUmur["< 7"]++;
+        else if (thn < 8) katUmur["7-8"]++;
+        else if (thn < 9) katUmur["8-9"]++;
+        else if (thn < 10) katUmur["9-10"]++;
+        else if (thn < 11) katUmur["10-11"]++;
+        else if (thn < 12) katUmur["11-12"]++;
+        else katUmur["> 12"]++;
     });
-    // Merah untuk <7, Biru untuk 7-12, Kuning untuk >12
-    const warnaUmur = ['#ef4444', '#3b82f6', '#f59e0b']; 
-    renderChart('chartUmur', 'pie', 'Umur', Object.keys(kategoriUmur), Object.values(kategoriUmur), warnaUmur);
+    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
+    renderChart('chartUmur', 'pie', 'Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
 
-    // --- 2. GRAFIK AGAMA ---
+    // --- 2. GRAFIK AGAMA (Ubah ke Bar agar lebih jelas) ---
     const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
     let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
-    renderChart('chartAgama', 'doughnut', 'Agama', listAgama, dataAgama);
+    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
 
-    // --- 3. GRAFIK BULAN LAHIR ---
-    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    // --- 3. GRAFIK BULAN LAHIR (Mengisi kotak kosong) ---
+    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     let statsBulan = Array(12).fill(0);
     dataAktif.forEach(s => {
-        if (s.tanggal_lahir) {
-            const bln = new Date(s.tanggal_lahir).getMonth(); // Pastikan format tanggal valid
-            if (!isNaN(bln)) statsBulan[bln]++;
+        if (s.tgl_lahir && s.tgl_lahir !== '-') {
+            const d = new Date(s.tgl_lahir);
+            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
         }
     });
-    renderChart('chartBulan', 'bar', 'Jumlah Murid', namaBulan, statsBulan, '#8b5cf6', 10);
+    // Gunakan id 'chartBulan' atau sesuaikan dengan id canvas di kotak tengah bawah
+    renderChart('chartBulanLahir', 'bar', 'Kelahiran Murid', namaBulan, statsBulan, '#f43f5e', 20);
 
-    // --- 4. GRAFIK PEKERJAAN & PENGHASILAN (Skala 50-500) ---
+    // --- 4. PEKERJAAN & PENGHASILAN ---
     const helperCount = (arr) => arr.reduce((acc, val) => { 
         if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
         return acc; 
@@ -458,21 +462,19 @@ function initCharts() {
     renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
     const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilan', 'bar', 'Penghasilan', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
+    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
 
-    // --- 5. GRAFIK PENDIDIKAN ORTU ---
     const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
     renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
 }
-    function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = null) {
+    function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
     if (charts[canvasId]) charts[canvasId].destroy();
 
-    const isPieOrDoughnut = type === 'pie' || type === 'doughnut';
     const total = data.reduce((a, b) => a + b, 0);
 
-    const config = {
+    charts[canvasId] = new Chart(ctx, {
         type: type,
         data: {
             labels: labels,
@@ -485,29 +487,30 @@ function initCharts() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            let value = context.raw;
-                            let percentage = ((value / total) * 100).toFixed(1) + "%";
-                            return `${context.label}: ${value} (${percentage})`;
+                            let val = context.raw;
+                            let pct = total > 0 ? ((val / total) * 100).toFixed(1) + "%" : "0%";
+                            return `${context.label}: ${val} (${pct})`;
                         }
                     }
                 },
-                legend: { position: 'bottom', display: isPieOrDoughnut }
+                legend: { 
+                    display: type === 'pie' || type === 'doughnut',
+                    position: 'bottom' 
+                }
             },
-            scales: type === 'bar' ? {
+            scales: (type === 'bar' || type === 'line') ? {
                 y: {
                     beginAtZero: true,
-                    min: 0,
-                    max: 500, // Sesuai permintaan rentang sampai 500
-                    ticks: { stepSize: stepSize || 50 } // Lonjakan per 50
+                    ticks: { stepSize: stepSize }
                 }
             } : {}
         }
-    };
-    charts[canvasId] = new Chart(ctx, config);
+    });
 }
     function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
 </script>
