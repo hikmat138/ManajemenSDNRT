@@ -280,22 +280,32 @@
     }
 
     async function loadData() {
-        try {
-            const res = await fetch(`${API_URL}?action=getAllData`);
-            const result = await res.json();
-            if (result.status === "success") {
-                masterData = result.data.siswa || [];
-                // Update Nama Admin dinamis
-                const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
-                if (userData && userData.nama) {
-                    document.getElementById('admin-name').innerText = userData.nama;
-                    document.getElementById('userMenuBtn').innerText = userData.nama.charAt(0).toUpperCase();
-                }
-                updateStats();
-                filterData();
+    try {
+        const res = await fetch(`${API_URL}?action=getAllData`);
+        const result = await res.json();
+        if (result.status === "success") {
+            masterData = result.data.siswa || [];
+            
+            // Update Nama Admin
+            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
+            if (userData && userData.nama) {
+                document.getElementById('admin-name').innerText = userData.nama;
+                document.getElementById('userMenuBtn').innerText = userData.nama.charAt(0).toUpperCase();
             }
-        } catch (e) { console.error(e); }
+
+            updateStats();
+            filterData();
+            initCharts(); // Jalankan grafik SETELAH data masterData terisi
+        }
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('stat-murid').innerText = "Error";
     }
+}
+
+// Hapus pemanggilan initCharts() yang berdiri sendiri di luar
+// Cukup gunakan window.onload saja
+window.onload = loadData;
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
