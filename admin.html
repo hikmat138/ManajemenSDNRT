@@ -541,12 +541,14 @@ window.onload = loadData;
     let charts = {}; 
 function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    if (dataAktif.length === 0) return;
+    if (!masterData || masterData.length === 0) return;
 
     // --- 1. GRAFIK UMUR DETAIL ---
     let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
     dataAktif.forEach(s => {
+        if (!s.umur) return;
         const thn = parseInt((s.umur || "0").split(' ')[0]);
+        if (isNaN(thn)) return;
         if (thn < 7) katUmur["< 7"]++;
         else if (thn < 8) katUmur["7-8"]++;
         else if (thn < 9) katUmur["8-9"]++;
@@ -572,7 +574,7 @@ function initCharts() {
             if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
         }
     });
-    // Gunakan id 'chartBulan' atau sesuaikan dengan id canvas di kotak tengah bawah
+    // Gunakan id 'chartBulanLahir' atau sesuaikan dengan id canvas di kotak tengah bawah
     renderChart('chartBulanLahir', 'bar', 'Kelahiran Murid', namaBulan, statsBulan, '#f43f5e', 20);
 
     // --- 4. PEKERJAAN & PENGHASILAN ---
@@ -581,7 +583,7 @@ function initCharts() {
         return acc; 
     }, {});
 
-    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
+    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]).filter(val => val && val !== '-'));
     renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
     const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
