@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - SDN Ranca Tales</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -168,6 +169,14 @@
         <div class="flex-1 overflow-y-auto p-6">
             <!-- Stats -->
             <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartUmur"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPekerjaan"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartAgama"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPenghasilan"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartBulanLahir"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPendidikan"></canvas></div>
+</div>
                 <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
                     <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
                     <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
@@ -251,7 +260,8 @@
         'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi'
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 
+    'keterangan_siswa': 'Keterangan'
     };
 
     function formatTanggalIndo(dateStr) {
@@ -313,9 +323,9 @@
                     'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
                     'transportasi', 'jarak', 'kip', 'pip','alasan_pip', 'hp', 'email', 'status_aktif'];
         } else if (currentMenu === 'siswa-periodik') {
-            cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita'];
+            cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
         } else if (currentMenu === 'siswa-registrasi') {
-            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi'];
+            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk','keterangan_siswa', 'aksi'];
         } else if (currentMenu === 'siswa-lulus') {
             cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
         } else {
@@ -388,8 +398,65 @@
             document.getElementById('form-lulus').classList.remove('hidden');
         }
     }
-    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+    let charts = {}; 
+function initCharts() {
+    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
+    const helperCount = (arr) => arr.reduce((acc, val) => { acc[val] = (acc[val] || 0) + 1; return acc; }, {});
 
+    // 1. Umur per Kelas (Bar)
+    const labelsKelas = [...new Set(dataAktif.map(s => s.kelas))].sort();
+    const avgUmur = labelsKelas.map(k => {
+        const siswas = dataAktif.filter(s => s.kelas === k && s.umur);
+        return (siswas.reduce((sum, s) => sum + parseFloat(s.umur), 0) / (siswas.length || 1)).toFixed(1);
+    });
+    renderChart('chartUmur', 'bar', 'Rata-rata Umur per Kelas', labelsKelas, avgUmur, '#2563eb');
+
+    // 2. Pekerjaan Orang Tua (Pie)
+    const kerja = dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]).filter(v => v && v !== '-');
+    const cKerja = helperCount(kerja);
+    renderChart('chartPekerjaan', 'pie', 'Pekerjaan Orang Tua', Object.keys(cKerja), Object.values(cKerja));
+
+    // 3. Agama (Doughnut)
+    const cAgama = helperCount(dataAktif.map(s => s.agama).filter(v => v && v !== '-'));
+    renderChart('chartAgama', 'doughnut', 'Agama Murid', Object.keys(cAgama), Object.values(cAgama));
+
+    // 4. Penghasilan (Bar)
+    const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan).filter(v => v && v !== '-'));
+    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#f59e0b');
+
+    // 5. Bulan Lahir (Line)
+    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const cBulan = new Array(12).fill(0);
+    dataAktif.forEach(s => {
+        const d = new Date(s.tgl_lahir);
+        if(!isNaN(d.getTime())) cBulan[d.getMonth()]++;
+    });
+    renderChart('chartBulanLahir', 'line', 'Bulan Lahir Murid', namaBulan, cBulan, '#10b981');
+
+    // 6. Pendidikan (PolarArea)
+    const pddk = dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]).filter(v => v && v !== '-');
+    const cPddk = helperCount(pddk);
+    renderChart('chartPendidikan', 'polarArea', 'Pendidikan Orang Tua', Object.keys(cPddk), Object.values(cPddk));
+}
+
+function renderChart(id, type, label, labels, data, color) {
+    if(charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: type === 'bar' || type === 'line' ? color : ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                borderColor: 'white', borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }, title: { display: true, text: label } } }
+    });
+}
+    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+initCharts();
     window.onload = loadData;
 </script>
 </body>
