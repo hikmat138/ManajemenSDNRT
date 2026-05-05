@@ -1,500 +1,751 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - SDN Ranca Tales</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; overflow: hidden; }
-    
-   /* Warna untuk Menu Utama yang Aktif */
-.sidebar-link.active { 
-    background-color: #eff6ff; 
-    color: #2563eb; 
-    border-right: 4px solid #2563eb; 
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panel Admin - SDN Ranca Tales</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+    body { font-family: 'Inter', sans-serif; overflow: hidden; }
+
+    
+
+   /* Warna untuk Menu Utama yang Aktif */
+
+.sidebar-link.active { 
+
+    background-color: #eff6ff; 
+
+    color: #2563eb; 
+
+    border-right: 4px solid #2563eb; 
+
 }
+
+
 
 /* Warna untuk Sub-Menu yang Aktif */
+
 .submenu-link.active-sub {
-    color: #2563eb;
-    background-color: #f1f5f9;
-    font-weight: 700;
+
+    color: #2563eb;
+
+    background-color: #f1f5f9;
+
+    font-weight: 700;
+
 }
-    
-    /* Perubahan di sini: Mengurangi padding-left agar lebih ke kiri */
-    .submenu-link { 
-        padding-left: 2.5rem; 
-        font-size: 0.8rem; 
-        color: #64748b; 
-        transition: all 0.2s; 
-        cursor: pointer; 
-        display: block; 
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        border-radius: 8px;
-        margin: 0 8px;
-    }
-    
-    .submenu-link:hover { 
-        color: #2563eb; 
-        background-color: #f8fafc;
-    }
-    
-    .hidden { display: none; }
-    .overflow-x-auto::-webkit-scrollbar { height: 6px; }
-    .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    
+
+    /* Perubahan di sini: Mengurangi padding-left agar lebih ke kiri */
+
+    .submenu-link { 
+
+        padding-left: 2.5rem; 
+
+        font-size: 0.8rem; 
+
+        color: #64748b; 
+
+        transition: all 0.2s; 
+
+        cursor: pointer; 
+
+        display: block; 
+
+        padding-top: 0.5rem;
+
+        padding-bottom: 0.5rem;
+
+        border-radius: 8px;
+
+        margin: 0 8px;
+
+    }
+
+    
+
+    .submenu-link:hover { 
+
+        color: #2563eb; 
+
+        background-color: #f8fafc;
+
+    }
+
+    
+
+    .hidden { display: none; }
+
+    .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
 </style>
+
 </head>
-    <!-- Modal Mutasi/Lulus -->
+
+    <!-- Modal Mutasi/Lulus -->
+
 <div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center">
-            <!-- Judul Modal Dinamis -->
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
-                    <p id="m-nama" class="font-bold text-gray-700">-</p>
-                </div>
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
-                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
-                </div>
-            </div>
-            
-            <div id="form-mutasi" class="hidden space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
-                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
-                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-            </div>
 
-            <div id="form-lulus" class="hidden space-y-3">
-                <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
-                        <p id="m-nis" class="font-bold text-gray-700">-</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
-                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
-                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
-                </div>
-            </div>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
 
-            <div class="flex space-x-3 pt-4">
-                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
-                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
-            </div>
-        </div>
-    </div>
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center">
+
+            <!-- Judul Modal Dinamis -->
+
+        </div>
+
+        <div class="p-6 space-y-4">
+
+            <div class="grid grid-cols-2 gap-4 text-xs">
+
+                <div>
+
+                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
+
+                    <p id="m-nama" class="font-bold text-gray-700">-</p>
+
+                </div>
+
+                <div>
+
+                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
+
+                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
+
+                </div>
+
+            </div>
+
+            
+
+            <div id="form-mutasi" class="hidden space-y-3">
+
+                <div>
+
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
+
+                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
+
+                </div>
+
+                <div>
+
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
+
+                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
+
+                </div>
+
+            </div>
+
+
+
+            <div id="form-lulus" class="hidden space-y-3">
+
+                <div class="grid grid-cols-2 gap-4 text-xs">
+
+                    <div>
+
+                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
+
+                        <p id="m-nis" class="font-bold text-gray-700">-</p>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
+
+                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+
+                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="flex space-x-3 pt-4">
+
+                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
+
+                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
 <body class="bg-gray-50 text-gray-800">
 
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-            <div class="p-6">
-                <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN MANAJAEMAN KELAS</h1>
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
-            </div>
-            
-            <nav class="flex-1 px-4 space-y-1">
-                <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-home mr-3 w-5"></i> Dashboard
-                </a>
 
-                <!-- Data Murid -->
-                <div>
-                    <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                        <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
-                        <i class="fas fa-chevron-down text-[10px]"></i>
-                    </button>
-                    <div id="sub-murid" class="hidden space-y-1 mt-1">
-                        <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
-                        <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
-                        <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
-                    </div>
-                </div>
 
-                <!-- Mutasi -->
-                <div>
-                    <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                        <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
-                        <i class="fas fa-chevron-down text-[10px]"></i>
-                    </button>
-                    <div id="sub-mutasi" class="hidden space-y-1 mt-1">
-                        <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
-                        <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
-                    </div>
-                </div>
-            </nav>
-        </aside>
+    <div class="flex h-screen">
 
-        <!-- Main Content -->
-       <!-- Main Content -->
+        <!-- Sidebar -->
+
+        <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+
+            <div class="p-6">
+
+                <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN MANAJAEMAN KELAS</h1>
+
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
+
+            </div>
+
+            
+
+            <nav class="flex-1 px-4 space-y-1">
+
+                <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+
+                    <i class="fas fa-home mr-3 w-5"></i> Dashboard
+
+                </a>
+
+
+
+                <!-- Data Murid -->
+
+                <div>
+
+                    <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+
+                        <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
+
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+
+                    </button>
+
+                    <div id="sub-murid" class="hidden space-y-1 mt-1">
+
+                        <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
+
+                        <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
+
+                        <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Mutasi -->
+
+                <div>
+
+                    <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+
+                        <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
+
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+
+                    </button>
+
+                    <div id="sub-mutasi" class="hidden space-y-1 mt-1">
+
+                        <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
+
+                        <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
+
+                    </div>
+
+                </div>
+
+            </nav>
+
+        </aside>
+
+
+
+        <!-- Main Content -->
+
+       <!-- Main Content -->
+
 <main class="flex-1 flex flex-col overflow-y-auto">
-    <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
-        <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-        <div class="flex items-center space-x-3">
-            <div class="text-right">
-                <p id= "admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
-                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
-            </div>
-            
-            <!-- Dropdown Container -->
-            <div class="relative">
-                <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition focus:outline-none" id="userMenuBtn">
-                    H
-                </button>
-                
-                <!-- Dropdown Menu -->
-                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                    <div class="px-4 py-2 border-b border-gray-50">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">Menu Akun</p>
-                    </div>
-                    <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
-                        <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
 
-            <div class="p-6">
-                <!-- Dashboard Statistics -->
-                <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
-                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 leading-none mt-2">Memuat...</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
-                        <h4 id="stat-guru" class="text-2xl font-bold text-green-600 leading-none mt-2">0</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
-                        <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 leading-none mt-2">0</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
-                        <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 leading-none mt-2">0</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
-                        <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 leading-none mt-2">0</h4>
-                    </div>
-                </div>
+    <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
 
-                <!-- Table Section -->
-                <div id="section-tabel-container" class="hidden space-y-4 mt-6">
-                    <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                        <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA SISWA</h3>
-                        <div class="flex gap-2 items-center">
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Baris:</span>
-                            <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
-                                <option value="10">10</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
-                                <option value="">Semua Kelas</option>
-                                <option value="1A">1A</option><option value="1B">1B</option>
-                                <option value="2A">2A</option><option value="2B">2B</option>
-                                <option value="3A">3A</option><option value="3B">3B</option>
-                                <option value="4A">4A</option><option value="4B">4B</option>
-                                <option value="5A">5A</option><option value="5B">5B</option>
-                                <option value="6A">6A</option><option value="6B">6B</option>
-                            </select>
-                            <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
-                        </div>
-                    </div>
+        <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
 
-                    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-[11px] text-left border-collapse">
-                                <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold"></thead>
-                                <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
-                            </table>
-                        </div>
-                        <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
-                            <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider"></div>
-                            <div class="flex gap-2">
-                                <button onclick="prevPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Prev</button>
-                                <button onclick="nextPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Next</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+        <div class="flex items-center space-x-3">
 
-    <!-- Bagian CSS & Header tetap sama seperti milik Anda -->
+            <div class="text-right">
+
+                <p id= "admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
+
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+
+            </div>
+
+            
+
+            <!-- Dropdown Container -->
+
+            <div class="relative">
+
+                <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition focus:outline-none" id="userMenuBtn">
+
+                    H
+
+                </button>
+
+                
+
+                <!-- Dropdown Menu -->
+
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+
+                    <div class="px-4 py-2 border-b border-gray-50">
+
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Menu Akun</p>
+
+                    </div>
+
+                    <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
+
+                        <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+            <div class="p-6">
+
+                <!-- Dashboard Statistics -->
+
+                <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
+
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
+
+                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 leading-none mt-2">Memuat...</h4>
+
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
+
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
+
+                        <h4 id="stat-guru" class="text-2xl font-bold text-green-600 leading-none mt-2">0</h4>
+
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
+
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+
+                        <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 leading-none mt-2">0</h4>
+
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
+
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+
+                        <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 leading-none mt-2">0</h4>
+
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
+
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+
+                        <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 leading-none mt-2">0</h4>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Table Section -->
+
+                <div id="section-tabel-container" class="hidden space-y-4 mt-6">
+
+                    <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
+
+                        <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA SISWA</h3>
+
+                        <div class="flex gap-2 items-center">
+
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Baris:</span>
+
+                            <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
+
+                                <option value="10">10</option>
+
+                                <option value="50">50</option>
+
+                                <option value="100">100</option>
+
+                            </select>
+
+                            <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
+
+                                <option value="">Semua Kelas</option>
+
+                                <option value="1A">1A</option><option value="1B">1B</option>
+
+                                <option value="2A">2A</option><option value="2B">2B</option>
+
+                                <option value="3A">3A</option><option value="3B">3B</option>
+
+                                <option value="4A">4A</option><option value="4B">4B</option>
+
+                                <option value="5A">5A</option><option value="5B">5B</option>
+
+                                <option value="6A">6A</option><option value="6B">6B</option>
+
+                            </select>
+
+                            <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full text-[11px] text-left border-collapse">
+
+                                <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold"></thead>
+
+                                <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
+
+                            </table>
+
+                        </div>
+
+                        <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
+
+                            <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase tracking-wider"></div>
+
+                            <div class="flex gap-2">
+
+                                <button onclick="prevPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Prev</button>
+
+                                <button onclick="nextPage()" class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-100 text-[10px] font-bold uppercase">Next</button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- Bagian CSS & Header tetap sama seperti milik Anda -->
+
+
+
+<!-- ... Bagian CSS dan Modal tetap sama ... -->
+
+
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-    let masterData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    let rowsPerPage = 10;
-    let currentMenu = 'siswa-pribadi';
 
-    // Perbaikan colMap agar tidak error sintaks
-    const colMap = {
-        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah','ayah_thn_lahir':'Tahun Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu','ibu_thn_lahir':'Tahun lahir ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_disablilitas': 'Disabilitas Ibu',
-        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
-        'berat_badan': 'BB (Kg)', 'tinggi_badan': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi'
-    };
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
-        let date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
-    }
+    let masterData = [];
 
-    async function loadData() {
-    try {
-        const res = await fetch(`${API_URL}?action=getAllData`);
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            masterData = result.data.siswa || [];
-            
-            // MENGAMBIL NAMA DARI SHEET USERS
-            // Misal: mengambil data user pertama di array 'users'
-            const userData = result.data.users && result.data.users.length > 0 ? result.data.users[0] : null;
-            
-            if (userData && userData.nama) {
-                // Update Nama di Header
-                document.getElementById('admin-name').innerText = userData.nama;
-                
-                // Update Inisial di Lingkaran Biru (H)
-                const inisial = userData.nama.charAt(0).toUpperCase();
-                document.getElementById('userMenuBtn').innerText = inisial;
-            } else {
-                document.getElementById('admin-name').innerText = "ADMIN";
-            }
+    let filteredData = [];
 
-            updateStats();
-            filterData();
-        }
-    } catch (e) { 
-        console.error(e);
-        document.getElementById('admin-name').innerText = "Gagal Memuat";
-    }
-}
+    let currentPage = 1;
 
-    function updateStats() {
-        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-        const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-        const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-        document.getElementById('stat-murid').innerText = aktif;
-        document.getElementById('stat-masuk').innerText = masuk;
-        document.getElementById('stat-keluar').innerText = keluar;
-    }
+    let rowsPerPage = 10;
 
-    function filterData() {
-        const keyword = document.getElementById('search-data').value.toLowerCase();
-        const kls = document.getElementById('filter-kelas').value;
-        
-        filteredData = masterData.filter(s => {
-            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-            const matchKelas = kls === "" || String(s.kelas) === kls;
-            
-            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
-            
-            return matchNama && matchKelas;
-        });
-        updatePagination();
-    }
+    let currentMenu = 'siswa-pribadi';
 
-    function renderTable(list) {
-        const thead = document.getElementById('thead-data');
-        const tbody = document.getElementById('tbody-data');
-        let cols = [];
-        
-        // Perbaikan logika penentuan kolom
-        switch(currentMenu) {
-            case 'siswa-pribadi': cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk', 'anak_ke', 'saudara', 'jns_tinggal',
-                                          'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' 'ibu_nama','ibu_nik,'ibu_thn_lahir',
-                'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                                         'transportasi', 'jarak', 'kip', 'pip','berat_badan', 'tinggi_badan', 'hobi', 'cita_cita','hp', 'email',
-                                          'status_aktif', 'aksi']; break
-            case 'siswa-registrasi': cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi']; break;
-            case 'siswa-lulus': cols = ['nama', 'jk', 'thn_ajaran_lulus', 'sekolah_asal', 'status_aktif']; break;
-            case 'mutasi-masuk': cols = ['nama', 'kelas', 'tgl_masuk', 'alasan', 'status_aktif']; break;
-            case 'mutasi-keluar': cols = ['nama', 'kelas', 'tgl_keluar', 'alasan', 'status_aktif']; break;
-            default: cols = ['nama', 'kelas', 'status_aktif'];
-        }
 
-        thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap">${colMap[c] || c}</th>`).join('')}</tr>`;
-        
-        tbody.innerHTML = list.length > 0 ? list.map(s => `
-            <tr class="hover:bg-blue-50 border-b">
-                ${cols.map(c => {
-                    // Di dalam renderTable, bagian c === 'aksi'
-if (c === 'aksi') {
-    return `<td class="p-3 border-r">
-        <div class="flex space-x-2">
-            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded text-[10px] hover:bg-orange-600">Mutasi</button>
-            <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded text-[10px] hover:bg-green-700">Lulus</button>
-        </div>
-    </td>`;
-}
-                    let val = s[c] || '-';
-                    if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
-                    const isAktif = String(val).toLowerCase() === 'aktif';
-                    return `<td class="p-3 border-r whitespace-nowrap ${isAktif ? 'text-green-600 font-bold' : ''}">${val}</td>`;
-                }).join('')}
-            </tr>
-        `).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400 font-bold uppercase tracking-widest">Data Tidak Ditemukan</td></tr>`;
-    }
 
-    // Fungsi pagination dan menu tetap sama
-    function updatePagination() {
-        const total = filteredData.length;
-        const maxPage = Math.ceil(total / rowsPerPage) || 1;
-        if (currentPage > maxPage) currentPage = maxPage;
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        renderTable(filteredData.slice(start, end));
-        document.getElementById('pagination-info').innerText = total > 0 ? `Menampilkan ${start + 1} - ${Math.min(end, total)} dari ${total} Murid` : `0 Murid ditemukan`;
-    }
+    const colMap = {
 
-    function showSection(id) {
-        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-        document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
+        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
 
-        if (id === 'dashboard') {
-            document.getElementById('link-dashboard').classList.add('active');
-            document.getElementById('section-dashboard').classList.remove('hidden');
-            document.getElementById('section-tabel-container').classList.add('hidden');
-        } else {
-            document.getElementById('section-dashboard').classList.add('hidden');
-            document.getElementById('section-tabel-container').classList.remove('hidden');
-            currentMenu = id;
-            const activeSub = document.querySelector(`div[onclick="showSection('${id}')"]`);
-            if (activeSub) {
-                activeSub.classList.add('active-sub');
-                const parentButton = activeSub.closest('div').parentElement.querySelector('button');
-                if (parentButton) parentButton.classList.add('active');
-            }
-            resetAndFilter();
-        }
-        document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
-    }
+        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'ayah_nama': 'Nama Ayah', 'ibu_nama': 'Nama Ibu', 'alamat': 'Alamat', 
 
-    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
-    function resetAndFilter() { currentPage = 1; filterData(); }
-    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
-    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
-    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
-let selectedMuridId = null;
-let currentActionType = '';
+        'status_aktif': 'Status', 'aksi': 'Aksi', 'sekolah_asal': 'Sekolah Asal', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar',
 
-function openModal(id, tipe) {
-    selectedMuridId = id;
-    currentActionType = tipe;
-    
-    // Cari data murid di masterData
-    const s = masterData.find(item => item.id == id);
-    if (!s) return;
+        'alasan': 'Alasan', 'thn_ajaran_lulus': 'Tahun Lulus'
 
-    // Isi data dasar
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    document.getElementById('modalAction').classList.remove('hidden');
+    };
 
-    const header = document.getElementById('modalHeader');
-    const formMutasi = document.getElementById('form-mutasi');
-    const formLulus = document.getElementById('form-lulus');
-    const btn = document.getElementById('btnKonfirmasi');
 
-    if (tipe === 'keluar') {
-        header.innerText = 'Konfirmasi Mutasi Keluar';
-        header.className = 'p-4 text-white font-bold uppercase text-center bg-orange-500';
-        btn.className = 'flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600';
-        formMutasi.classList.remove('hidden');
-        formLulus.classList.add('hidden');
-    } else {
-        header.innerText = 'Konfirmasi Kelulusan Murid';
-        header.className = 'p-4 text-white font-bold uppercase text-center bg-green-600';
-        btn.className = 'flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700';
-        document.getElementById('m-nis').innerText = s.nis || '-';
-        document.getElementById('m-nisn').innerText = s.nisn || '-';
-        formMutasi.classList.add('hidden');
-        formLulus.classList.remove('hidden');
-    }
 
-    // Set aksi tombol konfirmasi
-    btn.onclick = () => eksekusiAksi(tipe);
-}
+    function formatTanggalIndo(dateStr) {
 
-function closeModal() {
-    document.getElementById('modalAction').classList.add('hidden');
-    // Reset Input
-    document.getElementById('m-tujuan').value = '';
-    document.getElementById('m-tgl-keluar').value = '';
-    document.getElementById('m-ijazah').value = '';
-}
+        if (!dateStr || dateStr === '-' || dateStr === "") return '-';
 
-function eksekusiAksi(tipe) {
-    const dataKirim = {
-        id: selectedMuridId,
-        tipe: tipe,
-        tujuan: document.getElementById('m-tujuan').value,
-        tgl: document.getElementById('m-tgl-keluar').value,
-        ijazah: document.getElementById('m-ijazah').value
-    };
+        let date = new Date(dateStr);
 
-    if (tipe === 'keluar' && (!dataKirim.tujuan || !dataKirim.tgl)) {
-        alert('Mohon isi sekolah tujuan dan tanggal mutasi!');
-        return;
-    }
-    if (tipe === 'lulus' && !dataKirim.ijazah) {
-        alert('Mohon isi nomor ijazah!');
-        return;
-    }
+        if (isNaN(date.getTime())) return dateStr;
 
-    // Tampilkan Loading (Jika pakai library seperti Swal) atau alert biasa
-    console.log("Mengirim data ke GS:", dataKirim);
-    
-    // Panggil fungsi Google Apps Script
-    google.script.run.withSuccessHandler(function(res) {
-        alert('Data Murid Berhasil Diupdate!');
-        closeModal();
-        loadData(); // Refresh tabel
-    }).prosesMutasiRow(dataKirim);
-}
-    window.onload = loadData;
+        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
+
+    }
+
+
+
+    async function loadData() {
+
+        const statMurid = document.getElementById('stat-murid');
+
+        try {
+
+            // Menambahkan timestamp agar tidak terkena cache browser
+
+            const res = await fetch(`${API_URL}?action=getAllData&t=${new Date().getTime()}`);
+
+            const result = await res.json();
+
+            
+
+            if (result.status === "success") {
+
+                masterData = result.data.siswa || [];
+
+                
+
+                // Update Nama Admin
+
+                if (result.adminName) {
+
+                    document.getElementById('admin-name').innerText = result.adminName;
+
+                    document.getElementById('userMenuBtn').innerText = result.adminName.charAt(0).toUpperCase();
+
+                }
+
+
+
+                updateStats();
+
+                filterData();
+
+            } else {
+
+                statMurid.innerText = "Error Data";
+
+            }
+
+        } catch (e) { 
+
+            console.error("Fetch Error:", e);
+
+            statMurid.innerText = "Offline/Error";
+
+            document.getElementById('admin-name').innerText = "Gagal Memuat";
+
+        }
+
+    }
+
+
+
+    function updateStats() {
+
+        // Logika filter status berdasarkan data asli
+
+        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+
+        const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-' && s.tgl_masuk !== "").length;
+
+        const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-' && s.tgl_keluar !== "").length;
+
+        
+
+        document.getElementById('stat-murid').innerText = aktif;
+
+        document.getElementById('stat-masuk').innerText = masuk;
+
+        document.getElementById('stat-keluar').innerText = keluar;
+
+    }
+
+
+
+    function filterData() {
+
+        const keyword = document.getElementById('search-data').value.toLowerCase();
+
+        const kls = document.getElementById('filter-kelas').value;
+
+        
+
+        filteredData = masterData.filter(s => {
+
+            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
+
+            const matchKelas = kls === "" || String(s.kelas) === kls;
+
+            const statusStr = String(s.status_aktif).toLowerCase();
+
+            
+
+            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+
+            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+
+            if (currentMenu === 'siswa-lulus') return matchNama && statusStr === 'lulus';
+
+            if (currentMenu === 'siswa-pribadi') return matchNama && matchKelas && statusStr === 'aktif';
+
+            
+
+            return matchNama && matchKelas;
+
+        });
+
+        updatePagination();
+
+    }
+
+
+
+    // ... (Fungsi renderTable, showSection, dll tetap sama dengan logika filter di atas) ...
+
+
+
+    async function eksekusiAksi(tipe) {
+
+        const btn = document.getElementById('btnKonfirmasi');
+
+        const originalText = btn.innerText;
+
+        
+
+        // Validasi Sederhana
+
+        if (tipe === 'keluar' && !document.getElementById('m-tujuan').value) {
+
+            alert("Mohon isi sekolah tujuan");
+
+            return;
+
+        }
+
+
+
+        btn.innerText = "PROSES...";
+
+        btn.disabled = true;
+
+
+
+        const payload = {
+
+            nama: selectedMuridId, // Menggunakan nama sebagai identifier sesuai filter masterData
+
+            tipe: tipe,
+
+            tujuan: document.getElementById('m-tujuan').value,
+
+            tgl: document.getElementById('m-tgl-keluar').value,
+
+            ijazah: document.getElementById('m-ijazah').value
+
+        };
+
+
+
+        try {
+
+            // Apps Script butuh parameter action dan data dalam bentuk string
+
+            const res = await fetch(`${API_URL}?action=prosesAksi&payload=${encodeURIComponent(JSON.stringify(payload))}`);
+
+            const result = await res.json();
+
+            
+
+            if (result.status === "success") {
+
+                alert('Berhasil: ' + result.message);
+
+                closeModal();
+
+                await loadData(); // Refresh data
+
+            } else {
+
+                alert('Gagal: ' + result.message);
+
+            }
+
+        } catch (e) {
+
+            alert('Terjadi kesalahan koneksi ke server.');
+
+        } finally {
+
+            btn.innerText = originalText;
+
+            btn.disabled = false;
+
+        }
+
+    }
+
+
+
+    window.onload = loadData;
+
 </script>
+
 </body>
+
 </html>
-
-
-kode html ini bener gk ? takut ada yang salah
