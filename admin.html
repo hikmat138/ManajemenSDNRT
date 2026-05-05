@@ -417,61 +417,60 @@ window.onload = loadData;
     }
     let charts = {}; 
 function initCharts() {
-    // Filter hanya murid yang aktif di SD Negeri Ranca Tales
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    
-    if (dataAktif.length === 0) return; // Jangan render jika data kosong
+    if (dataAktif.length === 0) return;
 
-    const totalSiswa = dataAktif.length;
-    let kategoriUmur = {
-        "< 7 Thn": 0, "7-8 Thn": 0, "8-9 Thn": 0, "9-10 Thn": 0, 
-        "10-11 Thn": 0, "11-12 Thn": 0, "> 12 Thn": 0
-    };
-
+    // --- 1. GRAFIK UMUR (Warna Beda & Persentase) ---
+    let kategoriUmur = { "< 7 Thn": 0, "7-12 Thn": 0, "> 12 Thn": 0 };
     dataAktif.forEach(s => {
-        const teksUmur = s.umur || ""; 
-        const tahun = parseInt(teksUmur.split(' ')[0]); 
+        const tahun = parseInt((s.umur || "0").split(' ')[0]);
+        if (tahun < 7) kategoriUmur["< 7 Thn"]++;
+        else if (tahun <= 12) kategoriUmur["7-12 Thn"]++;
+        else kategoriUmur["> 12 Thn"]++;
+    });
+    // Merah untuk <7, Biru untuk 7-12, Kuning untuk >12
+    const warnaUmur = ['#ef4444', '#3b82f6', '#f59e0b']; 
+    renderChart('chartUmur', 'pie', 'Umur', Object.keys(kategoriUmur), Object.values(kategoriUmur), warnaUmur);
 
-        if (!isNaN(tahun)) {
-            if (tahun < 7) kategoriUmur["< 7 Thn"]++;
-            else if (tahun < 8) kategoriUmur["7-8 Thn"]++;
-            else if (tahun < 9) kategoriUmur["8-9 Thn"]++;
-            else if (tahun < 10) kategoriUmur["9-10 Thn"]++;
-            else if (tahun < 11) kategoriUmur["10-11 Thn"]++;
-            else if (tahun <= 12) kategoriUmur["11-12 Thn"]++;
-            else kategoriUmur["> 12 Thn"]++;
+    // --- 2. GRAFIK AGAMA ---
+    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
+    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
+    renderChart('chartAgama', 'doughnut', 'Agama', listAgama, dataAgama);
+
+    // --- 3. GRAFIK BULAN LAHIR ---
+    const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let statsBulan = Array(12).fill(0);
+    dataAktif.forEach(s => {
+        if (s.tanggal_lahir) {
+            const bln = new Date(s.tanggal_lahir).getMonth(); // Pastikan format tanggal valid
+            if (!isNaN(bln)) statsBulan[bln]++;
         }
     });
+    renderChart('chartBulan', 'bar', 'Jumlah Murid', namaBulan, statsBulan, '#8b5cf6', 10);
 
-    // Render Umur
-    renderChart('chartUmur', 'pie', 'Umur Murid (%)', Object.keys(kategoriUmur), Object.values(kategoriUmur).map(v => ((v/totalSiswa)*100).toFixed(1)));
-
+    // --- 4. GRAFIK PEKERJAAN & PENGHASILAN (Skala 50-500) ---
     const helperCount = (arr) => arr.reduce((acc, val) => { 
         if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
         return acc; 
     }, {});
 
-    // Pekerjaan (Ayah & Ibu)
-    const kerja = dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]);
-    const cKerja = helperCount(kerja);
-    renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb');
+    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
+    renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
-    // Agama
-    const cAgama = helperCount(dataAktif.map(s => s.agama));
-    renderChart('chartAgama', 'doughnut', 'Agama', Object.keys(cAgama), Object.values(cAgama));
-
-    // Penghasilan
     const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#f59e0b');
+    renderChart('chartPenghasilan', 'bar', 'Penghasilan', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
+
+    // --- 5. GRAFIK PENDIDIKAN ORTU ---
+    const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
+    renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
 }
-    function renderChart(canvasId, type, label, labels, data, bgColor) {
+    function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = null) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    if (charts[canvasId]) charts[canvasId].destroy();
 
-    // Hancurkan chart lama jika sudah ada (agar tidak tumpang tindih saat refresh)
-    if (charts[canvasId]) {
-        charts[canvasId].destroy();
-    }
+    const isPieOrDoughnut = type === 'pie' || type === 'doughnut';
+    const total = data.reduce((a, b) => a + b, 0);
 
     const config = {
         type: type,
@@ -480,25 +479,34 @@ function initCharts() {
             datasets: [{
                 label: label,
                 data: data,
-                backgroundColor: bgColor || [
-                    '#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
-                ],
+                backgroundColor: bgColor,
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { 
-                    display: type !== 'bar', // Sembunyikan legenda jika grafik batang
-                    position: 'bottom',
-                    labels: { font: { size: 10 } }
-                }
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw;
+                            let percentage = ((value / total) * 100).toFixed(1) + "%";
+                            return `${context.label}: ${value} (${percentage})`;
+                        }
+                    }
+                },
+                legend: { position: 'bottom', display: isPieOrDoughnut }
             },
-            scales: type === 'bar' ? { y: { beginAtZero: true } } : {}
+            scales: type === 'bar' ? {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 500, // Sesuai permintaan rentang sampai 500
+                    ticks: { stepSize: stepSize || 50 } // Lonjakan per 50
+                }
+            } : {}
         }
     };
-
     charts[canvasId] = new Chart(ctx, config);
 }
     function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
