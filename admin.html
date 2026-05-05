@@ -4,306 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - SDN Ranca Tales</title>
-    <!-- Tailwind via Play CDN (Sesuai kebutuhan pengembangan) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
-        
-        .sidebar-link.active { 
-            background-color: #eff6ff; 
-            color: #2563eb; 
-            border-right: 4px solid #2563eb; 
-        }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; overflow: hidden; }
+    
+    .sidebar-link.active { 
+        background-color: #eff6ff; 
+        color: #2563eb; 
+        border-right: 4px solid #2563eb; 
+    }
 
-        .submenu-link { 
-            padding-left: 2.5rem; 
-            font-size: 0.8rem; 
-            color: #64748b; 
-            transition: all 0.2s; 
-            cursor: pointer; 
-            display: block; 
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-radius: 8px;
-            margin: 0 8px;
-        }
-        
-        .submenu-link:hover, .submenu-link.active-sub { 
-            color: #2563eb; 
-            background-color: #f1f5f9;
-            font-weight: 700;
-        }
-        
-        .hidden { display: none; }
-        .overflow-x-auto::-webkit-scrollbar { height: 6px; }
-        .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
+    .submenu-link { 
+        padding-left: 2.5rem; 
+        font-size: 0.8rem; 
+        color: #64748b; 
+        transition: all 0.2s; 
+        cursor: pointer; 
+        display: block; 
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-radius: 8px;
+        margin: 0 8px;
+    }
+    
+    .submenu-link:hover { 
+        color: #2563eb; 
+        background-color: #f8fafc;
+    }
+    
+    .hidden { display: none; }
+    .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+    .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Modal Action -->
-<div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center bg-blue-600">
-            Aksi Murid
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
-                    <p id="m-nama" class="font-bold text-gray-700">-</p>
-                </div>
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
-                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
-                </div>
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+            <div class="p-6">
+                <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN MANAJAEMAN KELAS</h1>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
             </div>
             
-            <div id="form-mutasi" class="hidden space-y-3">
+            <nav class="flex-1 px-4 space-y-1">
+                <a href="#" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-home mr-3 w-5"></i> Dashboard
+                </a>
+
+                <!-- Data Murid -->
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
-                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
-                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-            </div>
-
-            <div class="flex space-x-3 pt-4">
-                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
-                <button id="btnKonfirmasi" class="flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700">Konfirmasi</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-        <div class="p-6">
-            <h1 class="text-xl font-bold text-blue-600 uppercase">Manajemen Murid</h1>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
-        </div>
-        
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg transition">
-                <i class="fas fa-home mr-3 w-5"></i> Dashboard
-            </a>
-
-            <div>
-                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-murid" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
-                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
-                </div>
-            </div>
-
-            <div>
-                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-mutasi" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
-                    <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
-                </div>
-            </div>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-y-auto">
-        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
-            <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-            <div class="flex items-center space-x-3">
-                <div class="text-right">
-                    <p id="admin-name" class="text-sm font-bold uppercase italic">Memuat...</p>
-                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
-                </div>
-                <button id="userMenuBtn" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase">H</button>
-            </div>
-        </header>
-
-        <div class="p-6">
-            <!-- Stats -->
-            <div id="section-dashboard" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Murid Aktif</p>
-                    <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">...</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Guru</p>
-                    <h4 class="text-2xl font-bold text-green-600 mt-2">12</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Tendik</p>
-                    <h4 class="text-2xl font-bold text-orange-600 mt-2">2</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Masuk</p>
-                    <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">0</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Keluar</p>
-                    <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">0</h4>
-                </div>
-            </div>
-
-            <!-- Tabel -->
-            <div id="section-tabel-container" class="hidden space-y-4 mt-6">
-                <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                    <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
-                    <div class="flex gap-2">
-                        <select id="filter-kelas" onchange="filterData()" class="border p-2 rounded-lg text-sm bg-gray-50 outline-none">
-                            <option value="">Semua Kelas</option>
-                            <option value="1">Kelas 1</option><option value="2">Kelas 2</option>
-                            <option value="3">Kelas 3</option><option value="4">Kelas 4</option>
-                            <option value="5">Kelas 5</option><option value="6">Kelas 6</option>
-                        </select>
-                        <input type="text" id="search-data" onkeyup="filterData()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-[11px] text-left">
-                            <thead class="bg-gray-100 border-b text-gray-600 uppercase font-bold">
-                                <tr>
-                                    <th class="p-3">Nama Murid</th>
-                                    <th class="p-3">Kelas</th>
-                                    <th class="p-3">NISN</th>
-                                    <th class="p-3">Status</th>
-                                    <th class="p-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-data" class="divide-y divide-gray-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-</div>
-
-<script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-    let masterData = [];
-    let filteredData = [];
-    let currentMenu = 'dashboard';
-    let selectedMurid = null;
-
-    // Load Data Awal
-    async function loadData() {
-        try {
-            const res = await fetch(`${API_URL}?action=getAllData&t=${Date.now()}`);
-            const result = await res.json();
-            if (result.status === "success") {
-                masterData = result.data.siswa;
-                document.getElementById('admin-name').innerText = result.adminName || "HIKMATULLAH, S. Pd., Gr.";
-                updateStats();
-                if(currentMenu !== 'dashboard') filterData();
-            }
-        } catch (e) {
-            console.error("Gagal memuat data", e);
-        }
-    }
-
-    function updateStats() {
-        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-        const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-        const keluar = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-        
-        document.getElementById('stat-murid').innerText = aktif;
-        document.getElementById('stat-masuk').innerText = masuk;
-        document.getElementById('stat-keluar').innerText = keluar;
-    }
-
-    function toggleSubmenu(id) {
-        const el = document.getElementById(id);
-        el.classList.toggle('hidden');
-    }
-
-    function showSection(menu) {
-        currentMenu = menu;
-        const container = document.getElementById('section-tabel-container');
-        const dash = document.getElementById('section-dashboard');
-        const title = document.getElementById('section-title');
-
-        // Reset Active Class
-        document.querySelectorAll('.sidebar-link, .submenu-link').forEach(l => l.classList.remove('active', 'active-sub'));
-
-        if (menu === 'dashboard') {
-            container.classList.add('hidden');
-            dash.classList.remove('hidden');
-            title.innerText = "Dashboard Utama";
-            document.getElementById('link-dashboard').classList.add('active');
-        } else {
-            container.classList.remove('hidden');
-            dash.classList.add('hidden');
-            title.innerText = menu.replace(/-/g, ' ').toUpperCase();
-            filterData();
-        }
-    }
-
-    function filterData() {
-        const keyword = document.getElementById('search-data').value.toLowerCase();
-        const kls = document.getElementById('filter-kelas').value;
-
-        filteredData = masterData.filter(s => {
-            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-            const matchKelas = kls === "" || String(s.kelas).startsWith(kls);
-            const status = String(s.status_aktif).toLowerCase();
-
-            if (currentMenu === 'siswa-pribadi') return matchNama && matchKelas && status === 'aktif';
-            if (currentMenu === 'siswa-lulus') return matchNama && status === 'lulus';
-            if (currentMenu === 'mutasi-masuk') return matchNama && s.tgl_masuk && s.tgl_masuk !== '-';
-            if (currentMenu === 'mutasi-keluar') return matchNama && s.tgl_keluar && s.tgl_keluar !== '-';
-            return matchNama && matchKelas;
-        });
-
-        renderTable();
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('tbody-data');
-        tbody.innerHTML = filteredData.map(s => `
-            <tr class="hover:bg-blue-50 transition">
-                <td class="p-3 font-bold">${s.nama}</td>
-                <td class="p-3">${s.kelas}</td>
-                <td class="p-3 text-gray-500">${s.nisn || '-'}</td>
-                <td class="p-3">
-                    <span class="px-2 py-1 rounded-full text-[9px] font-bold uppercase ${s.status_aktif === 'Aktif' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
-                        ${s.status_aktif}
-                    </span>
-                </td>
-                <td class="p-3 text-center">
-                    <button onclick="openModal('${s.nama}', '${s.kelas}')" class="text-blue-600 hover:text-blue-800">
-                        <i class="fas fa-edit"></i>
+                    <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                        <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
+                        <i class="fas fa-chevron-down text-[10px]"></i>
                     </button>
-                </td>
-            </tr>
-        `).join('');
-    }
+                    <div id="sub-murid" class="hidden space-y-1 mt-1">
+                        <div class="submenu-link">Data Siswa Aktif</div>
+                        <div class="submenu-link">Data Registrasi</div>
+                        <div class="submenu-link">Siswa Lulus</div>
+                    </div>
+                </div>
 
-    function openModal(nama, kelas) {
-        selectedMurid = nama;
-        document.getElementById('m-nama').innerText = nama;
-        document.getElementById('m-kelas').innerText = kelas;
-        document.getElementById('modalAction').classList.remove('hidden');
-        document.getElementById('form-mutasi').classList.remove('hidden');
-    }
+                <!-- Mutasi -->
+                <div>
+                    <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                        <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                    </button>
+                    <div id="sub-mutasi" class="hidden space-y-1 mt-1">
+                        <div class="submenu-link">Mutasi Masuk</div>
+                        <div class="submenu-link">Mutasi Keluar</div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
 
-    function closeModal() {
-        document.getElementById('modalAction').classList.add('hidden');
-    }
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
+                <h2 class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <p id="admin-name" class="text-sm font-bold uppercase italic">HIKMATULLAH, S. Pd., Gr.</p>
+                        <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+                    </div>
+                    <div class="relative">
+                        <button class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition focus:outline-none">
+                            H
+                        </button>
+                    </div>
+                </div>
+            </header>
 
-    window.onload = loadData;
-</script>
+            <div class="p-6">
+                <!-- Dashboard Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-blue-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
+                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 leading-none mt-2">Memuat...</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-green-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
+                        <h4 class="text-2xl font-bold text-green-600 leading-none mt-2">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-orange-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+                        <h4 class="text-2xl font-bold text-orange-600 leading-none mt-2">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-indigo-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+                        <h4 class="text-2xl font-bold text-indigo-600 leading-none mt-2">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm border-l-4 border-l-red-600">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+                        <h4 class="text-2xl font-bold text-red-600 leading-none mt-2">0</h4>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleSubmenu(id) {
+            const submenu = document.getElementById(id);
+            submenu.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>
