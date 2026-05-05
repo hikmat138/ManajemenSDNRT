@@ -9,14 +9,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow: hidden;height: 100vh }
+        body { font-family: 'Inter', sans-serif}
         
         .sidebar-link.active { 
             background-color: #eff6ff; 
             color: #2563eb; 
             border-right: 4px solid #2563eb; 
         }
-
+        .main-content-scroll {
+    height: calc(100vh - 64px); /* 64px adalah perkiraan tinggi header */
+    overflow-y: auto;
+}
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f1f5f9;
+} 
         .submenu-link.active-sub {
             color: #2563eb;
             background-color: #f1f5f9;
@@ -145,11 +154,11 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
+        <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
             <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
             <div class="flex items-center space-x-3">
                 <div class="text-right">
-                    <p id="admin-name" class="text-sm font-bold uppercase italic">HIKMATULLAH, S. Pd., Gr.</p>
+                    <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
                     <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
                 </div>
                 
@@ -166,7 +175,7 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6">
+        <div class="flex-1 overflow-y-auto p-6 main-content-scroll bg-gray-50">
     <!-- Container Dashboard Utama -->
     <div id="section-dashboard" class="space-y-6">
         
@@ -249,14 +258,14 @@
 </div>
             <!-- Tabel -->
             <div id="section-tabel-container" class="hidden space-y-4">
-                <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
+                <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm sticky top-0 z-20">
                     <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
                     <div class="flex gap-2 items-center">
-                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50">
-                            <option value="10">10 Baris</option>
-                            <option value="50">50 Baris</option>
-                            <option value="100">100 Baris</option>
-                        </select>
+                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold bg-gray-50 uppercase">
+                        <option value="10">10 Baris</option>
+                        <option value="50">50 Baris</option>
+                        <option value="100">100 Baris</option>
+                    </select>
                         <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50">
                             <option value="">Semua Kelas</option>
                             <option value="1A">1A</option><option value="1B">1B</option>
@@ -273,7 +282,7 @@
                 <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-[11px] text-left border-collapse">
-                            <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold sticky top-0"></thead>
+                            <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold sticky-header"></thead>
                             <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
                         </table>
                     </div>
@@ -420,6 +429,9 @@ window.onload = loadData;
         }
         document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
     }
+    const scrollArea = document.querySelector('.main-content-scroll');
+    if (scrollArea) scrollArea.scrollTop = 0;
+}
 
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
