@@ -1,559 +1,559 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - SDN Ranca Tales</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow: hidden;height: 100vh }
-        
-        .sidebar-link.active { 
-            background-color: #eff6ff; 
-            color: #2563eb; 
-            border-right: 4px solid #2563eb; 
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - SDN Ranca Tales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow: hidden;height: 100vh }
+        
+        .sidebar-link.active { 
+            background-color: #eff6ff; 
+            color: #2563eb; 
+            border-right: 4px solid #2563eb; 
+        }
 
-        .submenu-link.active-sub {
-            color: #2563eb;
-            background-color: #f1f5f9;
-            font-weight: 700;
-        }
-        
-        .submenu-link { 
-            padding-left: 2.5rem; 
-            font-size: 0.8rem; 
-            color: #64748b; 
-            transition: all 0.2s; 
-            cursor: pointer; 
-            display: block; 
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-radius: 8px;
-            margin: 0 8px;
-        }
-        
-        .submenu-link:hover { 
-            color: #2563eb; 
-            background-color: #f8fafc;
-        }
-        
-        .hidden { display: none; }
-        /* Scrollbar kustom untuk tabel data yang panjang */
-        .overflow-x-auto::-webkit-scrollbar { height: 8px; }
-        .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; }
-    </style>
+        .submenu-link.active-sub {
+            color: #2563eb;
+            background-color: #f1f5f9;
+            font-weight: 700;
+        }
+        
+        .submenu-link { 
+            padding-left: 2.5rem; 
+            font-size: 0.8rem; 
+            color: #64748b; 
+            transition: all 0.2s; 
+            cursor: pointer; 
+            display: block; 
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-radius: 8px;
+            margin: 0 8px;
+        }
+        
+        .submenu-link:hover { 
+            color: #2563eb; 
+            background-color: #f8fafc;
+        }
+        
+        .hidden { display: none; }
+        /* Scrollbar kustom untuk tabel data yang panjang */
+        .overflow-x-auto::-webkit-scrollbar { height: 8px; }
+        .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .overflow-x-auto::-webkit-scrollbar-track { background: #f1f5f9; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
 <!-- Modal Mutasi/Lulus -->
 <div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center"></div>
-        <div class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
-                    <p id="m-nama" class="font-bold text-gray-700">-</p>
-                </div>
-                <div>
-                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
-                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
-                </div>
-            </div>
-            
-            <div id="form-mutasi" class="hidden space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
-                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
-                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-            </div>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center"></div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
+                    <p id="m-nama" class="font-bold text-gray-700">-</p>
+                </div>
+                <div>
+                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
+                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
+                </div>
+            </div>
+            
+            <div id="form-mutasi" class="hidden space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
+                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
+                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+            </div>
 
-            <div id="form-lulus" class="hidden space-y-3">
-                <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
-                        <p id="m-nis" class="font-bold text-gray-700">-</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
-                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
-                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
-                </div>
-            </div>
+            <div id="form-lulus" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
+                        <p id="m-nis" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
+                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
+                </div>
+            </div>
 
-            <div class="flex space-x-3 pt-4">
-                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
-                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
-            </div>
-        </div>
-    </div>
+            <div class="flex space-x-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
+                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="flex h-screen">
-    <!-- Sidebar -->
-    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
-        <div class="p-6">
-            <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN</h1>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
-        </div>
-        
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
-                <i class="fas fa-home mr-3 w-5"></i> Dashboard
-            </a>
+    <!-- Sidebar -->
+    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+        <div class="p-6">
+            <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN</h1>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-home mr-3 w-5"></i> Dashboard
+            </a>
 
-            <!-- Menu Siswa -->
-            <div>
-                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-murid" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
-                    <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
-                    <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
-                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
-                </div>
-            </div>
+            <!-- Menu Siswa -->
+            <div>
+                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
+                    <i class="fas fa-chevron-down text-[10px]"></i>
+                </button>
+                <div id="sub-murid" class="hidden space-y-1 mt-1">
+                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
+                    <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
+                    <div onclick="showSection('siswa-registrasi')" class="submenu-link">Data Registrasi</div>
+                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
+                </div>
+            </div>
 
-            <!-- Menu Mutasi -->
-            <div>
-                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-mutasi" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
-                    <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
-                </div>
-            </div>
-        </nav>
-    </aside>
+            <!-- Menu Mutasi -->
+            <div>
+                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
+                    <i class="fas fa-chevron-down text-[10px]"></i>
+                </button>
+                <div id="sub-mutasi" class="hidden space-y-1 mt-1">
+                    <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
+                    <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
+                </div>
+            </div>
+        </nav>
+    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
-            <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-            <div class="flex items-center space-x-3">
-                <div class="text-right">
-                    <p id="admin-name" class="text-sm font-bold uppercase italic">HIKMATULLAH, S. Pd., Gr.</p>
-                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
-                </div>
-                
-                <div class="relative">
-                    <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">
-                        H
-                    </button>
-                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                        <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
-                            <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </header>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-10">
+            <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <p id="admin-name" class="text-sm font-bold uppercase italic">HIKMATULLAH, S. Pd., Gr.</p>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+                </div>
+                
+                <div class="relative">
+                    <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">
+                        H
+                    </button>
+                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
+                        <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
+                            <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-        <div class="flex-1 overflow-y-auto p-6">
-    <!-- Container Dashboard Utama -->
-    <div id="section-dashboard" class="space-y-6">
-        
-        <!-- 1. Baris Statistik (Angka) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
-                <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-green-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
-                <h4 id="stat-guru" class="text-2xl font-bold text-green-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-orange-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
-                <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
-                <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
-                <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">0</h4>
-            </div>
-        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+    <!-- Container Dashboard Utama -->
+    <div id="section-dashboard" class="space-y-6">
+        
+        <!-- 1. Baris Statistik (Angka) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
+                <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-green-600 shadow-sm">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
+                <h4 id="stat-guru" class="text-2xl font-bold text-green-600 mt-2">0</h4>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-orange-600 shadow-sm">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+                <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 mt-2">0</h4>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+                <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">0</h4>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+                <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">0</h4>
+            </div>
+        </div>
 
-        <!-- 2. Baris Grafik (Di bawah Statistik) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Grafik Umur -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Umur Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartUmur"></canvas>
-        </div>
-    </div>
+        <!-- 2. Baris Grafik (Di bawah Statistik) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Grafik Umur -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Umur Murid</h3>
+        <div class="h-[250px]">
+            <canvas id="chartUmur"></canvas>
+        </div>
+    </div>
 
-    <!-- Grafik Pekerjaan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pekerjaan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPekerjaan"></canvas>
-        </div>
-    </div>
+    <!-- Grafik Pekerjaan -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pekerjaan Orang Tua</h3>
+        <div class="h-[250px]">
+            <canvas id="chartPekerjaan"></canvas>
+        </div>
+    </div>
 
-    <!-- Grafik Agama -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Agama Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartAgama"></canvas>
-        </div>
-    </div>
+    <!-- Grafik Agama -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Agama Murid</h3>
+        <div class="h-[250px]">
+            <canvas id="chartAgama"></canvas>
+        </div>
+    </div>
 
-    <!-- Grafik Penghasilan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Penghasilan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPenghasilan"></canvas>
-        </div>
-    </div>
+    <!-- Grafik Penghasilan -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Penghasilan Orang Tua</h3>
+        <div class="h-[250px]">
+            <canvas id="chartPenghasilan"></canvas>
+        </div>
+    </div>
 
-    <!-- Grafik Bulan Lahir -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Bulan Kelahiran Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartBulanLahir"></canvas>
-        </div>
-    </div>
+    <!-- Grafik Bulan Lahir -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Bulan Kelahiran Murid</h3>
+        <div class="h-[250px]">
+            <canvas id="chartBulanLahir"></canvas>
+        </div>
+    </div>
 
-    <!-- Grafik Pendidikan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pendidikan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPendidikan"></canvas>
-        </div>
-    </div>
+    <!-- Grafik Pendidikan -->
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pendidikan Orang Tua</h3>
+        <div class="h-[250px]">
+            <canvas id="chartPendidikan"></canvas>
+        </div>
+    </div>
 </div>
 
-    </div>
+    </div>
 </div>
-            <!-- Tabel -->
-            <div id="section-tabel-container" class="hidden space-y-4">
-                <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                    <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
-                    <div class="flex gap-2 items-center">
-                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50">
-                            <option value="10">10 Baris</option>
-                            <option value="50">50 Baris</option>
-                            <option value="100">100 Baris</option>
-                        </select>
-                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50">
-                            <option value="">Semua Kelas</option>
-                            <option value="1A">1A</option><option value="1B">1B</option>
-                            <option value="2A">2A</option><option value="2B">2B</option>
-                            <option value="3A">3A</option><option value="3B">3B</option>
-                            <option value="4A">4A</option><option value="4B">4B</option>
-                            <option value="5A">5A</option><option value="5B">5B</option>
-                            <option value="6A">6A</option><option value="6B">6B</option>
-                        </select>
-                        <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
-                    </div>
-                </div>
+            <!-- Tabel -->
+            <div id="section-tabel-container" class="hidden space-y-4">
+                <div class="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
+                    <h3 id="tabel-title" class="font-bold text-blue-600 uppercase text-sm">DATA MURID</h3>
+                    <div class="flex gap-2 items-center">
+                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-sm bg-gray-50">
+                            <option value="10">10 Baris</option>
+                            <option value="50">50 Baris</option>
+                            <option value="100">100 Baris</option>
+                        </select>
+                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-gray-50">
+                            <option value="">Semua Kelas</option>
+                            <option value="1A">1A</option><option value="1B">1B</option>
+                            <option value="2A">2A</option><option value="2B">2B</option>
+                            <option value="3A">3A</option><option value="3B">3B</option>
+                            <option value="4A">4A</option><option value="4B">4B</option>
+                            <option value="5A">5A</option><option value="5B">5B</option>
+                            <option value="6A">6A</option><option value="6B">6B</option>
+                        </select>
+                        <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-gray-50">
+                    </div>
+                </div>
 
-                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-[11px] text-left border-collapse">
-                            <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold sticky top-0"></thead>
-                            <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
-                        </table>
-                    </div>
-                    <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
-                        <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase"></div>
-                        <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100 text-[10px] font-bold">PREV</button>
-                            <button onclick="nextPage()" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100 text-[10px] font-bold">NEXT</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-[11px] text-left border-collapse">
+                            <thead id="thead-data" class="bg-gray-100 border-b text-gray-600 uppercase font-bold sticky top-0"></thead>
+                            <tbody id="tbody-data" class="divide-y divide-gray-100 text-gray-700"></tbody>
+                        </table>
+                    </div>
+                    <div class="p-4 border-t bg-gray-50 flex justify-between items-center">
+                        <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase"></div>
+                        <div class="flex gap-2">
+                            <button onclick="prevPage()" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100 text-[10px] font-bold">PREV</button>
+                            <button onclick="nextPage()" class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-100 text-[10px] font-bold">NEXT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-    let masterData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    let rowsPerPage = 10;
-    let currentMenu = 'siswa-pribadi';
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+    let masterData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let currentMenu = 'siswa-pribadi';
 
-    const colMap = {
-        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
-        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
-        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 
-    'keterangan_siswa': 'Keterangan'
-    };
+    const colMap = {
+        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
+        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
+        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
+        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
+        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 
+    'keterangan_siswa': 'Keterangan'
+    };
 
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
-        let date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
-    }
+    function formatTanggalIndo(dateStr) {
+        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
+        let date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
+    }
 
-    async function loadData() {
-    try {
-        const res = await fetch(`${API_URL}?action=getAllData`);
-        const result = await res.json();
-        if (result.status === "success") {
-            masterData = result.data.siswa || [];
-            
-            // Update Nama Admin
-            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
-            if (userData && userData.nama) {
-                document.getElementById('admin-name').innerText = userData.nama;
-                document.getElementById('userMenuBtn').innerText = userData.nama.charAt(0).toUpperCase();
-            }
+    async function loadData() {
+    try {
+        const res = await fetch(`${API_URL}?action=getAllData`);
+        const result = await res.json();
+        if (result.status === "success") {
+            masterData = result.data.siswa || [];
+            
+            // Update Nama Admin
+            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
+            if (userData && userData.nama) {
+                document.getElementById('admin-name').innerText = userData.nama;
+                document.getElementById('userMenuBtn').innerText = userData.nama.charAt(0).toUpperCase();
+            }
 
-            updateStats();
-            filterData();
-            initCharts(); // Jalankan grafik SETELAH data masterData terisi
-        }
-    } catch (e) { 
-        console.error(e);
-        document.getElementById('stat-murid').innerText = "Error";
-    }
+            updateStats();
+            filterData();
+            initCharts(); // Jalankan grafik SETELAH data masterData terisi
+        }
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('stat-murid').innerText = "Error";
+    }
 }
 
 // Hapus pemanggilan initCharts() yang berdiri sendiri di luar
 // Cukup gunakan window.onload saja
 window.onload = loadData;
 
-    function updateStats() {
-        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-        document.getElementById('stat-murid').innerText = aktif;
-        document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-        document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-    }
+    function updateStats() {
+        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+        document.getElementById('stat-murid').innerText = aktif;
+        document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+        document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+    }
 
-    function filterData() {
-        const keyword = document.getElementById('search-data').value.toLowerCase();
-        const kls = document.getElementById('filter-kelas').value;
-        filteredData = masterData.filter(s => {
-            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-            const matchKelas = kls === "" || String(s.kelas) === kls;
-            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
-            return matchNama && matchKelas;
-        });
-        updatePagination();
-    }
+    function filterData() {
+        const keyword = document.getElementById('search-data').value.toLowerCase();
+        const kls = document.getElementById('filter-kelas').value;
+        filteredData = masterData.filter(s => {
+            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
+            const matchKelas = kls === "" || String(s.kelas) === kls;
+            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
+            return matchNama && matchKelas;
+        });
+        updatePagination();
+    }
 
-    function renderTable(list) {
-        const thead = document.getElementById('thead-data');
-        const tbody = document.getElementById('tbody-data');
-        let cols = [];
-        
-        // Memastikan semua kolom Bapak ada di 'siswa-pribadi'
-        if (currentMenu === 'siswa-pribadi') {
-            cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'anak_ke', 'saudara', 'jns_tinggal',
-                    'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' ,'ibu_nama','ibu_nik','ibu_thn_lahir',
-                    'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                    'transportasi', 'jarak', 'kip', 'pip','alasan_pip', 'hp', 'email', 'status_aktif'];
-        } else if (currentMenu === 'siswa-periodik') {
-            cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
-        } else if (currentMenu === 'siswa-registrasi') {
-            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk','keterangan_siswa', 'aksi'];
-        } else if (currentMenu === 'siswa-lulus') {
-            cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
-        } else {
-            cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
-        } 
+    function renderTable(list) {
+        const thead = document.getElementById('thead-data');
+        const tbody = document.getElementById('tbody-data');
+        let cols = [];
+        
+        // Memastikan semua kolom Bapak ada di 'siswa-pribadi'
+        if (currentMenu === 'siswa-pribadi') {
+            cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'anak_ke', 'saudara', 'jns_tinggal',
+                    'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' ,'ibu_nama','ibu_nik','ibu_thn_lahir',
+                    'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
+                    'transportasi', 'jarak', 'kip', 'pip','alasan_pip', 'hp', 'email', 'status_aktif'];
+        } else if (currentMenu === 'siswa-periodik') {
+            cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
+        } else if (currentMenu === 'siswa-registrasi') {
+            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk','keterangan_siswa', 'aksi'];
+        } else if (currentMenu === 'siswa-lulus') {
+            cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
+        } else {
+            cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
+        } 
 
-        thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center">${colMap[c] || c}</th>`).join('')}</tr>`;
-        tbody.innerHTML = list.length > 0 ? list.map(s => `
-            <tr class="hover:bg-blue-50 border-b">
-                ${cols.map(c => {
-                    if (c === 'aksi') return `<td class="p-3 border-r flex gap-1 justify-center">
-                        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600">Mutasi</button>
-                        <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Lulus</button>
-                    </td>`;
-                    let val = s[c] || '-';
-                    if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
-                    return `<td class="p-3 border-r whitespace-nowrap ${val === 'Aktif' ? 'text-green-600 font-bold' : ''}">${val}</td>`;
-                }).join('')}
-            </tr>`).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Kosong</td></tr>`;
-    }
+        thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center">${colMap[c] || c}</th>`).join('')}</tr>`;
+        tbody.innerHTML = list.length > 0 ? list.map(s => `
+            <tr class="hover:bg-blue-50 border-b">
+                ${cols.map(c => {
+                    if (c === 'aksi') return `<td class="p-3 border-r flex gap-1 justify-center">
+                        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600">Mutasi</button>
+                        <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Lulus</button>
+                    </td>`;
+                    let val = s[c] || '-';
+                    if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
+                    return `<td class="p-3 border-r whitespace-nowrap ${val === 'Aktif' ? 'text-green-600 font-bold' : ''}">${val}</td>`;
+                }).join('')}
+            </tr>`).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Kosong</td></tr>`;
+    }
 
-    function showSection(id) {
-        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-        document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
-        if (id === 'dashboard') {
-            document.getElementById('link-dashboard').classList.add('active');
-            document.getElementById('section-dashboard').classList.remove('hidden');
-            document.getElementById('section-tabel-container').classList.add('hidden');
-        } else {
-            document.getElementById('section-dashboard').classList.add('hidden');
-            document.getElementById('section-tabel-container').classList.remove('hidden');
-            currentMenu = id;
-            resetAndFilter();
-        }
-        document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
-    }
+    function showSection(id) {
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
+        if (id === 'dashboard') {
+            document.getElementById('link-dashboard').classList.add('active');
+            document.getElementById('section-dashboard').classList.remove('hidden');
+            document.getElementById('section-tabel-container').classList.add('hidden');
+        } else {
+            document.getElementById('section-dashboard').classList.add('hidden');
+            document.getElementById('section-tabel-container').classList.remove('hidden');
+            currentMenu = id;
+            resetAndFilter();
+        }
+        document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
+    }
 
-    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
-    function resetAndFilter() { currentPage = 1; filterData(); }
-    function updatePagination() {
-        const start = (currentPage - 1) * rowsPerPage;
-        renderTable(filteredData.slice(start, start + rowsPerPage));
-        document.getElementById('pagination-info').innerText = `Menampilkan ${start + 1} - ${Math.min(start + rowsPerPage, filteredData.length)} dari ${filteredData.length}`;
-    }
-    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
-    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
-    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
+    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
+    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
+    function resetAndFilter() { currentPage = 1; filterData(); }
+    function updatePagination() {
+        const start = (currentPage - 1) * rowsPerPage;
+        renderTable(filteredData.slice(start, start + rowsPerPage));
+        document.getElementById('pagination-info').innerText = `Menampilkan ${start + 1} - ${Math.min(start + rowsPerPage, filteredData.length)} dari ${filteredData.length}`;
+    }
+    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
+    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
+    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
 
-    // Logika Modal
-    let selectedMuridId = null;
-    function openModal(id, tipe) {
-        selectedMuridId = id;
-        const s = masterData.find(item => item.id == id);
-        document.getElementById('m-nama').innerText = s.nama;
-        document.getElementById('m-kelas').innerText = s.kelas;
-        document.getElementById('modalAction').classList.remove('hidden');
-        const header = document.getElementById('modalHeader');
-        if (tipe === 'keluar') {
-            header.innerText = 'MUTASI KELUAR';
-            header.className = 'p-4 text-white font-bold bg-orange-500 text-center';
-            document.getElementById('form-mutasi').classList.remove('hidden');
-            document.getElementById('form-lulus').classList.add('hidden');
-        } else {
-            header.innerText = 'KELULUSAN';
-            header.className = 'p-4 text-white font-bold bg-green-600 text-center';
-            document.getElementById('m-nis').innerText = s.nis;
-            document.getElementById('m-nisn').innerText = s.nisn;
-            document.getElementById('form-mutasi').classList.add('hidden');
-            document.getElementById('form-lulus').classList.remove('hidden');
-        }
-    }
-    let charts = {}; 
+    // Logika Modal
+    let selectedMuridId = null;
+    function openModal(id, tipe) {
+        selectedMuridId = id;
+        const s = masterData.find(item => item.id == id);
+        document.getElementById('m-nama').innerText = s.nama;
+        document.getElementById('m-kelas').innerText = s.kelas;
+        document.getElementById('modalAction').classList.remove('hidden');
+        const header = document.getElementById('modalHeader');
+        if (tipe === 'keluar') {
+            header.innerText = 'MUTASI KELUAR';
+            header.className = 'p-4 text-white font-bold bg-orange-500 text-center';
+            document.getElementById('form-mutasi').classList.remove('hidden');
+            document.getElementById('form-lulus').classList.add('hidden');
+        } else {
+            header.innerText = 'KELULUSAN';
+            header.className = 'p-4 text-white font-bold bg-green-600 text-center';
+            document.getElementById('m-nis').innerText = s.nis;
+            document.getElementById('m-nisn').innerText = s.nisn;
+            document.getElementById('form-mutasi').classList.add('hidden');
+            document.getElementById('form-lulus').classList.remove('hidden');
+        }
+    }
+    let charts = {}; 
 function initCharts() {
-    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    if (dataAktif.length === 0) return;
+    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
+    if (dataAktif.length === 0) return;
 
-    // --- 1. GRAFIK UMUR DETAIL ---
-    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
-    dataAktif.forEach(s => {
-        const thn = parseInt((s.umur || "0").split(' ')[0]);
-        if (thn < 7) katUmur["< 7"]++;
-        else if (thn < 8) katUmur["7-8"]++;
-        else if (thn < 9) katUmur["8-9"]++;
-        else if (thn < 10) katUmur["9-10"]++;
-        else if (thn < 11) katUmur["10-11"]++;
-        else if (thn < 12) katUmur["11-12"]++;
-        else katUmur["> 12"]++;
-    });
-    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
-    renderChart('chartUmur', 'pie', 'Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
+    // --- 1. GRAFIK UMUR DETAIL ---
+    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
+    dataAktif.forEach(s => {
+        const thn = parseInt((s.umur || "0").split(' ')[0]);
+        if (thn < 7) katUmur["< 7"]++;
+        else if (thn < 8) katUmur["7-8"]++;
+        else if (thn < 9) katUmur["8-9"]++;
+        else if (thn < 10) katUmur["9-10"]++;
+        else if (thn < 11) katUmur["10-11"]++;
+        else if (thn < 12) katUmur["11-12"]++;
+        else katUmur["> 12"]++;
+    });
+    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
+    renderChart('chartUmur', 'pie', 'Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
 
-    // --- 2. GRAFIK AGAMA (Ubah ke Bar agar lebih jelas) ---
-    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
-    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
-    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
+    // --- 2. GRAFIK AGAMA (Ubah ke Bar agar lebih jelas) ---
+    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
+    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
+    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
 
-    // --- 3. GRAFIK BULAN LAHIR (Mengisi kotak kosong) ---
-    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    let statsBulan = Array(12).fill(0);
-    dataAktif.forEach(s => {
-        if (s.tgl_lahir && s.tgl_lahir !== '-') {
-            const d = new Date(s.tgl_lahir);
-            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
-        }
-    });
-    // Gunakan id 'chartBulan' atau sesuaikan dengan id canvas di kotak tengah bawah
-    renderChart('chartBulanLahir', 'bar', 'Kelahiran Murid', namaBulan, statsBulan, '#f43f5e', 20);
+    // --- 3. GRAFIK BULAN LAHIR (Mengisi kotak kosong) ---
+    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    let statsBulan = Array(12).fill(0);
+    dataAktif.forEach(s => {
+        if (s.tgl_lahir && s.tgl_lahir !== '-') {
+            const d = new Date(s.tgl_lahir);
+            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
+        }
+    });
+    // Gunakan id 'chartBulan' atau sesuaikan dengan id canvas di kotak tengah bawah
+    renderChart('chartBulanLahir', 'bar', 'Kelahiran Murid', namaBulan, statsBulan, '#f43f5e', 20);
 
-    // --- 4. PEKERJAAN & PENGHASILAN ---
-    const helperCount = (arr) => arr.reduce((acc, val) => { 
-        if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
-        return acc; 
-    }, {});
+    // --- 4. PEKERJAAN & PENGHASILAN ---
+    const helperCount = (arr) => arr.reduce((acc, val) => { 
+        if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
+        return acc; 
+    }, {});
 
-    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
-    renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
+    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
+    renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
-    const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
+    const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
+    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
 
-    const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
-    renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
+    const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
+    renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
 }
-    function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
-    if (charts[canvasId]) charts[canvasId].destroy();
+    function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    if (charts[canvasId]) charts[canvasId].destroy();
 
-    const total = data.reduce((a, b) => a + b, 0);
+    const total = data.reduce((a, b) => a + b, 0);
 
-    charts[canvasId] = new Chart(ctx, {
-        type: type,
-        data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: data,
-                backgroundColor: bgColor,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let val = context.raw;
-                            let pct = total > 0 ? ((val / total) * 100).toFixed(1) + "%" : "0%";
-                            return `${context.label}: ${val} (${pct})`;
-                        }
-                    }
-                },
-                legend: { 
-                    display: type === 'pie' || type === 'doughnut',
-                    position: 'bottom' 
-                }
-            },
-            scales: (type === 'bar' || type === 'line') ? {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: stepSize }
-                }
-            } : {}
-        }
-    });
+    charts[canvasId] = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: bgColor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.raw;
+                            let pct = total > 0 ? ((val / total) * 100).toFixed(1) + "%" : "0%";
+                            return `${context.label}: ${val} (${pct})`;
+                        }
+                    }
+                },
+                legend: { 
+                    display: type === 'pie' || type === 'doughnut',
+                    position: 'bottom' 
+                }
+            },
+            scales: (type === 'bar' || type === 'line') ? {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: stepSize }
+                }
+            } : {}
+        }
+    });
 }
-    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
 </script>
 </body>
 </html>
