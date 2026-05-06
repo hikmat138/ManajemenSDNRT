@@ -475,11 +475,13 @@
             throw new Error("Respon server tidak sukses");
         }
     } catch (e) { 
-        console.error("Gagal memuat data:", e);
-        const statMuridEl = document.getElementById('stat-murid');
-        if (statMuridEl) statMuridEl.innerText = "Error";
-        alert("Terjadi kesalahan saat mengambil data dari Google Sheets.");
-    }
+    console.error("Detail Error:", e); // Ini akan memunculkan alasan error di Console F12
+    const statMuridEl = document.getElementById('stat-murid');
+    if (statMuridEl) statMuridEl.innerText = "Koneksi Gagal";
+    
+    // Memberikan informasi lebih detail ke pengguna
+    alert("Koneksi ke server SDN Ranca Tales gagal. Periksa apakah URL API sudah benar dan izin akses sudah diatur ke 'Anyone'.");
+}
 }
 
 // Inisialisasi saat halaman selesai dimuat
