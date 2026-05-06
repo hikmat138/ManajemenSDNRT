@@ -587,7 +587,7 @@ function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
     if (!masterData || masterData.length === 0) return;
 
-    // --- 1. GRAFIK UMUR DETAIL ---
+    // --- 1. PROSES DATA UMUR ---
     let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
     dataAktif.forEach(s => {
         if (!s.umur) return;
@@ -602,14 +602,15 @@ function initCharts() {
         else katUmur["> 12"]++;
     });
     const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
-    renderChart('chartUmur', 'pie', 'Grafik Umur Murid', labelsUmur, dataUmur, bgColorUmur);
+    // Panggil renderChart dengan data yang sudah dihitung
+    renderChart('chartUmur', 'pie', 'Grafik Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
 
-    // --- 2. GRAFIK AGAMA (Ubah ke Bar agar lebih jelas) ---
+    // --- 2. PROSES DATA AGAMA ---
     const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
     let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
     renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
 
-    // --- 3. GRAFIK BULAN LAHIR (Mengisi kotak kosong) ---
+    // --- 3. PROSES DATA BULAN LAHIR ---
     const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     let statsBulan = Array(12).fill(0);
     dataAktif.forEach(s => {
@@ -618,16 +619,15 @@ function initCharts() {
             if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
         }
     });
-    // Gunakan id 'chartBulanLahir' atau sesuaikan dengan id canvas di kotak tengah bawah
-    renderChart('chartBulanLahir', 'bar', 'Grafik Bulan Kelahiran Murid', labelsBulan, dataBulan, '#ef4444', 50);
+    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444', 50);
 
-    // --- 4. PEKERJAAN & PENGHASILAN ---
+    // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
     const helperCount = (arr) => arr.reduce((acc, val) => { 
         if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
         return acc; 
     }, {});
 
-    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]).filter(val => val && val !== '-'));
+    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
     renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
     const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
