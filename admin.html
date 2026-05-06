@@ -566,10 +566,22 @@ window.onload = loadData;
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
     function resetAndFilter() { currentPage = 1; filterData(); }
     function updatePagination() {
-        const start = (currentPage - 1) * rowsPerPage;
-        renderTable(filteredData.slice(start, start + rowsPerPage));
-        document.getElementById('pagination-info').innerText = `Menampilkan ${start + 1} - ${Math.min(start + rowsPerPage, filteredData.length)} dari ${filteredData.length}`;
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = Math.min(start + rowsPerPage, filteredData.length);
+    const dataToRender = filteredData.slice(start, end);
+    
+    renderTable(dataToRender);
+
+    // Update teks info pagination
+    const infoEl = document.getElementById('pagination-info');
+    if (infoEl) {
+        if (filteredData.length > 0) {
+            infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
+        } else {
+            infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
+        }
     }
+}
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
     function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
     function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
