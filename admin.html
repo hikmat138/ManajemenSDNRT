@@ -636,7 +636,6 @@ function initCharts() {
     const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
     renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
 }
-    Chart.register(ChartDataLabels);
 
 function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
     const ctx = document.getElementById(canvasId);
