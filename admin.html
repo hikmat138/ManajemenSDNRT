@@ -572,21 +572,24 @@ window.onload = loadData;
     }
 
     function showSection(id) {
-        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-        document.querySelectorAll('.submenu-link').forEach(s => s.classList.remove('active-sub'));
-        if (id === 'dashboard') {
-            document.getElementById('link-dashboard').classList.add('active');
-            document.getElementById('section-dashboard').classList.remove('hidden');
-            document.getElementById('section-tabel-container').classList.add('hidden');
-        } else {
-            document.getElementById('section-dashboard').classList.add('hidden');
-            document.getElementById('section-tabel-container').classList.remove('hidden');
-            currentMenu = id;
-            resetAndFilter();
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    
+    if (id === 'dashboard') {
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        document.getElementById('section-tabel-container').classList.add('hidden');
+    } else {
+        document.getElementById('section-dashboard').classList.add('hidden');
+        document.getElementById('section-tabel-container').classList.remove('hidden');
+        
+        // Update Judul Kecil di Atas Tabel
+        const mainTitle = document.getElementById('section-title-main');
+        if (mainTitle) {
+            mainTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
         }
-        document.getElementById('section-title').innerText = id.replace(/-/g, ' ').toUpperCase();
-    const scrollArea = document.querySelector('.main-content-scroll');
-    if (scrollArea) scrollArea.scrollTop = 0;
+        
+        currentMenu = id;
+        resetAndFilter();
+    }
 }
 
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
