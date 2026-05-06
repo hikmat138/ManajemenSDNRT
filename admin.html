@@ -261,178 +261,114 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
-            <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-            <div class="flex items-center space-x-3">
-                <div class="text-right">
-                    <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
-                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
-                </div>
-                
-                <div class="relative">
-                    <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">
-                        H
-                    </button>
-                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                        <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
-                            <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
-                        </a>
-                    </div>
+    <!-- Header Tetap -->
+    <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
+        <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
+        <div class="flex items-center space-x-3">
+            <div class="text-right">
+                <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+            </div>
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">H</button>
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
+                    <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
+                    </a>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="flex-1 overflow-y-auto p-6 main-content-scroll bg-gray-50">
-    <!-- Container Dashboard Utama -->
-    <div id="section-dashboard" class="space-y-6">
+    <!-- Area Konten yang Bisa di-Scroll -->
+    <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
         
-        <!-- 1. Baris Statistik (Angka) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
-                <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
+        <!-- 1. SECTION DASHBOARD (Muncul Pertama Kali) -->
+        <div id="section-dashboard" class="space-y-6">
+            <!-- Baris Statistik -->
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
+                    <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-green-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
+                    <h4 id="stat-guru" class="text-2xl font-bold text-green-600 mt-2">0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-orange-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
+                    <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 mt-2">0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
+                    <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">0</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
+                    <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">0</h4>
+                </div>
             </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-green-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
-                <h4 id="stat-guru" class="text-2xl font-bold text-green-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-orange-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
-                <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
-                <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">0</h4>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
-                <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">0</h4>
-            </div>
-        </div>
 
-        <!-- 2. Baris Grafik (Di bawah Statistik) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Grafik Umur -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Umur Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartUmur"></canvas>
-        </div>
-    </div>
-
-    <!-- Grafik Pekerjaan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pekerjaan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPekerjaan"></canvas>
-        </div>
-    </div>
-
-    <!-- Grafik Agama -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Agama Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartAgama"></canvas>
-        </div>
-    </div>
-
-    <!-- Grafik Penghasilan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Penghasilan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPenghasilan"></canvas>
-        </div>
-    </div>
-
-    <!-- Grafik Bulan Lahir -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Bulan Kelahiran Murid</h3>
-        <div class="h-[250px]">
-            <canvas id="chartBulanLahir"></canvas>
-        </div>
-    </div>
-
-    <!-- Grafik Pendidikan -->
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <h3 class="text-sm font-semibold text-gray-600 mb-4 text-center uppercase">Grafik Pendidikan Orang Tua</h3>
-        <div class="h-[250px]">
-            <canvas id="chartPendidikan"></canvas>
-        </div>
-    </div>
-</div>
-
-    </div>
-</div>
-            <!-- Tabel -->
-            <!-- Container Utama: Menghilangkan h-screen atau flex-grow yang tidak perlu -->
-<div id="section-tabel-container" class="p-6 pt-2 space-y-4"> 
-    
-    <!-- Judul Section Sekarang Berada di Atas Persis -->
-    <h2 id="section-title-main" class="text-xl font-bold text-gray-700 uppercase tracking-wide">Mutasi Masuk</h2>
-
-    <!-- Area Filter & Tabel -->
-    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <!-- Header Tabel & Filter -->
-        <div class="flex flex-wrap gap-4 justify-between items-center p-4 border-b bg-gray-50/50">
-            <h3 class="text-lg font-bold text-blue-800">DATA MURID</h3>
-            <div class="flex gap-2 items-center">
-                <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold bg-white uppercase outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="10">10 Baris</option>
-                    <option value="50">50 Baris</option>
-                    <option value="100">100 Baris</option>
-                </select>
-                <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm bg-white outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Semua Kelas</option>
-                    <!-- Opsi Kelas tetap sama -->
-                </select>
-                <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm outline-none w-64 bg-white focus:ring-2 focus:ring-blue-500">
+            <!-- Baris Grafik -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartUmur"></canvas></div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPekerjaan"></canvas></div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartAgama"></canvas></div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPenghasilan"></canvas></div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartBulanLahir"></canvas></div>
+                <div class="bg-white p-4 rounded-xl border shadow-sm"><canvas id="chartPendidikan"></canvas></div>
             </div>
         </div>
 
-        <!-- Wrapper Tabel dengan Scroll Internal -->
-        <div class="overflow-x-auto" style="max-height: 60vh;">
-            <table class="w-full text-left border-collapse">
-                <thead id="thead-data" class="sticky top-0 bg-gray-100 z-10 shadow-sm">
-                    <!-- Judul Kolom diisi JS -->
-                </thead>
-                <tbody id="tbody-data" class="text-sm">
-                    <!-- Data Murid diisi JS -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Footer Pagination Tetap di Bawah Tabel -->
-        <div class="p-4 border-t flex justify-between items-center bg-gray-50">
-            <div id="pagination-info" class="text-sm text-gray-500 font-medium">
-                Menampilkan 0 - 0 dari 0 murid
-            </div>
-            <div class="flex gap-2">
-                <button onclick="prevPage()" class="px-4 py-2 text-sm font-semibold border rounded-lg hover:bg-white transition">Sebelumnya</button>
-                <button onclick="nextPage()" class="px-4 py-2 text-sm font-semibold border rounded-lg hover:bg-white transition">Selanjutnya</button>
-            </div>
-        </div>
-    </div>
-</div>
-                <div class="table-wrapper">
-                    <div class="table-scroll-area">
-                        <table class="min-w-full">
-                            <thead id="thead-data" class="sticky-header"></thead>
-                           <tbody id="tbody-data"></tbody>
-                        </table>
+        <!-- 2. SECTION TABEL (Hidden secara Default) -->
+        <div id="section-tabel-container" class="hidden space-y-4">
+            <h2 id="section-title-main" class="text-xl font-bold text-gray-700 uppercase tracking-wide">Data Murid</h2>
+            
+            <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                <!-- Header Filter -->
+                <div class="flex flex-wrap gap-4 justify-between items-center p-4 border-b bg-gray-50/50">
+                    <h3 class="text-lg font-bold text-blue-800">DATA MURID</h3>
+                    <div class="flex gap-2 items-center">
+                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
+                            <option value="10">10 Baris</option>
+                            <option value="50">50 Baris</option>
+                        </select>
+                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
+                            <option value="">Semua Kelas</option>
+                            <option value="1A">1A</option><option value="1B">1B</option>
+                            <option value="2A">2A</option><option value="2B">2B</option>
+                            <option value="3A">3A</option><option value="3B">3B</option>
+                            <option value="4A">4A</option><option value="4B">4B</option>
+                            <option value="5A">5A</option><option value="5B">5B</option>
+                            <option value="6A">6A</option><option value="6B">6B</option>
+                        </select>
+                        <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
                     </div>
-                    <div id="pagination-controls" class="pagination-container">
-        <div class="text-sm text-gray-600">
-            Menampilkan <span id="showing-start">0</span> - <span id="showing-end">0</span> dari <span id="total-murid">0</span> murid
-        </div>
-        <div class="flex gap-2">
-            <button onclick="prevPage()" class="btn-nav">Sebelumnya</button>
-            <button onclick="nextPage()" class="btn-nav">Selanjutnya</button>
-        </div>
-    </div>
+                </div>
+
+                <!-- Tabel Area -->
+                <div class="overflow-x-auto" style="max-height: 65vh;">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="thead-data" class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold"></thead>
+                        <tbody id="tbody-data" class="text-sm divide-y"></tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Pagination -->
+                <div class="p-4 border-t flex justify-between items-center bg-gray-50">
+                    <div id="pagination-info" class="text-sm text-gray-500 font-medium">
+                        Menampilkan 0 - 0 dari 0 murid
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Sebelumnya</button>
+                        <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Selanjutnya</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+
+    </div>
+</main>
 </div>
 
 <script>
