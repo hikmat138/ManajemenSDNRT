@@ -655,11 +655,15 @@ function initCharts() {
     // Mengasumsikan kolom Z dipetakan ke property 'penerima_kps' atau 'layak_pip'
     let dataPIP = { "Ya": 0, "Tidak": 0 };
     dataAktif.forEach(s => {
-        // Sesuaikan 'penerima_kps' dengan nama property hasil mapping kolom Z Bapak
-        let status = String(s.layak_pip || "").toUpperCase(); 
-        if (status === 'Ya' || status === 'YES') dataPIP["Ya"]++;
-        else dataPIP["Tidak"]++;
-    });
+    // Memanggil properti s.layak_pip sesuai header baru di Spreadsheet
+    let status = String(s.layak_pip || "").trim().toUpperCase(); 
+    
+    if (status === 'YA' || status === 'YES') {
+        dataPIP["Ya"]++;
+    } else {
+        dataPIP["Tidak"]++;
+    }
+});
     renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
 }
 
