@@ -221,7 +221,7 @@
 
 <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto">
+   <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
         <div class="p-6">
             <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN</h1>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
@@ -264,23 +264,28 @@
     <main class="flex-1 flex flex-col overflow-hidden">
     <!-- Header Tetap -->
     <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
+    <div class="flex items-center space-x-4">
+        <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors" id="btn-toggle">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
         <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-        <div class="flex items-center space-x-3">
-            <div class="text-right">
-                <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
-                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
-            </div>
-            <div class="relative">
-                <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">H</button>
-                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                    <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
-                        <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
-                    </a>
-                </div>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+        <div class="text-right">
+            <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
+            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+        </div>
+        <div class="relative">
+            <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">H</button>
+            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
+                <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
+                    <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
+                </a>
             </div>
         </div>
-    </header>
-
+    </div>
+</header>
     <!-- Area Konten yang Bisa di-Scroll -->
     <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
         
@@ -762,6 +767,31 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
     });
 }
     function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+    function toggleSidebar() {
+    const sidebar = document.querySelector('aside'); // Pastikan tag sidebar bapak adalah <aside>
+    const mainContent = document.querySelector('main'); // Pastikan tag konten utama bapak adalah <main> atau div pembungkus
+
+    if (sidebar && mainContent) {
+        // Toggle class untuk sembunyikan sidebar
+        sidebar.classList.toggle('-translate-x-full');
+        
+        // Sesuaikan margin konten utama
+        if (sidebar.classList.contains('-translate-x-full')) {
+            mainContent.classList.remove('md:ml-64');
+            mainContent.classList.add('ml-0');
+        } else {
+            mainContent.classList.add('md:ml-64');
+            mainContent.classList.remove('ml-0');
+        }
+
+        // Paksa grafik untuk resize agar tidak gepeng/pecah
+        setTimeout(() => {
+            if (window.charts) {
+                Object.values(charts).forEach(chart => chart.resize());
+            }
+        }, 300); // Tunggu animasi sidebar selesai (300ms)
+    }
+}
 </script>
 </body>
 </html>
