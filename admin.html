@@ -194,27 +194,55 @@
                 </div>
             </div>
 
-            <div id="form-lulus" class="hidden space-y-3">
-                <div class="grid grid-cols-2 gap-4 text-xs">
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
-                        <p id="m-nis" class="font-bold text-gray-700">-</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
-                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
-                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: DN-28/M-SD/01/...">
-                </div>
-            </div>
+           <div id="form-lulus" class="hidden space-y-3">
+    <div class="grid grid-cols-2 gap-4 text-xs">
+        <div>
+            <label class="block text-gray-400 font-bold uppercase">NIS</label>
+            <p id="m-nis" class="font-bold text-gray-700">-</p>
+        </div>
+        <div>
+            <label class="block text-gray-400 font-bold uppercase">NISN</label>
+            <p id="m-nisn" class="font-bold text-gray-700">-</p>
+        </div>
+    </div>
 
-            <div class="flex space-x-3 pt-4">
-                <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">Batal</button>
-                <button id="btnKonfirmasi" class="flex-1 py-2 text-white rounded-xl font-bold uppercase text-xs">Konfirmasi</button>
-            </div>
+    <div class="text-xs">
+        <label class="block text-gray-400 font-bold uppercase">Tempat, Tanggal Lahir</label>
+        <p id="m-ttl" class="font-bold text-gray-700">-</p>
+    </div>
+
+    <hr class="border-dashed">
+
+    <div class="grid grid-cols-2 gap-4 text-xs">
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun Ajaran</label>
+            <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="2025/2026">
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
+            <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm outline-blue-500">
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-gray-500 uppercase">No. SK Kelulusan</label>
+        <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: 421/001/SD-RT/2026">
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+        <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="2355643">
+    </div>
+</div>
+
+           <div class="flex space-x-3 pt-4">
+    <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">
+        Batal
+    </button>
+    <button id="btnKonfirmasi" class="flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700 transition">
+        Konfirmasi
+    </button>
+</div>
         </div>
     </div>
 </div>
