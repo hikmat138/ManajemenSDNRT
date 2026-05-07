@@ -627,7 +627,7 @@ function initCharts() {
         return acc; 
     }, {});
 
-    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan, s.ibu_pekerjaan]));
+    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan]));
     renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
 
     const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
