@@ -768,29 +768,22 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
 }
     function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
     function toggleSidebar() {
-    const sidebar = document.querySelector('aside'); // Pastikan tag sidebar bapak adalah <aside>
-    const mainContent = document.querySelector('main'); // Pastikan tag konten utama bapak adalah <main> atau div pembungkus
+    const sidebar = document.getElementById('sidebar');
+    
+    // Toggle class untuk sembunyikan/tampilkan
+    sidebar.classList.toggle('w-72');
+    sidebar.classList.toggle('w-0');
+    sidebar.classList.toggle('opacity-0');
 
-    if (sidebar && mainContent) {
-        // Toggle class untuk sembunyikan sidebar
-        sidebar.classList.toggle('-translate-x-full');
-        
-        // Sesuaikan margin konten utama
-        if (sidebar.classList.contains('-translate-x-full')) {
-            mainContent.classList.remove('md:ml-64');
-            mainContent.classList.add('ml-0');
-        } else {
-            mainContent.classList.add('md:ml-64');
-            mainContent.classList.remove('ml-0');
+    // Paksa semua chart (murid, agama, dll) untuk menyesuaikan lebar layar baru
+    setTimeout(() => {
+        // Asumsi variabel chart bapak disimpan dalam objek bernama 'charts'
+        if (typeof charts !== 'undefined') {
+            Object.values(charts).forEach(chart => {
+                chart.resize();
+            });
         }
-
-        // Paksa grafik untuk resize agar tidak gepeng/pecah
-        setTimeout(() => {
-            if (window.charts) {
-                Object.values(charts).forEach(chart => chart.resize());
-            }
-        }, 300); // Tunggu animasi sidebar selesai (300ms)
-    }
+    }, 300); // 300ms sesuai durasi transition-all sidebar
 }
 </script>
 </body>
