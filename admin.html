@@ -661,6 +661,7 @@ function initCharts() {
         else dataPIP["Tidak"]++;
     });
     renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
+}
 
 function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
     const ctx = document.getElementById(canvasId);
