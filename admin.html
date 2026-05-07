@@ -586,7 +586,6 @@ window.onload = loadData;
 function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
     if (!masterData || masterData.length === 0) return;
-
     // --- 1. PROSES DATA UMUR ---
     let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
     dataAktif.forEach(s => {
@@ -622,20 +621,42 @@ function initCharts() {
     renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444', 50);
 
     // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
-    const helperCount = (arr) => arr.reduce((acc, val) => { 
-        if(val && val !== '-') acc[val] = (acc[val] || 0) + 1; 
+   const helperCount = (arr) => arr.reduce((acc, val) => { 
+        let key = (val && val !== '-' && val !== '') ? val : 'Tidak Diisi';
+        acc[key] = (acc[key] || 0) + 1; 
         return acc; 
     }, {});
 
-    const cKerja = helperCount(dataAktif.flatMap(s => [s.ayah_pekerjaan]));
-    renderChart('chartPekerjaan', 'bar', 'Pekerjaan Ortu', Object.keys(cKerja), Object.values(cKerja), '#2563eb', 50);
+    const cKerjaAyah = helperCount(dataAktif.map(s => s.ayah_pekerjaan));
+    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb', 50);
 
-    const cHasil = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilan', 'bar', 'Penghasilan Ayah', Object.keys(cHasil), Object.values(cHasil), '#10b981', 50);
+    const cKerjaIbu = helperCount(dataAktif.map(s => s.ibu_pekerjaan));
+    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777', 50);
 
-    const cPend = helperCount(dataAktif.flatMap(s => [s.ayah_pendidikan, s.ibu_pendidikan]));
-    renderChart('chartPendidikan', 'bar', 'Pendidikan Ortu', Object.keys(cPend), Object.values(cPend), '#6366f1', 50);
-}
+    // --- 2. GRAFIK PENDIDIKAN (DIPISAH) ---
+    const cPendAyah = helperCount(dataAktif.map(s => s.ayah_pendidikan));
+    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5', 50);
+
+    const cPendIbu = helperCount(dataAktif.map(s => s.ibu_pendidikan));
+    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea', 50);
+
+    // --- 3. GRAFIK PENGHASILAN (DIPISAH) ---
+    const cHasilAyah = helperCount(dataAktif.map(s => s.ayah_penghasilan));
+    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669', 50);
+
+    const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
+    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981', 50);
+
+    // --- 4. GRAFIK LAYAK PIP (KOLOM Z / penerima_kps) ---
+    // Mengasumsikan kolom Z dipetakan ke property 'penerima_kps' atau 'layak_pip'
+    let dataPIP = { "Ya": 0, "Tidak": 0 };
+    dataAktif.forEach(s => {
+        // Sesuaikan 'penerima_kps' dengan nama property hasil mapping kolom Z Bapak
+        let status = String(s.penerima_kps || "").toUpperCase(); 
+        if (status === 'YA' || status === 'YES') dataPIP["Ya"]++;
+        else dataPIP["Tidak"]++;
+    });
+    renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
 
 function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
     const ctx = document.getElementById(canvasId);
