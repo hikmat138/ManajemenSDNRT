@@ -670,11 +670,11 @@ function initCharts() {
 function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
+    
+    // Hapus chart lama jika ada agar tidak tumpang tindih saat hover
     if (charts[canvasId]) charts[canvasId].destroy();
 
     const total = data.reduce((a, b) => a + b, 0);
-
-    // Cek apakah plugin tersedia untuk menghindari error 'kosong'
     const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
 
     charts[canvasId] = new Chart(ctx, {
@@ -688,20 +688,18 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
                 borderWidth: 1
             }]
         },
-        // Daftarkan plugin di sini (hanya jika tersedia)
         plugins: isPluginAvailable ? [ChartDataLabels] : [],
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                // JUDUL GRAFIK
                 title: {
                     display: true,
                     text: label.toUpperCase(),
                     font: { size: 14, weight: 'bold' }
                 },
-                // PERSENTASE DI DALAM CHART
                 datalabels: {
+                    // Hanya munculkan persentase jika tipe chart adalah Pie/Doughnut
                     display: (type === 'pie' || type === 'doughnut'),
                     color: '#fff',
                     font: { weight: 'bold' },
@@ -714,14 +712,14 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
                     position: 'bottom' 
                 }
             },
-            // PENGATURAN SKALA 50-450
+            // PENGATURAN SKALA (Y-Axis)
             scales: (type === 'bar' || type === 'line') ? {
                 y: {
                     beginAtZero: true,
                     min: 0,
-                    max: 450, // Sesuai permintaan Bapak
+                    max: 450, // Batas maksimal sesuai permintaan
                     ticks: { 
-                        stepSize: 50,
+                        stepSize: stepSize, // Menggunakan nilai 50 dari parameter
                         font: { size: 10 }
                     }
                 },
