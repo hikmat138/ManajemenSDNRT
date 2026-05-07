@@ -656,7 +656,7 @@ function initCharts() {
     let dataPIP = { "Ya": 0, "Tidak": 0 };
     dataAktif.forEach(s => {
         // Sesuaikan 'penerima_kps' dengan nama property hasil mapping kolom Z Bapak
-        let status = String(s.penerima_kps || "").toUpperCase(); 
+        let status = String(s.layak_pip || "").toUpperCase(); 
         if (status === 'Ya' || status === 'YES') dataPIP["Ya"]++;
         else dataPIP["Tidak"]++;
     });
