@@ -387,7 +387,7 @@
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
         'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
         'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'layak_pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
         'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
         'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
         'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
@@ -485,7 +485,7 @@ window.onload = loadData;
             cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'anak_ke', 'saudara', 'jns_tinggal',
                     'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' ,'ibu_nama','ibu_nik','ibu_thn_lahir',
                     'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                    'transportasi', 'jarak', 'kip', 'pip','alasan_pip', 'hp', 'email', 'status_aktif'];
+                    'transportasi', 'jarak', 'kip', 'layak_pip','alasan_pip', 'hp', 'email', 'status_aktif'];
         } else if (currentMenu === 'siswa-periodik') {
             cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
         } else if (currentMenu === 'siswa-registrasi') {
@@ -657,7 +657,7 @@ function initCharts() {
     dataAktif.forEach(s => {
         // Sesuaikan 'penerima_kps' dengan nama property hasil mapping kolom Z Bapak
         let status = String(s.penerima_kps || "").toUpperCase(); 
-        if (status === 'YA' || status === 'YES') dataPIP["Ya"]++;
+        if (status === 'Ya' || status === 'YES') dataPIP["Ya"]++;
         else dataPIP["Tidak"]++;
     });
     renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
