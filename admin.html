@@ -631,10 +631,14 @@ window.onload = loadData;
     function openModal(id, tipe) {
         selectedMuridId = id;
         const s = masterData.find(item => item.id == id);
+        
+        // Mengisi data dasar
         document.getElementById('m-nama').innerText = s.nama;
         document.getElementById('m-kelas').innerText = s.kelas;
         document.getElementById('modalAction').classList.remove('hidden');
+        
         const header = document.getElementById('modalHeader');
+        
         if (tipe === 'keluar') {
             header.innerText = 'MUTASI KELUAR';
             header.className = 'p-4 text-white font-bold bg-orange-500 text-center';
@@ -643,10 +647,24 @@ window.onload = loadData;
         } else {
             header.innerText = 'KELULUSAN';
             header.className = 'p-4 text-white font-bold bg-green-600 text-center';
-            document.getElementById('m-nis').innerText = s.nis;
-            document.getElementById('m-nisn').innerText = s.nisn;
+            
+            // Mengisi data spesifik kelulusan
+            document.getElementById('m-nis').innerText = s.nis || '-';
+            document.getElementById('m-nisn').innerText = s.nisn || '-';
+            
+            // --- LOGIKA PENGGABUNGAN TEMPAT & TANGGAL LAHIR ---
+            const tempat = s.tmpt_lahir || '';
+            const tanggal = formatTanggalIndo(s.tgl_lahir);
+            document.getElementById('m-ttl').innerText = `${tempat}, ${tanggal}`;
+            
             document.getElementById('form-mutasi').classList.add('hidden');
             document.getElementById('form-lulus').classList.remove('hidden');
+
+            // Reset inputan form agar bersih setiap kali dibuka
+            document.getElementById('m-tapel').value = "";
+            document.getElementById('m-tgl-lulus').value = "";
+            document.getElementById('m-sk-lulus').value = "";
+            document.getElementById('m-ijazah').value = "";
         }
     }
     let charts = {}; 
