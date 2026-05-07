@@ -671,7 +671,6 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
     
-    // Hapus chart lama jika ada agar tidak tumpang tindih saat hover
     if (charts[canvasId]) charts[canvasId].destroy();
 
     const total = data.reduce((a, b) => a + b, 0);
@@ -699,7 +698,6 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
                     font: { size: 14, weight: 'bold' }
                 },
                 datalabels: {
-                    // Hanya munculkan persentase jika tipe chart adalah Pie/Doughnut
                     display: (type === 'pie' || type === 'doughnut'),
                     color: '#fff',
                     font: { weight: 'bold' },
@@ -712,31 +710,25 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
                     position: 'bottom' 
                 }
             },
-            // PENGATURAN SKALA (Y-Axis)
             scales: (type === 'bar' || type === 'line') ? {
-    y: {
-        beginAtZero: true,
-        min: 0,
-        max: 450, 
-        ticks: { 
-            stepSize: 50,      // Jarak antar angka wajib 50
-            fixedStepSize: 50, // Mengunci agar tidak berubah otomatis
-            precision: 0,      // Menghindari angka desimal/koma
-            callback: function(value) {
-                return value; // Memastikan angka ditampilkan apa adanya
-            },
-            font: { size: 10 }
-        },
-        grid: {
-            display: true,
-            drawOnChartArea: true,
-            drawTicks: true
-        }
-    },
-    x: {
-        ticks: { font: { size: 10 } }
-    }
-} : {}
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 450, 
+                    ticks: { 
+                        stepSize: 50,
+                        autoSkip: false, // Memaksa semua kelipatan 50 muncul
+                        precision: 0,
+                        font: { size: 9 } 
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)' // Garis halus agar tidak kotor
+                    }
+                },
+                x: {
+                    ticks: { font: { size: 10 } }
+                }
+            } : {}
         }
     });
 }
