@@ -714,19 +714,29 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
             },
             // PENGATURAN SKALA (Y-Axis)
             scales: (type === 'bar' || type === 'line') ? {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 450, // Batas maksimal sesuai permintaan
-                    ticks: { 
-                        stepSize: stepSize, // Menggunakan nilai 50 dari parameter
-                        font: { size: 10 }
-                    }
-                },
-                x: {
-                    ticks: { font: { size: 10 } }
-                }
-            } : {}
+    y: {
+        beginAtZero: true,
+        min: 0,
+        max: 450, 
+        ticks: { 
+            stepSize: 50,      // Jarak antar angka wajib 50
+            fixedStepSize: 50, // Mengunci agar tidak berubah otomatis
+            precision: 0,      // Menghindari angka desimal/koma
+            callback: function(value) {
+                return value; // Memastikan angka ditampilkan apa adanya
+            },
+            font: { size: 10 }
+        },
+        grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: true
+        }
+    },
+    x: {
+        ticks: { font: { size: 10 } }
+    }
+} : {}
         }
     });
 }
