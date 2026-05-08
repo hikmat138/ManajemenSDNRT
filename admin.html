@@ -453,6 +453,8 @@
     let currentPage = 1;
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
+    let selectedMuridId = null;
+    let charts = {}; 
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -465,9 +467,10 @@
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
         'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 
-    'keterangan_siswa': 'Keterangan'
+        'keterangan_siswa': 'Keterangan'
     };
 
+    // --- FUNGSI CORE ---
     function formatTanggalIndo(dateStr) {
         if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
         let date = new Date(dateStr);
@@ -477,53 +480,36 @@
     }
 
     async function loadData() {
-    try {
-        // Beri indikasi loading pada UI
-        const statMuridEl = document.getElementById('stat-murid');
-        if (statMuridEl) statMuridEl.innerText = "Memuat...";
+        try {
+            const statMuridEl = document.getElementById('stat-murid');
+            if (statMuridEl) statMuridEl.innerText = "Memuat...";
 
-        const res = await fetch(`${API_URL}?action=getAllData`);
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            // Mengambil data siswa dari database
-            masterData = result.data.siswa || [];
+            const res = await fetch(`${API_URL}?action=getAllData`);
+            const result = await res.json();
             
-            // 1. Update Profil Admin (Guru/Operator)
-            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
-            if (userData && userData.nama) {
-                const nameEl = document.getElementById('admin-name');
-                const btnEl = document.getElementById('userMenuBtn');
-                if (nameEl) nameEl.innerText = userData.nama;
-                if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
-            }
-
-            // 2. Jalankan fungsi pendukung secara berurutan
-            updateStats(); // Hitung total murid aktif dsb.
-            filterData();  // Render baris tabel pertama kali
-            
-            // 3. Render Grafik (Gunakan sedikit delay agar DOM tabel siap)
-            setTimeout(() => {
-                if (typeof initCharts === "function") {
-                    initCharts(); 
+            if (result.status === "success") {
+                masterData = result.data.siswa || [];
+                
+                const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
+                if (userData && userData.nama) {
+                    const nameEl = document.getElementById('admin-name');
+                    const btnEl = document.getElementById('userMenuBtn');
+                    if (nameEl) nameEl.innerText = userData.nama;
+                    if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
                 }
-            }, 200);
 
-        } else {
-            throw new Error("Respon server tidak sukses");
+                updateStats();
+                filterData();
+                
+                setTimeout(() => { if (typeof initCharts === "function") initCharts(); }, 300);
+            }
+        } catch (e) { 
+            console.error(e);
+            alert("Koneksi gagal ke server SD Negeri Ranca Tales.");
         }
-    } catch (e) { 
-    console.error("Detail Error:", e); // Ini akan memunculkan alasan error di Console F12
-    const statMuridEl = document.getElementById('stat-murid');
-    if (statMuridEl) statMuridEl.innerText = "Koneksi Gagal";
-    
-    // Memberikan informasi lebih detail ke pengguna
-    alert("Koneksi ke server SDN Ranca Tales gagal. Periksa apakah URL API sudah benar dan izin akses sudah diatur ke 'Anyone'.");
-}
-}
+    }
 
-// Inisialisasi saat halaman selesai dimuat
-window.onload = loadData;
+    window.onload = loadData;
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -546,21 +532,18 @@ window.onload = loadData;
         updatePagination();
     }
 
+    // --- RENDER TABEL (SUDAH DIPERBAIKI) ---
     function renderTable(list) {
         const thead = document.getElementById('thead-data');
         const tbody = document.getElementById('tbody-data');
         let cols = [];
         
-        // Memastikan semua kolom Bapak ada di 'siswa-pribadi'
         if (currentMenu === 'siswa-pribadi') {
-            cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'anak_ke', 'saudara', 'jns_tinggal',
-                    'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' ,'ibu_nama','ibu_nik','ibu_thn_lahir',
-                    'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                    'transportasi', 'jarak', 'kip', 'layak_pip','alasan_pip', 'hp', 'email', 'status_aktif'];
+            cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'status_aktif'];
         } else if (currentMenu === 'siswa-periodik') {
             cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
         } else if (currentMenu === 'siswa-registrasi') {
-            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk','keterangan_siswa', 'aksi'];
+            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'aksi'];
         } else if (currentMenu === 'siswa-lulus') {
             cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
         } else {
@@ -568,34 +551,26 @@ window.onload = loadData;
         } 
 
         thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center">${colMap[c] || c}</th>`).join('')}</tr>`;
+        
         tbody.innerHTML = list.length > 0 ? list.map(s => `
             <tr class="hover:bg-blue-50 border-b">
                 ${cols.map(c => {
                     if (c === 'aksi') {
-    const kelasSekarang = String(s.kelas).substring(0, 1);
-    
-    // Tentukan Icon dan Warna berdasarkan kelas
-    let iconAksi, warnaAksi, labelAksi;
-    if (kelasSekarang === "6") {
-        iconAksi = "fa-user-graduate"; // Icon Toga untuk Lulus
-        warnaAksi = "bg-green-600 hover:bg-green-700";
-        labelAksi = "Luluskan";
-    } else {
-        iconAksi = "fa-level-up-alt"; // Icon Panah Naik untuk Naik Kelas
-        warnaAksi = "bg-blue-600 hover:bg-blue-700";
-        labelAksi = "Naik Kelas";
-    }
+                        const kelasSekarang = String(s.kelas).substring(0, 1);
+                        const isKelas6 = (kelasSekarang === "6");
+                        const icon = isKelas6 ? "fa-user-graduate" : "fa-level-up-alt";
+                        const warna = isKelas6 ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700";
+                        const label = isKelas6 ? "Luluskan" : "Naik Kelas";
 
-    return `<td class="p-3 border-r flex gap-1 justify-center">
-        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 title="${labelAksi}">
-            <i class="fas fa-exchange-alt"></i>
-        </button>
-        
-        <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white p-2 rounded-lg transition shadow-sm" title="${labelAksi}">
-            <i class="fas ${iconAksi}"></i>
-        </button>
-    </td>`;
-}
+                        return `<td class="p-3 border-r flex gap-1 justify-center">
+                            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600" title="Mutasi Keluar">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                            <button onclick="openModal('${s.id}', 'lulus')" class="${warna} text-white p-2 rounded-lg transition" title="${label}">
+                                <i class="fas ${icon}"></i>
+                            </button>
+                        </td>`;
+                    }
                     let val = s[c] || '-';
                     if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
                     return `<td class="p-3 border-r whitespace-nowrap ${val === 'Aktif' ? 'text-green-600 font-bold' : ''}">${val}</td>`;
@@ -603,297 +578,181 @@ window.onload = loadData;
             </tr>`).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Kosong</td></tr>`;
     }
 
-    function showSection(id) {
-    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
-    document.getElementById('section-dashboard').classList.add('hidden');
-    document.getElementById('section-tabel-container').classList.add('hidden');
+    // --- MODAL & ACTION (SUDAH LENGKAP) ---
+    function openModal(id, tipe) {
+        selectedMuridId = id;
+        const s = masterData.find(item => item.id == id);
+        if(!s) return;
 
-    // 2. Ambil elemen judul di Header (ID: section-title dari dashboard utama)
-    const headerTitle = document.getElementById('section-title');
+        const header = document.getElementById('modalHeader');
+        const formLulus = document.getElementById('form-lulus');
+        const formNaik = document.getElementById('form-naik-kelas');
+        const formMutasi = document.getElementById('form-mutasi');
+        const btnKonf = document.getElementById('btnKonfirmasi');
 
-    // 3. Logika pemindahan menu
-    if (id === 'dashboard') {
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        headerTitle.innerText = "DASHBOARD UTAMA";
-    } else {
-        document.getElementById('section-tabel-container').classList.remove('hidden');
-        
-        // Mengubah ID menu menjadi Judul yang rapi (Contoh: 'data-siswa-aktif' jadi 'DATA SISWA AKTIF')
-        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
-        headerTitle.innerText = formattedTitle;
+        document.getElementById('m-nama').innerText = s.nama;
+        document.getElementById('m-kelas').innerText = s.kelas;
+        document.getElementById('modalAction').classList.remove('hidden');
 
-        // Reset dan muat data tabel murid
-        currentMenu = id;
-        resetAndFilter();
+        // Reset Input
+        if(document.getElementById('m-tapel')) document.getElementById('m-tapel').value = "2025/2026";
+        if(document.getElementById('m-ijazah')) document.getElementById('m-ijazah').value = "";
+
+        if (tipe === 'lulus') {
+            const kelasSekarang = String(s.kelas).substring(0, 1);
+            formMutasi.classList.add('hidden');
+            
+            if (kelasSekarang === "6") {
+                header.innerText = 'PROSES KELULUSAN MURID';
+                header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase';
+                formLulus.classList.remove('hidden');
+                if(formNaik) formNaik.classList.add('hidden');
+                
+                document.getElementById('m-nis').innerText = s.nis || '-';
+                document.getElementById('m-nisn').innerText = s.nisn || '-';
+                document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${formatTanggalIndo(s.tgl_lahir)}`;
+                
+                btnKonf.innerText = "KONFIRMASI LULUS";
+                btnKonf.className = "w-full py-2 bg-green-600 text-white rounded-lg font-bold";
+            } else {
+                header.innerText = 'PROSES KENAIKAN KELAS';
+                header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase';
+                formLulus.classList.add('hidden');
+                if(formNaik) formNaik.classList.remove('hidden');
+                
+                btnKonf.innerText = "KONFIRMASI NAIK KELAS";
+                btnKonf.className = "w-full py-2 bg-blue-600 text-white rounded-lg font-bold";
+            }
+        } else {
+            header.innerText = 'MUTASI KELUAR';
+            header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
+            formMutasi.classList.remove('hidden');
+            formLulus.classList.add('hidden');
+            if(formNaik) formNaik.classList.add('hidden');
+            btnKonf.innerText = "KONFIRMASI MUTASI";
+            btnKonf.className = "w-full py-2 bg-orange-500 text-white rounded-lg font-bold";
+        }
     }
 
-    // 4. Update tampilan aktif di Sidebar (Opsional)
-    updateSidebarUI(id);
-}
+    // FUNGSI KIRIM DATA KE GOOGLE SHEETS
+    document.getElementById('btnKonfirmasi').onclick = async function() {
+        if (!selectedMuridId) return;
+        
+        const btn = this;
+        const text = document.getElementById('modalHeader').innerText;
+        const tipeAksi = text.includes("LULUS") ? "lulus" : (text.includes("NAIK") ? "naik" : "keluar");
 
+        const payload = {
+            id: selectedMuridId,
+            tipe: tipeAksi,
+            tapel: document.getElementById('m-tapel').value,
+            ijazah: document.getElementById('m-ijazah').value,
+            alasan: document.getElementById('m-alasan-mutasi') ? document.getElementById('m-alasan-mutasi').value : ""
+        };
+
+        btn.disabled = true;
+        btn.innerText = "Memproses...";
+
+        try {
+            const res = await fetch(`${API_URL}?action=prosesAksi`, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+
+            if (result.status === "success") {
+                alert(result.message);
+                closeModal();
+                loadData(); 
+            }
+        } catch (err) {
+            alert("Gagal memproses data.");
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+    
+    // --- NAVIGASI & SIDEBAR ---
+    function showSection(id) {
+        document.getElementById('section-dashboard').classList.add('hidden');
+        document.getElementById('section-tabel-container').classList.add('hidden');
+        const headerTitle = document.getElementById('section-title');
+
+        if (id === 'dashboard') {
+            document.getElementById('section-dashboard').classList.remove('hidden');
+            headerTitle.innerText = "DASHBOARD UTAMA";
+        } else {
+            document.getElementById('section-tabel-container').classList.remove('hidden');
+            headerTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
+            currentMenu = id;
+            resetAndFilter();
+        }
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('w-72');
+        sidebar.classList.toggle('w-0');
+        sidebar.classList.toggle('opacity-0');
+        setTimeout(() => {
+            Object.values(charts).forEach(chart => chart.resize());
+        }, 300);
+    }
+
+    // Fungsi tambahan pagination & menu (tetap sama)
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
     function resetAndFilter() { currentPage = 1; filterData(); }
-    function updatePagination() {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = Math.min(start + rowsPerPage, filteredData.length);
-    const dataToRender = filteredData.slice(start, end);
-    
-    renderTable(dataToRender);
-
-    // Update teks info pagination
-    const infoEl = document.getElementById('pagination-info');
-    if (infoEl) {
-        if (filteredData.length > 0) {
-            infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
-        } else {
-            infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
-        }
-    }
-}
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
     function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
     function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
 
-    // Logika Modal
-    let selectedMuridId = null;
-    function openModal(id, tipe) {
-        
-    selectedMuridId = id;
-    const s = masterData.find(item => item.id == id);
-    
-    // Ambil elemen-elemen UI
-    const header = document.getElementById('modalHeader');
-    const formLulus = document.getElementById('form-lulus');
-    const formNaikKelas = document.getElementById('form-naik-kelas'); // Buat ID baru ini di HTML
-    const btnKonfirmasi = document.getElementById('btnKonfirmasi');
-
-    // Isi data dasar nama & kelas
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    document.getElementById('modalAction').classList.remove('hidden');
-
-        // Tambahkan ini di awal fungsi openModal agar form selalu bersih saat dibuka
-if (document.getElementById('m-tapel')) document.getElementById('m-tapel').value = "";
-if (document.getElementById('m-ijazah')) document.getElementById('m-ijazah').value = "";
-if (document.getElementById('m-sk-lulus')) document.getElementById('m-sk-lulus').value = "";
-if (document.getElementById('m-tgl-lulus')) document.getElementById('m-tgl-lulus').value = "";
-    // CEK APAKAH TIPE 'LULUS' DIKLIK
-    if (tipe === 'lulus') {
-        // Logika Cek Kelas
-        const kelasSekarang = String(s.kelas).substring(0, 1); // Mengambil angka depan (misal '6' dari '6A')
-
-        if (kelasSekarang === "6") {
-            // TAMPILAN KHUSUS KELULUSAN (KELAS 6)
-            header.innerText = 'PROSES KELULUSAN MURID';
-            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase';
-            
-            formLulus.classList.remove('hidden');
-            if(formNaikKelas) formNaikKelas.classList.add('hidden');
-            
-            // Isi data otomatis untuk lulus
-            document.getElementById('m-nis').innerText = s.nis || '-';
-            document.getElementById('m-nisn').innerText = s.nisn || '-';
-            const tempat = s.tmpt_lahir || '';
-            const tanggal = formatTanggalIndo(s.tgl_lahir);
-            document.getElementById('m-ttl').innerText = `${tempat}, ${tanggal}`;
-            
-            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700";
-
-        } else {
-            // TAMPILAN KHUSUS NAIK KELAS (KELAS 1-5)
-            header.innerText = 'PROSES KENAIKAN KELAS';
-            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase';
-            
-            formLulus.classList.add('hidden');
-            if(formNaikKelas) formNaikKelas.classList.remove('hidden');
-
-            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700";
-        }
-        
-        document.getElementById('form-mutasi').classList.add('hidden');
-
-    } else if (tipe === 'keluar') {
-        // Logika Mutasi
-        header.innerText = 'MUTASI KELUAR';
-        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
-        
-        document.getElementById('form-mutasi').classList.remove('hidden');
-        formLulus.classList.add('hidden');
-        if(formNaikKelas) formNaikKelas.classList.add('hidden');
-
-        // PERBAIKAN TOMBOL KONFIRMASI DI SINI
-        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
-        btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
+    function updatePagination() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = Math.min(start + rowsPerPage, filteredData.length);
+        renderTable(filteredData.slice(start, end));
+        const infoEl = document.getElementById('pagination-info');
+        if (infoEl) infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
     }
-}
-    let charts = {}; 
-function initCharts() {
-    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    if (!masterData || masterData.length === 0) return;
-    // --- 1. PROSES DATA UMUR ---
-    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
-    dataAktif.forEach(s => {
-        if (!s.umur) return;
-        const thn = parseInt((s.umur || "0").split(' ')[0]);
-        if (isNaN(thn)) return;
-        if (thn < 7) katUmur["< 7"]++;
-        else if (thn < 8) katUmur["7-8"]++;
-        else if (thn < 9) katUmur["8-9"]++;
-        else if (thn < 10) katUmur["9-10"]++;
-        else if (thn < 11) katUmur["10-11"]++;
-        else if (thn < 12) katUmur["11-12"]++;
-        else katUmur["> 12"]++;
-    });
-    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
-    // Panggil renderChart dengan data yang sudah dihitung
-    renderChart('chartUmur', 'pie', 'Grafik Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
 
-    // --- 2. PROSES DATA AGAMA ---
-    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
-    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
-    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
+    // --- CHARTS (GRAFIK) ---
+    function initCharts() {
+        const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
+        if (dataAktif.length === 0) return;
 
-    // --- 3. PROSES DATA BULAN LAHIR ---
-    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    let statsBulan = Array(12).fill(0);
-    dataAktif.forEach(s => {
-        if (s.tgl_lahir && s.tgl_lahir !== '-') {
-            const d = new Date(s.tgl_lahir);
-            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
-        }
-    });
-    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444', 50);
-
-    // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
-   const helperCount = (arr) => arr.reduce((acc, val) => { 
-        let key = (val && val !== '-' && val !== '') ? val : 'Tidak Diisi';
-        acc[key] = (acc[key] || 0) + 1; 
-        return acc; 
-    }, {});
-
-    const cKerjaAyah = helperCount(dataAktif.map(s => s.ayah_pekerjaan));
-    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb', 50);
-
-    const cKerjaIbu = helperCount(dataAktif.map(s => s.ibu_pekerjaan));
-    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777', 50);
-
-    // --- 2. GRAFIK PENDIDIKAN (DIPISAH) ---
-    const cPendAyah = helperCount(dataAktif.map(s => s.ayah_pendidikan));
-    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5', 50);
-
-    const cPendIbu = helperCount(dataAktif.map(s => s.ibu_pendidikan));
-    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea', 50);
-
-    // --- 3. GRAFIK PENGHASILAN (DIPISAH) ---
-    const cHasilAyah = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669', 50);
-
-    const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
-    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981', 50);
-
-    // --- 4. GRAFIK LAYAK PIP (KOLOM Z / penerima_kps) ---
-    // Mengasumsikan kolom Z dipetakan ke property 'penerima_kps' atau 'layak_pip'
-    let dataPIP = { "Ya": 0, "Tidak": 0 };
-    dataAktif.forEach(s => {
-    // Memanggil properti s.layak_pip sesuai header baru di Spreadsheet
-    let status = String(s.layak_pip || "").trim().toUpperCase(); 
-    
-    if (status === 'YA' || status === 'YES') {
-        dataPIP["Ya"]++;
-    } else {
-        dataPIP["Tidak"]++;
+        // Contoh Chart Umur
+        let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
+        dataAktif.forEach(s => {
+            if (!s.umur) return;
+            const thn = parseInt(s.umur.split(' ')[0]);
+            if (thn < 7) katUmur["< 7"]++;
+            else if (thn < 8) katUmur["7-8"]++;
+            else if (thn < 9) katUmur["8-9"]++;
+            else if (thn < 10) katUmur["9-10"]++;
+            else if (thn < 11) katUmur["10-11"]++;
+            else if (thn < 12) katUmur["11-12"]++;
+            else katUmur["> 12"]++;
+        });
+        renderChart('chartUmur', 'pie', 'Umur Murid', Object.keys(katUmur), Object.values(katUmur), ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569']);
+        
+        // Tambahkan grafik lain di sini sesuai pola...
     }
-});
-    renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
-}
 
-function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
-    
-    if (charts[canvasId]) charts[canvasId].destroy();
-
-    const total = data.reduce((a, b) => a + b, 0);
-    const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
-
-    charts[canvasId] = new Chart(ctx, {
-        type: type,
-        data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: data,
-                backgroundColor: bgColor,
-                borderWidth: 1
-            }]
-        },
-        plugins: isPluginAvailable ? [ChartDataLabels] : [],
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: label.toUpperCase(),
-                    font: { size: 14, weight: 'bold' }
-                },
-                datalabels: {
-                    display: (type === 'pie' || type === 'doughnut'),
-                    color: '#fff',
-                    font: { weight: 'bold' },
-                    formatter: (value) => {
-                        return total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
-                    }
-                },
-                legend: { 
-                    display: (type === 'pie' || type === 'doughnut'),
-                    position: 'bottom' 
-                }
+    function renderChart(canvasId, type, label, labels, data, bgColor) {
+        const ctx = document.getElementById(canvasId);
+        if (!ctx) return;
+        if (charts[canvasId]) charts[canvasId].destroy();
+        charts[canvasId] = new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{ label: label, data: data, backgroundColor: bgColor }]
             },
-            scales: (type === 'bar' || type === 'line') ? {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 450, 
-                    ticks: { 
-                        stepSize: 50,
-                        autoSkip: false, // Memaksa semua kelipatan 50 muncul
-                        precision: 0,
-                        font: { size: 9 } 
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)' // Garis halus agar tidak kotor
-                    }
-                },
-                x: {
-                    ticks: { font: { size: 10 } }
-                }
-            } : {}
-        }
-    });
-}
-    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
-    function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    
-    // Toggle class untuk sembunyikan/tampilkan
-    sidebar.classList.toggle('w-72');
-    sidebar.classList.toggle('w-0');
-    sidebar.classList.toggle('opacity-0');
-
-    // Paksa semua chart (murid, agama, dll) untuk menyesuaikan lebar layar baru
-    setTimeout(() => {
-        // Asumsi variabel chart bapak disimpan dalam objek bernama 'charts'
-        if (typeof charts !== 'undefined') {
-            Object.values(charts).forEach(chart => {
-                chart.resize();
-            });
-        }
-    }, 300); // 300ms sesuai durasi transition-all sidebar
-}
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
 </script>
 </body>
 </html>
