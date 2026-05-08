@@ -686,76 +686,79 @@ window.onload = loadData;
     // Logika Modal
     let selectedMuridId = null;
     function openModal(id, tipe) {
-        
-    selectedMuridId = id;
-    const s = masterData.find(item => item.id == id);
-    
-    // Ambil elemen-elemen UI
-    const header = document.getElementById('modalHeader');
-    const formLulus = document.getElementById('form-lulus');
-    const formNaikKelas = document.getElementById('form-naik-kelas'); // Buat ID baru ini di HTML
-    const btnKonfirmasi = document.getElementById('btnKonfirmasi');
+    selectedMuridId = id;
+    const s = masterData.find(item => item.id == id);
+    if (!s) return;
 
-    // Isi data dasar nama & kelas
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    document.getElementById('modalAction').classList.remove('hidden');
+    // Ambil elemen-elemen UI
+    const header = document.getElementById('modalHeader');
+    const formLulus = document.getElementById('form-lulus');
+    const formNaikKelas = document.getElementById('form-naik-kelas');
+    const formMutasi = document.getElementById('form-mutasi');
+    const btnKonfirmasi = document.getElementById('btnKonfirmasi');
 
-        // Tambahkan ini di awal fungsi openModal agar form selalu bersih saat dibuka
-if (document.getElementById('m-tapel')) document.getElementById('m-tapel').value = "";
-if (document.getElementById('m-ijazah')) document.getElementById('m-ijazah').value = "";
-if (document.getElementById('m-sk-lulus')) document.getElementById('m-sk-lulus').value = "";
-if (document.getElementById('m-tgl-lulus')) document.getElementById('m-tgl-lulus').value = "";
-    // CEK APAKAH TIPE 'LULUS' DIKLIK
-    if (tipe === 'lulus') {
-        // Logika Cek Kelas
-        const kelasSekarang = String(s.kelas).substring(0, 1); // Mengambil angka depan (misal '6' dari '6A')
+    // 1. Reset Semua Input Form agar bersih saat dibuka
+    const inputsToReset = [
+        'm-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 
+        'm-tgl-keluar', 'm-alasan-mutasi'
+    ];
+    inputsToReset.forEach(idInput => {
+        const el = document.getElementById(idInput);
+        if (el) el.value = "";
+    });
 
-        if (kelasSekarang === "6") {
-            // TAMPILAN KHUSUS KELULUSAN (KELAS 6)
-            header.innerText = 'PROSES KELULUSAN MURID';
-            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase';
-            
-            formLulus.classList.remove('hidden');
-            if(formNaikKelas) formNaikKelas.classList.add('hidden');
-            
-            // Isi data otomatis untuk lulus
-            document.getElementById('m-nis').innerText = s.nis || '-';
-            document.getElementById('m-nisn').innerText = s.nisn || '-';
-            const tempat = s.tmpt_lahir || '';
-            const tanggal = formatTanggalIndo(s.tgl_lahir);
-            document.getElementById('m-ttl').innerText = `${tempat}, ${tanggal}`;
-            
-            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700";
+    // 2. Isi data dasar identitas murid
+    document.getElementById('m-nama').innerText = s.nama;
+    document.getElementById('m-kelas').innerText = s.kelas;
+    document.getElementById('modalAction').classList.remove('hidden');
 
-        } else {
-            // TAMPILAN KHUSUS NAIK KELAS (KELAS 1-5)
-            header.innerText = 'PROSES KENAIKAN KELAS';
-            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase';
-            
-            formLulus.classList.add('hidden');
-            if(formNaikKelas) formNaikKelas.classList.remove('hidden');
+    // 3. Logika Tampilan berdasarkan Tipe
+    if (tipe === 'lulus') {
+        const kelasSekarang = String(s.kelas).substring(0, 1);
 
-            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700";
-        }
-        
-        document.getElementById('form-mutasi').classList.add('hidden');
+        if (kelasSekarang === "6") {
+            // MODE LULUS (KHUSUS KELAS 6)
+            header.innerText = 'PROSES KELULUSAN MURID';
+            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase';
+            
+            formLulus.classList.remove('hidden');
+            if (formNaikKelas) formNaikKelas.classList.add('hidden');
+            if (formMutasi) formMutasi.classList.add('hidden');
 
-    } else if (tipe === 'keluar') {
-        // Logika Mutasi
-        header.innerText = 'MUTASI KELUAR';
-        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
-        
-        document.getElementById('form-mutasi').classList.remove('hidden');
-        formLulus.classList.add('hidden');
-        if(formNaikKelas) formNaikKelas.classList.add('hidden');
+            // Isi info tambahan di modal lulus
+            document.getElementById('m-nis').innerText = s.nis || '-';
+            document.getElementById('m-nisn').innerText = s.nisn || '-';
+            const tempat = s.tmpt_lahir || '';
+            const tanggal = formatTanggalIndo(s.tgl_lahir);
+            document.getElementById('m-ttl').innerText = `${tempat}, ${tanggal}`;
+            
+            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
+            btnKonfirmasi.className = "flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700 transition";
+        } else {
+            // MODE NAIK KELAS (KELAS 1-5)
+            header.innerText = 'PROSES KENAIKAN KELAS';
+            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase';
+            
+            formLulus.classList.add('hidden');
+            if (formMutasi) formMutasi.classList.add('hidden');
+            if (formNaikKelas) formNaikKelas.classList.remove('hidden');
 
-        // PERBAIKAN TOMBOL KONFIRMASI DI SINI
-        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
-        btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
-    }
+            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
+            btnKonfirmasi.className = "flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700 transition";
+        }
+
+    } else if (tipe === 'keluar') {
+        // MODE MUTASI KELUAR
+        header.innerText = 'MUTASI KELUAR';
+        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
+        
+        if (formMutasi) formMutasi.classList.remove('hidden');
+        formLulus.classList.add('hidden');
+        if (formNaikKelas) formNaikKelas.classList.add('hidden');
+
+        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
+        btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
+    }
 }
     let charts = {}; 
 function initCharts() {
