@@ -658,6 +658,7 @@ window.onload = loadData;
     // Logika Modal
     let selectedMuridId = null;
     function openModal(id, tipe) {
+        
     selectedMuridId = id;
     const s = masterData.find(item => item.id == id);
     
@@ -672,6 +673,11 @@ window.onload = loadData;
     document.getElementById('m-kelas').innerText = s.kelas;
     document.getElementById('modalAction').classList.remove('hidden');
 
+        // Tambahkan ini di awal fungsi openModal agar form selalu bersih saat dibuka
+if (document.getElementById('m-tapel')) document.getElementById('m-tapel').value = "";
+if (document.getElementById('m-ijazah')) document.getElementById('m-ijazah').value = "";
+if (document.getElementById('m-sk-lulus')) document.getElementById('m-sk-lulus').value = "";
+if (document.getElementById('m-tgl-lulus')) document.getElementById('m-tgl-lulus').value = "";
     // CEK APAKAH TIPE 'LULUS' DIKLIK
     if (tipe === 'lulus') {
         // Logika Cek Kelas
