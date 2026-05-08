@@ -760,6 +760,73 @@ window.onload = loadData;
         btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
     }
 }
+    async function konfirmasiProses() {
+    if (!selectedMuridId) return;
+
+    const btn = document.getElementById('btnKonfirmasi');
+    const originalText = btn.innerText;
+
+    // 1. Tentukan jenis aksi berdasarkan teks tombol
+    let actionType = "";
+    if (originalText.includes("LULUS")) {
+        actionType = "LULUS";
+    } else if (originalText.includes("NAIK")) {
+        actionType = "NAIK_KELAS";
+    } else if (originalText.includes("MUTASI")) {
+        actionType = "MUTASI_KELUAR";
+    }
+
+    // 2. Ambil data dari input modal (sesuai ID di modal Bapak)
+    const payload = {
+        id: selectedMuridId,
+        action: actionType,
+        // Data untuk kelulusan
+        tapel: document.getElementById('m-tapel')?.value || "",
+        tglLulus: document.getElementById('m-tgl-lulus')?.value || "",
+        skLulus: document.getElementById('m-sk-lulus')?.value || "",
+        noIjazah: document.getElementById('m-ijazah')?.value || "",
+        // Data untuk mutasi
+        tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
+        alasan: document.getElementById('m-alasan-mutasi')?.value || ""
+    };
+
+    // 3. Validasi: Jangan sampai data kosong dikirim
+    if (actionType === "LULUS" && !payload.tapel) {
+        alert("Tahun Ajaran Kelulusan harus diisi!");
+        return;
+    }
+    if (actionType === "MUTASI_KELUAR" && !payload.tglKeluar) {
+        alert("Tanggal Mutasi harus diisi!");
+        return;
+    }
+
+    // 4. Proses kirim data ke Google Apps Script (SD Negeri Ranca Tales)
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        
+        const res = await response.json();
+
+        if (res.status === "success") {
+            alert(`✅ Murid berhasil di-update: ${actionType.replace('_', ' ')}`);
+            closeModal();
+            loadData(); // Refresh tabel otomatis
+        } else {
+            alert("❌ Gagal: " + res.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("❌ Koneksi ke server gagal. Coba lagi, Pak.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
+}
     let charts = {}; 
 function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
