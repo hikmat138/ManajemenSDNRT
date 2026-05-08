@@ -571,10 +571,31 @@ window.onload = loadData;
         tbody.innerHTML = list.length > 0 ? list.map(s => `
             <tr class="hover:bg-blue-50 border-b">
                 ${cols.map(c => {
-                    if (c === 'aksi') return `<td class="p-3 border-r flex gap-1 justify-center">
-                        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600">Mutasi</button>
-                        <button onclick="openModal('${s.id}', 'lulus')" class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">Lulus</button>
-                    </td>`;
+                    if (c === 'aksi') {
+    const kelasSekarang = String(s.kelas).substring(0, 1);
+    
+    // Tentukan Icon dan Warna berdasarkan kelas
+    let iconAksi, warnaAksi, labelAksi;
+    if (kelasSekarang === "6") {
+        iconAksi = "fa-user-graduate"; // Icon Toga untuk Lulus
+        warnaAksi = "bg-green-600 hover:bg-green-700";
+        labelAksi = "Luluskan";
+    } else {
+        iconAksi = "fa-level-up-alt"; // Icon Panah Naik untuk Naik Kelas
+        warnaAksi = "bg-blue-600 hover:bg-blue-700";
+        labelAksi = "Naik Kelas";
+    }
+
+    return `<td class="p-3 border-r flex gap-1 justify-center">
+        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 title="${labelAksi}">
+            <i class="fas fa-exchange-alt"></i>
+        </button>
+        
+        <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white p-2 rounded-lg transition shadow-sm" title="${labelAksi}">
+            <i class="fas ${iconAksi}"></i>
+        </button>
+    </td>`;
+}
                     let val = s[c] || '-';
                     if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
                     return `<td class="p-3 border-r whitespace-nowrap ${val === 'Aktif' ? 'text-green-600 font-bold' : ''}">${val}</td>`;
