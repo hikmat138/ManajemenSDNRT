@@ -547,61 +547,85 @@ window.onload = loadData;
     }
 
     function renderTable(list) {
-        const thead = document.getElementById('thead-data');
-        const tbody = document.getElementById('tbody-data');
-        let cols = [];
-        
-        // Memastikan semua kolom Bapak ada di 'siswa-pribadi'
-        if (currentMenu === 'siswa-pribadi') {
-            cols = ['nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama','kk','akte', 'anak_ke', 'saudara', 'jns_tinggal',
-                    'ayah_nama', 'ayah_nik','ayah_thn_lahir','ayah_pendidikan','ayah_pekerjaan','ayah_penghasilan','ayah_disabilitas' ,'ibu_nama','ibu_nik','ibu_thn_lahir',
-                    'ibu_pendidikan','ibu_pekerjaan','ibu_penghasilan','ibu_disabilitas','wali_nama','alamat', 'rt', 'rw', 'kelurahan', 'kecamatan','sekolah_asal',
-                    'transportasi', 'jarak', 'kip', 'layak_pip','alasan_pip', 'hp', 'email', 'status_aktif'];
-        } else if (currentMenu === 'siswa-periodik') {
-            cols = ['nama', 'jk', 'bb', 'tb','hobi', 'cita_cita','umur'];
-        } else if (currentMenu === 'siswa-registrasi') {
-            cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk','keterangan_siswa', 'aksi'];
-        } else if (currentMenu === 'siswa-lulus') {
-            cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
-        } else {
-            cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
-        } 
+    const thead = document.getElementById('thead-data');
+    const tbody = document.getElementById('tbody-data');
+    if (!thead || !tbody) return;
 
-        thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center">${colMap[c] || c}</th>`).join('')}</tr>`;
-        tbody.innerHTML = list.length > 0 ? list.map(s => `
-            <tr class="hover:bg-blue-50 border-b">
-                ${cols.map(c => {
-                    if (c === 'aksi') {
-    const kelasSekarang = String(s.kelas).substring(0, 1);
-    
-    // Tentukan Icon dan Warna berdasarkan kelas
-    let iconAksi, warnaAksi, labelAksi;
-    if (kelasSekarang === "6") {
-        iconAksi = "fa-user-graduate"; // Icon Toga untuk Lulus
-        warnaAksi = "bg-green-600 hover:bg-green-700";
-        labelAksi = "Luluskan";
-    } else {
-        iconAksi = "fa-level-up-alt"; // Icon Panah Naik untuk Naik Kelas
-        warnaAksi = "bg-blue-600 hover:bg-blue-700";
-        labelAksi = "Naik Kelas";
-    }
+    let cols = [];
+    
+    // 1. DAFTAR KOLOM LENGKAP SESUAI REQUEST BAPAK
+    if (currentMenu === 'siswa-pribadi') {
+        cols = [
+            'nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'kk', 'akte', 
+            'anak_ke', 'saudara', 'jns_tinggal', 'ayah_nama', 'ayah_nik', 'ayah_thn_lahir', 'ayah_pendidikan', 
+            'ayah_pekerjaan', 'ayah_penghasilan', 'ayah_disabilitas', 'ibu_nama', 'ibu_nik', 'ibu_thn_lahir', 
+            'ibu_pendidikan', 'ibu_pekerjaan', 'ibu_penghasilan', 'ibu_disabilitas', 'wali_nama', 'alamat', 
+            'rt', 'rw', 'kelurahan', 'kecamatan', 'sekolah_asal', 'transportasi', 'jarak', 'kip', 
+            'layak_pip', 'alasan_pip', 'hp', 'email', 'status_aktif'
+        ];
+    } else if (currentMenu === 'siswa-periodik') {
+        cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
+    } else if (currentMenu === 'siswa-registrasi') {
+        cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
+    } else if (currentMenu === 'siswa-lulus') {
+        cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
+    } else {
+        cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
+    }
 
-    return `<td class="p-3 border-r flex gap-1 justify-center">
-        <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 title="${labelAksi}">
-            <i class="fas fa-exchange-alt"></i>
-        </button>
-        
-        <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white p-2 rounded-lg transition shadow-sm" title="${labelAksi}">
-            <i class="fas ${iconAksi}"></i>
-        </button>
-    </td>`;
+    // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
+    thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100">${colMap[c] || c}</th>`).join('')}</tr>`;
+    
+    // 3. RENDER BODY
+    if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Tidak Ditemukan</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(s => {
+        let rowHtml = `<tr class="hover:bg-blue-50 border-b">`;
+        
+        cols.forEach(c => {
+            if (c === 'aksi') {
+                // LOGIKA TOMBOL AKSI (Aman & Ramping)
+                const kelasSekarang = String(s.kelas || "").substring(0, 1);
+                let iconAksi, warnaAksi, labelAksi;
+
+                if (kelasSekarang === "6") {
+                    iconAksi = "fa-user-graduate";
+                    warnaAksi = "bg-green-600 hover:bg-green-700";
+                    labelAksi = "Luluskan";
+                } else {
+                    iconAksi = "fa-level-up-alt";
+                    warnaAksi = "bg-blue-600 hover:bg-blue-700";
+                    labelAksi = "Naik Kelas";
+                }
+
+                rowHtml += `
+                    <td class="p-2 border-r text-center" style="width: 110px; min-width: 110px;">
+                        <div class="flex gap-1 justify-center">
+                            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white w-9 h-9 rounded-lg hover:bg-orange-600 transition shadow-sm" title="Mutasi Keluar">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                            <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white w-9 h-9 rounded-lg transition shadow-sm" title="${labelAksi}">
+                                <i class="fas ${iconAksi}"></i>
+                            </button>
+                        </div>
+                    </td>`;
+            } else {
+                // LOGIKA DATA BIASA
+                let val = s[c] || '-';
+                if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
+                
+                const textStyle = (val === 'Aktif') ? 'text-green-600 font-bold' : '';
+                rowHtml += `<td class="p-3 border-r whitespace-nowrap ${textStyle}">${val}</td>`;
+            }
+        });
+
+        rowHtml += `</tr>`;
+        return rowHtml;
+    }).join('');
 }
-                    let val = s[c] || '-';
-                    if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
-                    return `<td class="p-3 border-r whitespace-nowrap ${val === 'Aktif' ? 'text-green-600 font-bold' : ''}">${val}</td>`;
-                }).join('')}
-            </tr>`).join('') : `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Kosong</td></tr>`;
-    }
 
     function showSection(id) {
     // 1. Sembunyikan semua kontainer agar tidak bertumpuk
