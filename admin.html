@@ -710,12 +710,17 @@ window.onload = loadData;
         document.getElementById('form-mutasi').classList.add('hidden');
 
     } else if (tipe === 'keluar') {
-        // Logika Mutasi (Tetap seperti sebelumnya)
+        // Logika Mutasi
         header.innerText = 'MUTASI KELUAR';
-        header.className = 'p-4 text-white font-bold bg-orange-500 text-center';
+        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
+        
         document.getElementById('form-mutasi').classList.remove('hidden');
         formLulus.classList.add('hidden');
         if(formNaikKelas) formNaikKelas.classList.add('hidden');
+
+        // PERBAIKAN TOMBOL KONFIRMASI DI SINI
+        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
+        btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
     }
 }
     let charts = {}; 
