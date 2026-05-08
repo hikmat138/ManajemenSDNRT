@@ -567,8 +567,13 @@ window.onload = loadData;
         cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
     } else if (currentMenu === 'siswa-registrasi') {
         cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
-    } else if (currentMenu === 'siswa-lulus') {
-        cols = ['nama', 'jk', 'thn_ajaran_lulus', 'status_aktif'];
+   } else if (currentMenu === 'siswa-lulus') {
+    // Menampilkan identitas dasar + data kelulusan
+    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'nis', 'nisn', 'thn_ajaran_lulus', 'no_ijazah', 'status_aktif'];
+} else if (currentMenu === 'mutasi-keluar') {
+    // Menampilkan identitas dasar + data mutasi
+    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
+}
     } else {
         cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
     }
