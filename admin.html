@@ -1126,7 +1126,6 @@ async function prosesMasal(tipe, extra = {}) {
         "Apakah Bapak yakin ingin MELULUSKAN SEMUA murid Kelas 6?";
 
     if (!confirm(pesan)) return;
-
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
