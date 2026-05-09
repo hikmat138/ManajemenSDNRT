@@ -1075,6 +1075,80 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
         }
     }, 300); // 300ms sesuai durasi transition-all sidebar
 }
+    // --- FUNGSI KONTROL MODAL ---
+function bukaModalTambahSiswa() {
+    document.getElementById('modal-tambah-siswa').classList.remove('hidden');
+}
+
+function tutupModal(id) {
+    document.getElementById(id).classList.add('hidden');
+    if(id === 'modal-tambah-siswa') document.getElementById('form-tambah-siswa').reset();
+}
+
+// --- FUNGSI SIMPAN SISWA BARU ---
+async function simpanMuridBaru(event) {
+    event.preventDefault(); // Mencegah reload halaman
+    
+    const loadingMsg = "Sedang menyimpan data ke SD Negeri Ranca Tales...";
+    console.log(loadingMsg);
+
+    const dataSiswa = {
+        id: "M-" + Date.now(), // Generate ID Unik
+        nama: document.getElementById('in-nama').value,
+        kelas: document.getElementById('in-kelas').value,
+        jk: document.getElementById('in-jk').value,
+        nisn: document.getElementById('in-nisn').value,
+        nis: document.getElementById('in-nis').value,
+        sekolah_asal: document.getElementById('in-asal').value || "-"
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'TAMBAH_SISWA', data: dataSiswa })
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            alert("Berhasil! " + result.message);
+            tutupModal('modal-tambah-siswa');
+            loadData(); // Refresh tabel biar muncul yang baru
+        }
+    } catch (err) {
+        alert("Gagal terhubung ke server. Silakan coba lagi.");
+    }
+}
+
+// --- FUNGSI AKSI MASAL (NAIK/LULUS SEMUA) ---
+async function prosesMasal(tipe, extra = {}) {
+    let pesan = (tipe === 'NAIK_SEMUA') ? 
+        "Apakah Bapak yakin ingin MENAIKKAN KELAS semua murid (1-5)?" : 
+        "Apakah Bapak yakin ingin MELULUSKAN SEMUA murid Kelas 6?";
+
+    if (!confirm(pesan)) return;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: tipe, ...extra })
+        });
+        const result = await response.json();
+        alert(result.message);
+        loadData();
+    } catch (err) {
+        alert("Gagal memproses aksi masal.");
+    }
+}
+
+// Khusus untuk Lulus Masal agar input Tapel & Tanggal
+function openModalLulusMasal() {
+    const tapel = prompt("Masukkan Tahun Ajaran Lulus (Contoh: 2025/2026):");
+    if (!tapel) return;
+    const tgl = prompt("Masukkan Tanggal Lulus (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+    if (!tgl) return;
+
+    prosesMasal('LULUS_SEMUA', { tapel: tapel, tglLulus: tgl });
+}
 </script>
 </body>
 </html>
