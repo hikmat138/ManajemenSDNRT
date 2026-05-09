@@ -630,7 +630,7 @@ window.onload = loadData;
             } else {
                 // LOGIKA DATA BIASA
                 let val = s[c] || '-';
-                if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar'].includes(c)) val = formatTanggalIndo(val);
+                if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
                 
                 const textStyle = (val === 'Aktif') ? 'text-green-600 font-bold' : '';
                 rowHtml += `<td class="p-3 border-r whitespace-nowrap ${textStyle}">${val}</td>`;
