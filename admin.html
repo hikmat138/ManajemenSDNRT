@@ -464,7 +464,7 @@
         'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
     'keterangan_siswa': 'Keterangan'
     };
 
@@ -488,6 +488,7 @@
         if (result.status === "success") {
             // Mengambil data siswa dari database
             masterData = result.data.siswa || [];
+            masterDataLulus = result.data.siswa_lulus || [];
             
             // 1. Update Profil Admin (Guru/Operator)
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
@@ -535,12 +536,12 @@ window.onload = loadData;
     function filterData() {
         const keyword = document.getElementById('search-data').value.toLowerCase();
         const kls = document.getElementById('filter-kelas').value;
+        let sourceData = (currentMenu === 'siswa-lulus') ? masterDataLulus : masterData;
         filteredData = masterData.filter(s => {
             const matchNama = (s.nama || "").toLowerCase().includes(keyword);
             const matchKelas = kls === "" || String(s.kelas) === kls;
             if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
             if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-            if (currentMenu === 'siswa-lulus') return matchNama && matchKelas && s.status_aktif === 'Lulus';
             return matchNama && matchKelas;
         });
         updatePagination();
@@ -568,9 +569,9 @@ window.onload = loadData;
     } else if (currentMenu === 'siswa-registrasi') {
         cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
    } else if (currentMenu === 'siswa-lulus') {
-    // Menampilkan identitas dasar + data kelulusan
-    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'nis', 'nisn', 'thn_ajaran_lulus', 'no_ijazah', 'status_aktif'];
-} else if (currentMenu === 'mutasi-keluar') {
+        // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
+        cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
+    } else if (currentMenu === 'mutasi-keluar') {
     // Menampilkan identitas dasar + data mutasi
     cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
     } else {
