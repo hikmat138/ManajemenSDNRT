@@ -397,6 +397,17 @@
 
         <!-- 2. SECTION TABEL (Hidden secara Default) -->
         <div id="section-tabel-container" class="hidden space-y-4">
+            <div id="container-aksi-masal" class="hidden flex flex-wrap gap-2">
+        <button onclick="prosesMasal('NAIK_SEMUA')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-users"></i> Naik Semua (1-5)
+        </button>
+        <button onclick="openModalLulusMasal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-graduation-cap"></i> Luluskan Semua (Kelas 6)
+        </button>
+        <button onclick="bukaModalTambahSiswa()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-user-plus"></i> Tambah Murid
+        </button>
+    </div>
             
             <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
                 <!-- Header Filter -->
@@ -643,31 +654,44 @@ window.onload = loadData;
 }
 
     function showSection(id) {
-    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
-    document.getElementById('section-dashboard').classList.add('hidden');
-    document.getElementById('section-tabel-container').classList.add('hidden');
+    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
+    document.getElementById('section-dashboard').classList.add('hidden');
+    document.getElementById('section-tabel-container').classList.add('hidden');
 
-    // 2. Ambil elemen judul di Header (ID: section-title dari dashboard utama)
-    const headerTitle = document.getElementById('section-title');
+    // 2. Ambil elemen judul di Header
+    const headerTitle = document.getElementById('section-title');
+    
+    // --- TAMBAHAN: Ambil elemen tombol aksi masal ---
+    const containerAksi = document.getElementById('container-aksi-masal');
 
-    // 3. Logika pemindahan menu
-    if (id === 'dashboard') {
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        headerTitle.innerText = "DASHBOARD UTAMA";
-    } else {
-        document.getElementById('section-tabel-container').classList.remove('hidden');
-        
-        // Mengubah ID menu menjadi Judul yang rapi (Contoh: 'data-siswa-aktif' jadi 'DATA SISWA AKTIF')
-        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
-        headerTitle.innerText = formattedTitle;
+    // 3. Logika pemindahan menu
+    if (id === 'dashboard') {
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        headerTitle.innerText = "DASHBOARD UTAMA";
+        
+        // Sembunyikan tombol aksi jika balik ke dashboard
+        if (containerAksi) containerAksi.classList.add('hidden');
+        
+    } else {
+        document.getElementById('section-tabel-container').classList.remove('hidden');
+        
+        // --- LOGIKA TOMBOL AKSI MASAL ---
+        // Jika menu yang diklik adalah 'siswa-registrasi', munculkan tombol sakti
+        if (id === 'siswa-registrasi') {
+            containerAksi.classList.remove('hidden');
+        } else {
+            containerAksi.classList.add('hidden');
+        }
+        
+        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
+        headerTitle.innerText = formattedTitle;
 
-        // Reset dan muat data tabel murid
-        currentMenu = id;
-        resetAndFilter();
-    }
+        currentMenu = id;
+        resetAndFilter();
+    }
 
-    // 4. Update tampilan aktif di Sidebar (Opsional)
-    updateSidebarUI(id);
+    // 4. Update tampilan aktif di Sidebar
+    updateSidebarUI(id);
 }
 
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
