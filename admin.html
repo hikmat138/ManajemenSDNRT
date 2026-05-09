@@ -535,18 +535,27 @@ window.onload = loadData;
     }
 
     function filterData() {
-        const keyword = document.getElementById('search-data').value.toLowerCase();
-        const kls = document.getElementById('filter-kelas').value;
-        let sourceData = (currentMenu === 'siswa-lulus') ? masterDataLulus : masterData;
-        filteredData = masterData.filter(s => {
-            const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-            const matchKelas = kls === "" || String(s.kelas) === kls;
-            if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-            if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-            return matchNama && matchKelas;
-        });
-        updatePagination();
-    }
+    const keyword = document.getElementById('search-data').value.toLowerCase();
+    const kls = document.getElementById('filter-kelas').value;
+
+    // 1. Tentukan sumbernya: sourceData sudah benar
+    let sourceData = (currentMenu === 'siswa-lulus') ? masterDataLulus : masterData;
+
+    // 2. PERBAIKAN: Gunakan sourceData.filter, JANGAN masterData.filter
+    filteredData = sourceData.filter(s => {
+        const matchNama = (s.nama || "").toLowerCase().includes(keyword);
+        const matchKelas = kls === "" || String(s.kelas) === kls;
+
+        // Logika tambahan untuk menu mutasi
+        if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
+        if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+        
+        // Untuk menu lainnya (termasuk siswa-lulus), langsung return hasil pencarian
+        return matchNama && matchKelas;
+    });
+
+    updatePagination();
+}
 
     function renderTable(list) {
     const thead = document.getElementById('thead-data');
