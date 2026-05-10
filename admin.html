@@ -169,7 +169,7 @@
 
 <!-- Modal Mutasi/Lulus -->
     <div id="modal-tambah-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-auto max-w-lg overflow-hidden animate__animated animate__fadeInDown">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__fadeInDown">
         <div class="bg-indigo-700 p-4 text-white flex justify-between items-center">
             <h3 class="font-bold uppercase"><i class="fas fa-user-plus mr-2"></i> Tambah Murid Baru</h3>
             <button onclick="tutupModal('modal-tambah-siswa')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
@@ -177,12 +177,12 @@
         <form id="form-tambah-siswa" onsubmit="simpanMuridBaru(event)" class="p-6 space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">NAMA LENGKAP</label>
-                    <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
+                    <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500 text-sm" placeholder="Nama Lengkap Murid">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">KELAS</label>
-                    <select id="in-kelas" required class="w-full border p-2 rounded-lg outline-none">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
+                    <select id="in-kelas" required class="w-full border p-2 rounded-lg outline-none text-sm bg-white">
                         <option value="1A">1A</option><option value="1B">1B</option>
                         <option value="2A">2A</option><option value="2B">2B</option>
                         <option value="3A">3A</option><option value="4A">4A</option>
@@ -190,43 +190,45 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">JK</label>
-                    <select id="in-jk" class="w-full border p-2 rounded-lg">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">JK</label>
+                    <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">NISN</label>
-                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN</label>
+                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="00123xxx">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">NIS</label>
-                    <input type="number" id="in-nis" class="w-full border p-2 rounded-lg">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIS</label>
+                    <input type="number" id="in-nis" class="w-full border p-2 rounded-lg text-sm" placeholder="123xx">
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-xs font-bold text-gray-500 mb-1">SEKOLAH ASAL (Jika Pindahan)</label>
-                    <input type="text" id="in-asal" placeholder="Kosongkan jika siswa baru" class="w-full border p-2 rounded-lg">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal (Jika Pindahan)</label>
+                    <input type="text" id="in-asal" placeholder="Kosongkan jika bukan pindahan" class="w-full border p-2 rounded-lg text-sm">
                 </div>
             </div>
             <div class="flex gap-2 pt-4">
-                <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2 rounded-lg font-bold">BATAL</button>
-                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2 rounded-lg font-bold">SIMPAN DATA</button>
+                <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
+                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg shadow-indigo-200">Simpan Data</button>
             </div>
         </form>
     </div>
 </div>
+
 <div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center"></div>
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn animate__faster">
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center shadow-md"></div>
         <div class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-4 text-xs">
+            
+            <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
                 <div>
-                    <label class="block text-gray-400 font-bold uppercase">Nama Murid</label>
-                    <p id="m-nama" class="font-bold text-gray-700">-</p>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Nama Murid</label>
+                    <p id="m-nama" class="font-bold text-gray-700 truncate">-</p>
                 </div>
                 <div>
-                    <label class="block text-gray-400 font-bold uppercase">Kelas</label>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Kelas Saat Ini</label>
                     <p id="m-kelas" class="font-bold text-gray-700">-</p>
                 </div>
             </div>
@@ -234,71 +236,75 @@
             <div id="form-mutasi" class="hidden space-y-3">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
-                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Masukkan nama sekolah...">
+                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500" placeholder="Contoh: SDN 1 Serang">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
-                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm">
+                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Alasan Mutasi</label>
+                    <textarea id="m-alasan" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500" placeholder="Contoh: Ikut orang tua pindah rumah"></textarea>
                 </div>
             </div>
 
-           <div id="form-lulus" class="hidden space-y-3">
-    <div class="grid grid-cols-2 gap-4 text-xs">
-        <div>
-            <label class="block text-gray-400 font-bold uppercase">NIS</label>
-            <p id="m-nis" class="font-bold text-gray-700">-</p>
-        </div>
-        <div>
-            <label class="block text-gray-400 font-bold uppercase">NISN</label>
-            <p id="m-nisn" class="font-bold text-gray-700">-</p>
-        </div>
-    </div>
+            <div id="form-lulus" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-4 text-xs bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
+                        <p id="m-nis" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
+                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-gray-400 font-bold uppercase">Tempat, Tanggal Lahir</label>
+                        <p id="m-ttl" class="font-bold text-gray-700">-</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun Ajaran</label>
+                        <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="2025/2026">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
+                        <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">No. SK Kelulusan</label>
+                    <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="421/001/SD-RT/2026">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="DN-28 DI 000xxxx">
+                </div>
+            </div>
 
-    <div class="text-xs">
-        <label class="block text-gray-400 font-bold uppercase">Tempat, Tanggal Lahir</label>
-        <p id="m-ttl" class="font-bold text-gray-700">-</p>
-    </div>
-
-    <hr class="border-dashed">
-
-    <div class="grid grid-cols-2 gap-4 text-xs">
-        <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun</label>
-            <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="2026">
-        </div>
-        <div>
-            <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
-            <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm outline-blue-500">
-        </div>
-    </div>
-
-    <div>
-        <label class="block text-[10px] font-bold text-gray-500 uppercase">No. SK Kelulusan</label>
-        <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="Contoh: 421/001/SD-RT/2026">
-    </div>
-
-    <div>
-        <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
-        <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-blue-500" placeholder="2355643">
-    </div>
-</div>
-
-           <div class="flex space-x-3 pt-4">
-    <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-xs hover:bg-gray-200">
-        Batal
-    </button>
-    <button id="btnKonfirmasi" onclick="konfirmasiProses()" class="flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700 transition">
-        Konfirmasi
-    </button>
-</div>
             <div id="form-naik-kelas" class="hidden space-y-4 py-4 text-center">
-    <i class="fas fa-arrow-up text-4xl text-blue-500 mb-2"></i>
-    <p class="text-sm text-gray-600">Murid ini akan diproses untuk <b>Naik Kelas</b> ke tingkat selanjutnya.</p>
-    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-        <p class="text-[10px] text-blue-400 font-bold uppercase">Kelas Tujuan</p>
-        <p class="text-lg font-bold text-blue-700">Otomatis ke Tingkat Berikutnya</p>
-    </div>
-</div>
+                <div class="flex justify-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center animate-bounce">
+                        <i class="fas fa-arrow-up text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 px-4">Murid ini akan diproses untuk <b>Naik Kelas</b> secara otomatis ke tingkat selanjutnya.</p>
+                <div class="bg-blue-600 p-3 rounded-xl shadow-lg mx-8">
+                    <p class="text-[10px] text-blue-200 font-bold uppercase">Kelas Tujuan</p>
+                    <p id="m-target-kelas" class="text-xl font-black text-white italic">MEMPROSES...</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-[10px] hover:bg-gray-200 transition">
+                    Batal
+                </button>
+                <button id="btnKonfirmasi" onclick="konfirmasiProses()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg transition active:scale-95">
+                    Konfirmasi
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -773,117 +779,97 @@ window.onload = loadData;
     const s = masterData.find(item => item.id == id);
     if (!s) return;
 
-    // Ambil elemen-elemen UI
     const header = document.getElementById('modalHeader');
     const formLulus = document.getElementById('form-lulus');
     const formNaikKelas = document.getElementById('form-naik-kelas');
     const formMutasi = document.getElementById('form-mutasi');
     const btnKonfirmasi = document.getElementById('btnKonfirmasi');
 
-    // 1. Reset Semua Input Form agar bersih saat dibuka
-    const inputsToReset = [
-        'm-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 
-        'm-tgl-keluar', 'm-alasan-mutasi'
-    ];
+    // 1. Reset Input (Gunakan ID yang ada di HTML terbaru Bapak)
+    const inputsToReset = ['m-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 'm-tgl-keluar', 'm-alasan', 'm-tujuan'];
     inputsToReset.forEach(idInput => {
         const el = document.getElementById(idInput);
         if (el) el.value = "";
     });
 
-    // 2. Isi data dasar identitas murid
+    // 2. Isi Identitas Dasar
     document.getElementById('m-nama').innerText = s.nama;
     document.getElementById('m-kelas').innerText = s.kelas;
     document.getElementById('modalAction').classList.remove('hidden');
 
-    // 3. Logika Tampilan berdasarkan Tipe
+    // Sembunyikan semua form dulu
+    [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
+
+    // 3. Logika Tampilan Berdasarkan Tipe
     if (tipe === 'lulus') {
-        const kelasSekarang = String(s.kelas).substring(0, 1);
+        const tingkat = parseInt(s.kelas);
 
-        if (kelasSekarang === "6") {
-            // MODE LULUS (KHUSUS KELAS 6)
+        if (tingkat === 6) {
+            // MODE LULUS
             header.innerText = 'PROSES KELULUSAN MURID';
-            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase';
-            
+            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase shadow-md';
             formLulus.classList.remove('hidden');
-            if (formNaikKelas) formNaikKelas.classList.add('hidden');
-            if (formMutasi) formMutasi.classList.add('hidden');
-
-            // Isi info tambahan di modal lulus
+            
             document.getElementById('m-nis').innerText = s.nis || '-';
             document.getElementById('m-nisn').innerText = s.nisn || '-';
-            const tempat = s.tmpt_lahir || '';
-            const tanggal = formatTanggalIndo(s.tgl_lahir);
-            document.getElementById('m-ttl').innerText = `${tempat}, ${tanggal}`;
+            document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${s.tgl_lahir || ''}`;
             
             btnKonfirmasi.innerText = "KONFIRMASI LULUS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-green-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-green-700 transition";
+            btnKonfirmasi.className = "flex-1 py-3 bg-green-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-green-700 transition";
         } else {
-            // MODE NAIK KELAS (KELAS 1-5)
+            // MODE NAIK KELAS (Jika klik lulus tapi bukan kelas 6)
             header.innerText = 'PROSES KENAIKAN KELAS';
-            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase';
+            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase shadow-md';
+            formNaikKelas.classList.remove('hidden');
             
-            formLulus.classList.add('hidden');
-            if (formMutasi) formMutasi.classList.add('hidden');
-            if (formNaikKelas) formNaikKelas.classList.remove('hidden');
+            // Logika target kelas (Misal: 1A -> 2A)
+            const angka = tingkat;
+            const huruf = s.kelas.replace(/[0-9]/g, '');
+            document.getElementById('m-target-kelas').innerText = (angka + 1) + huruf;
 
             btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
-            btnKonfirmasi.className = "flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold uppercase text-xs hover:bg-blue-700 transition";
+            btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-blue-700 transition";
         }
-
     } else if (tipe === 'keluar') {
-        // MODE MUTASI KELUAR
+        // MODE MUTASI
         header.innerText = 'MUTASI KELUAR';
-        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase';
-        
-        if (formMutasi) formMutasi.classList.remove('hidden');
-        formLulus.classList.add('hidden');
-        if (formNaikKelas) formNaikKelas.classList.add('hidden');
+        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase shadow-md';
+        formMutasi.classList.remove('hidden');
 
         btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
-        btnKonfirmasi.className = "flex-1 py-2 bg-orange-500 text-white rounded-xl font-bold uppercase text-xs hover:bg-orange-600 transition";
+        btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
     }
-    }
+}
     async function konfirmasiProses() {
     if (!selectedMuridId) return;
 
     const btn = document.getElementById('btnKonfirmasi');
     const originalText = btn.innerText;
 
-    // 1. Tentukan jenis aksi berdasarkan teks tombol
+    // 1. Tentukan jenis aksi
     let actionType = "";
-    if (originalText.includes("LULUS")) {
-        actionType = "LULUS";
-    } else if (originalText.includes("NAIK")) {
-        actionType = "NAIK_KELAS";
-    } else if (originalText.includes("MUTASI")) {
-        actionType = "MUTASI_KELUAR";
-    }
+    if (originalText.includes("LULUS")) actionType = "LULUS";
+    else if (originalText.includes("NAIK")) actionType = "NAIK_KELAS";
+    else if (originalText.includes("MUTASI")) actionType = "MUTASI_KELUAR";
 
-    // 2. Ambil data dari input modal (sesuai ID di modal Bapak)
+    // 2. Ambil data payload (Sesuai dengan code.gs Bapak)
     const payload = {
         id: selectedMuridId,
         action: actionType,
-        // Data untuk kelulusan
         tapel: document.getElementById('m-tapel')?.value || "",
         tglLulus: document.getElementById('m-tgl-lulus')?.value || "",
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
-        // Data untuk mutasi
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-        alasan: document.getElementById('m-alasan-mutasi')?.value || ""
+        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
+        tujuan: document.getElementById('m-tujuan')?.value || ""
     };
 
-    // 3. Validasi: Jangan sampai data kosong dikirim
-    if (actionType === "LULUS" && !payload.tapel) {
-        alert("Tahun Ajaran Kelulusan harus diisi!");
-        return;
-    }
-    if (actionType === "MUTASI_KELUAR" && !payload.tglKeluar) {
-        alert("Tanggal Mutasi harus diisi!");
-        return;
-    }
+    // 3. Validasi singkat
+    if (actionType === "LULUS" && !payload.tapel) return alert("Tahun Ajaran Kelulusan harus diisi!");
+    if (actionType === "MUTASI_KELUAR" && !payload.tglKeluar) return alert("Tanggal Mutasi harus diisi!");
 
-    // 4. Proses kirim data ke Google Apps Script (SD Negeri Ranca Tales)
+    // 4. Kirim ke Google Apps Script
     btn.disabled = true;
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
 
@@ -896,15 +882,15 @@ window.onload = loadData;
         const res = await response.json();
 
         if (res.status === "success") {
-            alert(`✅ Murid berhasil di-update: ${actionType.replace('_', ' ')}`);
+            alert(`✅ Berhasil di-update: ${actionType.replace('_', ' ')}`);
             closeModal();
-            loadData(); // Refresh tabel otomatis
+            loadData(); // Refresh tabel SDN Ranca Tales
         } else {
             alert("❌ Gagal: " + res.message);
         }
     } catch (err) {
         console.error(err);
-        alert("❌ Koneksi ke server gagal. Coba lagi, Pak.");
+        alert("❌ Gagal terhubung ke server. Coba lagi, Pak.");
     } finally {
         btn.disabled = false;
         btn.innerText = originalText;
@@ -1081,19 +1067,29 @@ function bukaModalTambahSiswa() {
 }
 
 function tutupModal(id) {
-    document.getElementById(id).classList.add('hidden');
-    if(id === 'modal-tambah-siswa') document.getElementById('form-tambah-siswa').reset();
+    const modal = document.getElementById(id);
+    if (modal) {
+        modal.classList.add('hidden');
+        // Jika yang ditutup modal tambah, reset formnya agar bersih
+        if (id === 'modal-tambah-siswa') {
+            const form = document.getElementById('form-tambah-siswa');
+            if (form) form.reset();
+        }
+    }
 }
 
 // --- FUNGSI SIMPAN SISWA BARU ---
 async function simpanMuridBaru(event) {
-    event.preventDefault(); // Mencegah reload halaman
+    event.preventDefault(); 
     
-    const loadingMsg = "Sedang menyimpan data ke SD Negeri Ranca Tales...";
-    console.log(loadingMsg);
+    // Gunakan visual loading agar lebih profesional
+    const btn = event.submitter; 
+    const originalText = btn.innerText;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
 
     const dataSiswa = {
-        id: "M-" + Date.now(), // Generate ID Unik
+        id: "M-" + Date.now(),
         nama: document.getElementById('in-nama').value,
         kelas: document.getElementById('in-kelas').value,
         jk: document.getElementById('in-jk').value,
@@ -1112,10 +1108,15 @@ async function simpanMuridBaru(event) {
         if (result.status === "success") {
             alert("Berhasil! " + result.message);
             tutupModal('modal-tambah-siswa');
-            loadData(); // Refresh tabel biar muncul yang baru
+            if (typeof loadData === "function") loadData(); 
+        } else {
+            alert("Gagal: " + result.message);
         }
     } catch (err) {
-        alert("Gagal terhubung ke server. Silakan coba lagi.");
+        alert("Gagal terhubung ke server SD Negeri Ranca Tales.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
     }
 }
 
@@ -1126,6 +1127,7 @@ async function prosesMasal(tipe, extra = {}) {
         "Apakah Bapak yakin ingin MELULUSKAN SEMUA murid Kelas 6?";
 
     if (!confirm(pesan)) return;
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
@@ -1133,20 +1135,27 @@ async function prosesMasal(tipe, extra = {}) {
         });
         const result = await response.json();
         alert(result.message);
-        loadData();
+        if (typeof loadData === "function") loadData();
     } catch (err) {
         alert("Gagal memproses aksi masal.");
     }
 }
 
-// Khusus untuk Lulus Masal agar input Tapel & Tanggal
+// Fitur Lulus Masal via Prompt (Cepat)
 function openModalLulusMasal() {
     const tapel = prompt("Masukkan Tahun Ajaran Lulus (Contoh: 2025/2026):");
     if (!tapel) return;
+    
     const tgl = prompt("Masukkan Tanggal Lulus (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
     if (!tgl) return;
 
-    prosesMasal('LULUS_SEMUA', { tapel: tapel, tglLulus: tgl });
+    // Sesuai dengan code.gs Bapak: IMPOR_LULUS
+    // Kita kirim dataImpor sebagai array kosong jika hanya ingin meluluskan yang ada di sistem
+    prosesMasal('IMPOR_LULUS', { 
+        tapel: tapel, 
+        tglLulus: tgl,
+        dataImpor: [] // Mengikuti struktur dataImpor di code.gs baris 37
+    });
 }
 </script>
 </body>
