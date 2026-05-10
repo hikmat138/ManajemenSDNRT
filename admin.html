@@ -1239,49 +1239,71 @@ async function eksekusiLulusMasal() {
 }
     // 1. Fungsi Download Format CSV Sederhana
 function downloadFormatLulus() {
-    // 1. Filter murid kelas 6 saja (6A, 6B, dst)
-    const muridKelas6 = masterData.filter(m => String(m.kelas).startsWith('6'));
+    console.log("Memulai proses download format...");
 
-    // 2. Urutkan: Kelas dulu (A ke B), lalu Nama (A ke Z)
+    // 1. Cek apakah library XLSX sudah terpasang
+    if (typeof XLSX === 'undefined') {
+        alert("Library Excel belum terpasang! Mohon tambahkan script SheetJS di HTML Bapak.");
+        return;
+    }
+
+    // 2. Ambil data masterData (Pastikan variabel ini ada dan isinya array)
+    if (!masterData || masterData.length === 0) {
+        alert("Data murid tidak ditemukan. Silakan load data terlebih dahulu.");
+        return;
+    }
+
+    // 3. Filter murid kelas 6 (A dan B)
+    const muridKelas6 = masterData.filter(m => {
+        const kls = String(m.kelas).toUpperCase();
+        return kls.startsWith('6');
+    });
+
+    // 4. Urutkan: Kelas (6A dulu baru 6B), lalu Nama
     muridKelas6.sort((a, b) => {
         if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
         return a.nama.localeCompare(b.nama);
     });
 
-    // 3. Susun data untuk Excel
+    // 5. Susun format kolom
     const dataExcel = muridKelas6.map(m => ({
         "Nama Murid": m.nama,
         "Kelas": m.kelas,
         "NIS": m.nis,
         "NISN": m.nisn,
-        "No. SK Lulus": "", // Kosongkan untuk diisi manual
-        "No. Ijazah": ""    // Kosongkan untuk diisi manual
+        "No. SK Lulus": "", 
+        "No. Ijazah": ""   
     }));
 
     if (dataExcel.length === 0) {
-        alert("Tidak ada data murid kelas 6 yang ditemukan!");
+        alert("Tidak ada murid kelas 6 di database.");
         return;
     }
 
-    // 4. Proses pembuatan file XLSX
-    const worksheet = XLSX.utils.json_to_sheet(dataExcel);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Lulus");
+    try {
+        // 6. Buat Workbook & Sheet
+        const ws = XLSX.utils.json_to_sheet(dataExcel);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Daftar Lulus");
 
-    // Atur lebar kolom agar rapi
-    worksheet['!cols'] = [
-        { wch: 30 }, // Nama
-        { wch: 10 }, // Kelas
-        { wch: 15 }, // NIS
-        { wch: 15 }, // NISN
-        { wch: 25 }, // SK
-        { wch: 25 }  // Ijazah
-    ];
+        // 7. Atur lebar kolom (Opsional tapi biar rapi)
+        ws['!cols'] = [
+            { wch: 35 }, // Nama
+            { wch: 10 }, // Kelas
+            { wch: 15 }, // NIS
+            { wch: 15 }, // NISN
+            { wch: 25 }, // SK
+            { wch: 25 }  // Ijazah
+        ];
 
-    // 5. Download file
-    XLSX.writeFile(workbook, `Format_Lulus_SDNRT_2026.xlsx`);
+        // 8. Proses Download
+        XLSX.writeFile(wb, "Format_Impor_Lulus_SDNRT.xlsx");
+        console.log("Download berhasil!");
+    } catch (error) {
+        console.error("Error saat download:", error);
+        alert("Gagal membuat file excel: " + error.message);
+    }
 }
-
 // 2. Fungsi Eksekusi Impor
 async function eksekusiImporLulus() {
     const tapel = document.getElementById('masal-tapel').value;
