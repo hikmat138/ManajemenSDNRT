@@ -1312,7 +1312,7 @@ async function eksekusiImporLulus() {
     const fileInput = document.getElementById('masal-file');
     
     if (!tapel || !tgl || fileInput.files.length === 0) {
-        return alert("Lengkapi data dan pilih file Excel-nya dulu, Pak.");
+        return alert("Mohon lengkapi Tahun Ajaran, Tanggal, dan pilih file Excel-nya dulu, Pak.");
     }
 
     const btn = document.getElementById('btnEksekusiImpor');
@@ -1324,21 +1324,33 @@ async function eksekusiImporLulus() {
     const reader = new FileReader();
 
     reader.onload = async function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-        // Mapping agar sesuai dengan variabel di code.gs
-        const dataImpor = rows.map(r => ({
-            nama: r["Nama Murid"],
-            nis: r["NIS"],
-            nisn: r["NISN"],
-            skLulus: r["No. SK Lulus"],
-            noIjazah: r["No. Ijazah"]
-        }));
-
         try {
+            // Membaca data binary Excel
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // Ambil sheet pertama
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Ubah sheet jadi JSON
+            const rows = XLSX.utils.sheet_to_json(worksheet);
+
+            if (rows.length === 0) {
+                alert("File Excel kosong atau format tidak sesuai.");
+                return;
+            }
+
+            // Mapping kolom (Sesuaikan dengan header di file Excel download)
+            const dataImpor = rows.map(r => ({
+                nama: r["Nama Murid"] || "",
+                nis: r["NIS"] || "",
+                nisn: r["NISN"] || "",
+                skLulus: r["No. SK Lulus"] || "",
+                noIjazah: r["No. Ijazah"] || ""
+            }));
+
+            // Kirim ke Google Apps Script SDN Ranca Tales
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -1348,23 +1360,26 @@ async function eksekusiImporLulus() {
                     dataImpor: dataImpor
                 })
             });
+            
             const result = await response.json();
             
             if(result.status === "success") {
-                alert("Alhamdulillah, Kelulusan Masal Berhasil!");
+                alert("✅ Berhasil! " + result.message);
                 tutupModal('modal-lulus-masal');
                 loadData(); 
             } else {
-                alert("Gagal: " + result.message);
+                alert("❌ Gagal: " + result.message);
             }
         } catch (err) {
-            alert("Koneksi bermasalah saat mengirim data.");
+            console.error(err);
+            alert("Terjadi kesalahan saat membaca file Excel. Pastikan formatnya benar.");
         } finally {
             btn.disabled = false;
             btn.innerText = originalText;
         }
     };
 
+    // PENTING: Gunakan readAsArrayBuffer untuk file Excel (.xlsx)
     reader.readAsArrayBuffer(file);
 }
 </script>
