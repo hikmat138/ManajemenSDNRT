@@ -1342,11 +1342,11 @@ function downloadFormatLulus() {
 // 2. Fungsi Eksekusi Impor
 async function eksekusiImporLulus() {
     const fileInput = document.getElementById('masal-file');
-    if (fileInput.files.length === 0) return alert("Pilih file Excel-nya dulu, Pak!");
+    if (fileInput.files.length === 0) return alert("Pilih file Excel dulu, Pak.");
 
     const btn = document.getElementById('btnEksekusiImpor');
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memindahkan Data...`;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
 
     const file = fileInput.files[0];
     const reader = new FileReader();
@@ -1356,27 +1356,34 @@ async function eksekusiImporLulus() {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
+            const rows = XLSX.utils.sheet_to_json(sheet);
 
-            // Kirim seluruh array data ke server
+            // Mapping data sesuai header Excel Bapak
+            const dataImpor = rows.map(r => ({
+                nama: r.nama,
+                nis: String(r.nis || ""),
+                thn_ajaran_lulus: r.thn_ajaran_lulus,
+                tgl_lulus: r.tgl_lulus,
+                sk_kelulusan: r.sk_kelulusan,
+                no_ijazah: r.no_ijazah
+            }));
+
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({
-                    action: 'IMPOR_LULUS_MASAL', // Pastikan di code.gs Bapak ada action ini
-                    payload: json
+                    action: 'IMPOR_LULUS',
+                    dataImpor: dataImpor
                 })
             });
 
-            const res = await response.json();
-            if (res.status === "success") {
-                alert(`✅ Berhasil! ${res.count} murid dipindahkan ke sheet Siswa Lulus.`);
+            const result = await response.json();
+            alert(result.message);
+            if (result.status === "success") {
                 tutupModal('modal-lulus-masal');
-                loadData(); // Refresh tabel murid aktif
-            } else {
-                alert("❌ Gagal: " + res.message);
+                loadData(); 
             }
         } catch (err) {
-            alert("❌ Terjadi kesalahan sistem.");
+            alert("Gagal membaca file.");
         } finally {
             btn.disabled = false;
             btn.innerText = "Mulai Impor";
