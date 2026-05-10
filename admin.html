@@ -213,14 +213,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
-                    <select id="in-kelas" required class="w-full border p-2 rounded-lg outline-none text-sm bg-white">
-                        <option value="1A">1A</option><option value="1B">1B</option>
-                        <option value="2A">2A</option><option value="3A">3A</option>
-                        <option value="4A">4A</option><option value="5A">5A</option>
-                        <option value="6A">6A</option>
-                    </select>
-                </div>
+    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
+    <select id="in-kelas" required class="w-full border p-2 rounded-lg outline-none text-sm bg-white">
+        </select>
+</div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jenis Kelamin</label>
                     <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
@@ -1158,23 +1154,49 @@ function setTipeInput(tipe) {
     const boxNisn = document.getElementById('box-nisn');
     const boxAsal = document.getElementById('box-asal');
     const boxTtl = document.getElementById('box-ttl');
+    const selectKelas = document.getElementById('in-kelas'); // Ambil elemen select kelas
+
+    // Kosongkan isi dropdown kelas terlebih dahulu
+    selectKelas.innerHTML = '';
 
     if (tipe === 'BARU') {
-        // Tampilkan input untuk murid baru
+        // 1. Tampilan Tab & Input
         tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
         tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
         boxNik.classList.remove('hidden');
         boxTtl.classList.remove('hidden');
         boxNisn.classList.add('hidden');
         boxAsal.classList.add('hidden');
+
+        // 2. Isi Dropdown KHUSUS KELAS 1 saja
+        const opsiBaru = ['1A', '1B'];
+        opsiBaru.forEach(kls => {
+            let opt = document.createElement('option');
+            opt.value = kls;
+            opt.text = kls;
+            selectKelas.add(opt);
+        });
+
     } else {
-        // Tampilkan input untuk pindahan
+        // 1. Tampilan Tab & Input
         tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
         tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
         boxNisn.classList.remove('hidden');
         boxAsal.classList.remove('hidden');
         boxNik.classList.add('hidden');
         boxTtl.classList.add('hidden');
+
+        // 2. Isi Dropdown SEMUA KELAS (1-6)
+        const opsiPindahan = [
+            '1A', '1B', '2A', '2B', '3A', '3B', 
+            '4A', '4B', '5A', '5B', '6A', '6B'
+        ];
+        opsiPindahan.forEach(kls => {
+            let opt = document.createElement('option');
+            opt.value = kls;
+            opt.text = kls;
+            selectKelas.add(opt);
+        });
     }
 }
 
