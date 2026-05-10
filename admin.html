@@ -308,7 +308,36 @@
         </div>
     </div>
 </div>
+<div id="modal-lulus-masal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__fadeInUp animate__faster">
+        <div class="bg-green-700 p-4 text-white flex justify-between items-center shadow-lg">
+            <h3 class="font-bold uppercase text-sm"><i class="fas fa-graduation-cap mr-2"></i> Kelulusan Masal Kelas 6</h3>
+            <button onclick="tutupModal('modal-lulus-masal')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="bg-green-50 border border-green-100 p-3 rounded-xl text-center">
+                <p class="text-[10px] text-green-600 font-bold uppercase">Peringatan</p>
+                <p class="text-xs text-green-800">Aksi ini akan memindahkan <b>Semua Murid Kelas 6</b> ke tabel Alumni.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Ajaran</label>
+                    <input type="text" id="masal-tapel" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-600" placeholder="2025/2026">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lulus</label>
+                    <input type="date" id="masal-tgl" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-600">
+                </div>
+            </div>
 
+            <div class="flex gap-2 pt-2">
+                <button onclick="tutupModal('modal-lulus-masal')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-[10px] uppercase text-gray-600">Batal</button>
+                <button onclick="eksekusiLulusMasal()" class="flex-1 bg-green-700 text-white py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg shadow-green-200">Proses Sekarang</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="flex h-screen">
     <!-- Sidebar -->
    <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
@@ -1142,20 +1171,55 @@ async function prosesMasal(tipe, extra = {}) {
 }
 
 // Fitur Lulus Masal via Prompt (Cepat)
+// Membuka Modal Lulus Masal
 function openModalLulusMasal() {
-    const tapel = prompt("Masukkan Tahun Ajaran Lulus (Contoh: 2025/2026):");
-    if (!tapel) return;
-    
-    const tgl = prompt("Masukkan Tanggal Lulus (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-    if (!tgl) return;
+    // Set tanggal hari ini secara otomatis agar tidak repot input
+    document.getElementById('masal-tgl').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modal-lulus-masal').classList.remove('hidden');
+}
 
-    // Sesuai dengan code.gs Bapak: IMPOR_LULUS
-    // Kita kirim dataImpor sebagai array kosong jika hanya ingin meluluskan yang ada di sistem
-    prosesMasal('IMPOR_LULUS', { 
-        tapel: tapel, 
+// Eksekusi pengiriman data ke GAS
+async function eksekusiLulusMasal() {
+    const tapel = document.getElementById('masal-tapel').value;
+    const tgl = document.getElementById('masal-tgl').value;
+
+    if (!tapel || !tgl) {
+        alert("Mohon isi Tahun Ajaran dan Tanggal Lulus, Pak.");
+        return;
+    }
+
+    if (!confirm("Apakah Bapak benar-benar yakin ingin meluluskan SELURUH siswa kelas 6?")) return;
+
+    // Sesuai code.gs Bapak: Aksi IMPOR_LULUS dengan dataImpor kosong
+    const payload = {
+        action: 'IMPOR_LULUS',
+        tapel: tapel,
         tglLulus: tgl,
-        dataImpor: [] // Mengikuti struktur dataImpor di code.gs baris 37
-    });
+        dataImpor: [] 
+    };
+
+    const btn = event?.target || document.querySelector('#modal-lulus-masal button.bg-green-700');
+    const originalText = btn.innerText;
+    
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        
+        alert("Selesai! " + result.message);
+        tutupModal('modal-lulus-masal');
+        loadData(); // Refresh tabel murid
+    } catch (err) {
+        alert("Gagal memproses kelulusan masal.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
 }
 </script>
 </body>
