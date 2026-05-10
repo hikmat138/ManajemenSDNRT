@@ -175,47 +175,69 @@
     <div id="modal-tambah-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__fadeInDown">
         <div class="bg-indigo-700 p-4 text-white flex justify-between items-center">
-            <h3 class="font-bold uppercase"><i class="fas fa-user-plus mr-2"></i> Tambah Murid Baru</h3>
+            <h3 class="font-bold uppercase"><i class="fas fa-user-plus mr-2"></i> Tambah Murid</h3>
             <button onclick="tutupModal('modal-tambah-siswa')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
         </div>
+        
+        <div class="flex border-b">
+            <button onclick="setTipeInput('BARU')" id="tab-baru" class="flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50">Murid Baru (Kelas 1)</button>
+            <button onclick="setTipeInput('PINDAHAN')" id="tab-pindahan" class="flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50">Murid Pindahan</button>
+        </div>
+
         <form id="form-tambah-siswa" onsubmit="simpanMuridBaru(event)" class="p-6 space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
                     <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
                     <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500 text-sm" placeholder="Nama Lengkap Murid">
                 </div>
+
+                <div id="box-nik" class="col-span-2">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK (Nomor Induk Kependudukan)</label>
+                    <input type="number" id="in-nik" class="w-full border p-2 rounded-lg text-sm" placeholder="16 Digit NIK">
+                </div>
+
+                <div id="box-nisn" class="col-span-2 hidden">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN (Siswa Pindahan)</label>
+                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="NISN dari sekolah lama">
+                </div>
+
+                <div id="box-ttl" class="col-span-2 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tempat Lahir</label>
+                        <input type="text" id="in-tmpt" class="w-full border p-2 rounded-lg text-sm" placeholder="Kota Lahir">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lahir</label>
+                        <input type="date" id="in-tgl" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
                     <select id="in-kelas" required class="w-full border p-2 rounded-lg outline-none text-sm bg-white">
                         <option value="1A">1A</option><option value="1B">1B</option>
-                        <option value="2A">2A</option><option value="2B">2B</option>
-                        <option value="3A">3A</option><option value="4A">4A</option>
-                        <option value="5A">5A</option><option value="6A">6A</option>
+                        <option value="2A">2A</option><option value="3A">3A</option>
+                        <option value="4A">4A</option><option value="5A">5A</option>
+                        <option value="6A">6A</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">JK</label>
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jenis Kelamin</label>
                     <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN</label>
-                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="00123xxx">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIS</label>
-                    <input type="number" id="in-nis" class="w-full border p-2 rounded-lg text-sm" placeholder="123xx">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal (Jika Pindahan)</label>
-                    <input type="text" id="in-asal" placeholder="Kosongkan jika bukan pindahan" class="w-full border p-2 rounded-lg text-sm">
+
+                <div id="box-asal" class="col-span-2 hidden">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal</label>
+                    <input type="text" id="in-asal" placeholder="SD Negeri sebelumnya..." class="w-full border p-2 rounded-lg text-sm">
                 </div>
             </div>
+
             <div class="flex gap-2 pt-4">
                 <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
-                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg shadow-indigo-200">Simpan Data</button>
+                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg">Simpan Data</button>
             </div>
         </form>
     </div>
@@ -1125,23 +1147,58 @@ function tutupModal(id) {
 }
 
 // --- FUNGSI SIMPAN SISWA BARU ---
+let tipeMuridAktif = "BARU"; // Default
+
+// Fungsi Ganti Tab
+function setTipeInput(tipe) {
+    tipeMuridAktif = tipe;
+    const tabBaru = document.getElementById('tab-baru');
+    const tabPindahan = document.getElementById('tab-pindahan');
+    const boxNik = document.getElementById('box-nik');
+    const boxNisn = document.getElementById('box-nisn');
+    const boxAsal = document.getElementById('box-asal');
+    const boxTtl = document.getElementById('box-ttl');
+
+    if (tipe === 'BARU') {
+        // Tampilkan input untuk murid baru
+        tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
+        tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
+        boxNik.classList.remove('hidden');
+        boxTtl.classList.remove('hidden');
+        boxNisn.classList.add('hidden');
+        boxAsal.classList.add('hidden');
+    } else {
+        // Tampilkan input untuk pindahan
+        tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
+        tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
+        boxNisn.classList.remove('hidden');
+        boxAsal.classList.remove('hidden');
+        boxNik.classList.add('hidden');
+        boxTtl.classList.add('hidden');
+    }
+}
+
+// Fungsi Simpan
 async function simpanMuridBaru(event) {
-    event.preventDefault(); 
+    event.preventDefault();
     
-    // Gunakan visual loading agar lebih profesional
-    const btn = event.submitter; 
+    const btn = event.submitter;
     const originalText = btn.innerText;
     btn.disabled = true;
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
 
     const dataSiswa = {
         id: "M-" + Date.now(),
+        tipe: tipeMuridAktif,
         nama: document.getElementById('in-nama').value,
         kelas: document.getElementById('in-kelas').value,
         jk: document.getElementById('in-jk').value,
-        nisn: document.getElementById('in-nisn').value,
-        nis: document.getElementById('in-nis').value,
-        sekolah_asal: document.getElementById('in-asal').value || "-"
+        // Data Bersyarat
+        nik: tipeMuridAktif === "BARU" ? document.getElementById('in-nik').value : "",
+        tmpt_lahir: tipeMuridAktif === "BARU" ? document.getElementById('in-tmpt').value : "",
+        tgl_lahir: tipeMuridAktif === "BARU" ? document.getElementById('in-tgl').value : "",
+        nisn: tipeMuridAktif === "PINDAHAN" ? document.getElementById('in-nisn').value : "",
+        sekolah_asal: tipeMuridAktif === "PINDAHAN" ? document.getElementById('in-asal').value : "Penerimaan Murid Baru"
     };
 
     try {
@@ -1152,14 +1209,12 @@ async function simpanMuridBaru(event) {
         const result = await response.json();
         
         if (result.status === "success") {
-            alert("Berhasil! " + result.message);
+            alert("✅ Berhasil Menambah " + (tipeMuridAktif === "BARU" ? "Murid Baru" : "Murid Pindahan"));
             tutupModal('modal-tambah-siswa');
-            if (typeof loadData === "function") loadData(); 
-        } else {
-            alert("Gagal: " + result.message);
+            loadData();
         }
     } catch (err) {
-        alert("Gagal terhubung ke server SD Negeri Ranca Tales.");
+        alert("Gagal koneksi ke server.");
     } finally {
         btn.disabled = false;
         btn.innerText = originalText;
