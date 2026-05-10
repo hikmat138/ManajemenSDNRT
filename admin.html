@@ -1295,146 +1295,93 @@ async function eksekusiLulusMasal() {
 }
     // 1. Fungsi Download Format CSV Sederhana
 function downloadFormatLulus() {
-    console.log("Memulai proses download format...");
+    if (typeof XLSX === 'undefined') return alert("Library Excel belum siap!");
 
-    // 1. Cek apakah library XLSX sudah terpasang
-    if (typeof XLSX === 'undefined') {
-        alert("Library Excel belum terpasang! Mohon tambahkan script SheetJS di HTML Bapak.");
-        return;
-    }
+    const tapel = document.getElementById('masal-tapel').value || "2025/2026";
+    const tglLulus = document.getElementById('masal-tgl').value || "";
 
-    // 2. Ambil data masterData (Pastikan variabel ini ada dan isinya array)
-    if (!masterData || masterData.length === 0) {
-        alert("Data murid tidak ditemukan. Silakan load data terlebih dahulu.");
-        return;
-    }
+    // Saring murid kelas 6 (6A & 6B)
+    const muridKelas6 = masterData.filter(m => String(m.kelas).startsWith('6'));
 
-    // 3. Filter murid kelas 6 (A dan B)
-    const muridKelas6 = masterData.filter(m => {
-        const kls = String(m.kelas).toUpperCase();
-        return kls.startsWith('6');
-    });
-
-    // 4. Urutkan: Kelas (6A dulu baru 6B), lalu Nama
+    // Urutkan Kelas 6A -> 6B
     muridKelas6.sort((a, b) => {
         if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
         return a.nama.localeCompare(b.nama);
     });
 
-    // 5. Susun format kolom
+    // Susun sesuai urutan kolom database siswa_lulus
     const dataExcel = muridKelas6.map(m => ({
-        "Nama Murid": m.nama,
-        "Kelas": m.kelas,
-        "NIS": m.nis,
-        "NISN": m.nisn,
-        "No. SK Lulus": "", 
-        "No. Ijazah": ""   
+        "nama": m.nama,
+        "jk": m.jk,
+        "tmpt_lahir": m.tmpt_lahir || "",
+        "tgl_lahir": m.tgl_lahir || "",
+        "kelas": m.kelas,
+        "nis": m.nis,
+        "nisn": m.nisn,
+        "thn_ajaran_lulus": tapel,
+        "tgl_lulus": tglLulus,
+        "sk_kelulusan": "", // Kosongkan untuk diisi Bapak
+        "no_ijazah": "",    // Kosongkan untuk diisi Bapak
+        "status_aktif": "LULUS"
     }));
 
-    if (dataExcel.length === 0) {
-        alert("Tidak ada murid kelas 6 di database.");
-        return;
-    }
+    if (dataExcel.length === 0) return alert("Murid kelas 6 tidak ditemukan!");
 
-    try {
-        // 6. Buat Workbook & Sheet
-        const ws = XLSX.utils.json_to_sheet(dataExcel);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Daftar Lulus");
+    const ws = XLSX.utils.json_to_sheet(dataExcel);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Format Lulus");
 
-        // 7. Atur lebar kolom (Opsional tapi biar rapi)
-        ws['!cols'] = [
-            { wch: 35 }, // Nama
-            { wch: 10 }, // Kelas
-            { wch: 15 }, // NIS
-            { wch: 15 }, // NISN
-            { wch: 25 }, // SK
-            { wch: 25 }  // Ijazah
-        ];
+    // Atur lebar kolom agar enak dipandang
+    ws['!cols'] = [
+        {wch:25}, {wch:5}, {wch:15}, {wch:12}, {wch:8}, {wch:10}, 
+        {wch:12}, {wch:15}, {wch:12}, {wch:25}, {wch:25}, {wch:12}
+    ];
 
-        // 8. Proses Download
-        XLSX.writeFile(wb, "Format_Impor_Lulus_SDNRT.xlsx");
-        console.log("Download berhasil!");
-    } catch (error) {
-        console.error("Error saat download:", error);
-        alert("Gagal membuat file excel: " + error.message);
-    }
+    XLSX.writeFile(wb, `Format_Impor_Lulus_SDNRT.xlsx`);
 }
 // 2. Fungsi Eksekusi Impor
 async function eksekusiImporLulus() {
-    const tapel = document.getElementById('masal-tapel').value;
-    const tgl = document.getElementById('masal-tgl').value;
     const fileInput = document.getElementById('masal-file');
-    
-    if (!tapel || !tgl || fileInput.files.length === 0) {
-        return alert("Mohon lengkapi Tahun Ajaran, Tanggal, dan pilih file Excel-nya dulu, Pak.");
-    }
+    if (fileInput.files.length === 0) return alert("Pilih file Excel-nya dulu, Pak!");
 
     const btn = document.getElementById('btnEksekusiImpor');
-    const originalText = btn.innerText;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses Excel...`;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memindahkan Data...`;
 
     const file = fileInput.files[0];
     const reader = new FileReader();
 
     reader.onload = async function(e) {
         try {
-            // Membaca data binary Excel
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            
-            // Ambil sheet pertama
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            
-            // Ubah sheet jadi JSON
-            const rows = XLSX.utils.sheet_to_json(worksheet);
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
 
-            if (rows.length === 0) {
-                alert("File Excel kosong atau format tidak sesuai.");
-                return;
-            }
-
-            // Mapping kolom (Sesuaikan dengan header di file Excel download)
-            const dataImpor = rows.map(r => ({
-                nama: r["Nama Murid"] || "",
-                nis: r["NIS"] || "",
-                nisn: r["NISN"] || "",
-                skLulus: r["No. SK Lulus"] || "",
-                noIjazah: r["No. Ijazah"] || ""
-            }));
-
-            // Kirim ke Google Apps Script SDN Ranca Tales
+            // Kirim seluruh array data ke server
             const response = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({
-                    action: 'IMPOR_LULUS',
-                    tapel: tapel,
-                    tglLulus: tgl,
-                    dataImpor: dataImpor
+                    action: 'IMPOR_LULUS_MASAL', // Pastikan di code.gs Bapak ada action ini
+                    payload: json
                 })
             });
-            
-            const result = await response.json();
-            
-            if(result.status === "success") {
-                alert("✅ Berhasil! " + result.message);
+
+            const res = await response.json();
+            if (res.status === "success") {
+                alert(`✅ Berhasil! ${res.count} murid dipindahkan ke sheet Siswa Lulus.`);
                 tutupModal('modal-lulus-masal');
-                loadData(); 
+                loadData(); // Refresh tabel murid aktif
             } else {
-                alert("❌ Gagal: " + result.message);
+                alert("❌ Gagal: " + res.message);
             }
         } catch (err) {
-            console.error(err);
-            alert("Terjadi kesalahan saat membaca file Excel. Pastikan formatnya benar.");
+            alert("❌ Terjadi kesalahan sistem.");
         } finally {
             btn.disabled = false;
-            btn.innerText = originalText;
+            btn.innerText = "Mulai Impor";
         }
     };
-
-    // PENTING: Gunakan readAsArrayBuffer untuk file Excel (.xlsx)
     reader.readAsArrayBuffer(file);
 }
 </script>
