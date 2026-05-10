@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
    <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -1236,16 +1237,47 @@ async function eksekusiLulusMasal() {
 }
     // 1. Fungsi Download Format CSV Sederhana
 function downloadFormatLulus() {
-    const csvContent = "nama,nis,nisn,sk_lulus,ijazah\nContoh Nama Siswa,12345,0012345678,421/001/2026,DN-28 001";
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", "Format_Impor_Lulus_SDNRT.csv");
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // 1. Filter murid kelas 6 saja (6A, 6B, dst)
+    const muridKelas6 = masterData.filter(m => String(m.kelas).startsWith('6'));
+
+    // 2. Urutkan: Kelas dulu (A ke B), lalu Nama (A ke Z)
+    muridKelas6.sort((a, b) => {
+        if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
+        return a.nama.localeCompare(b.nama);
+    });
+
+    // 3. Susun data untuk Excel
+    const dataExcel = muridKelas6.map(m => ({
+        "Nama Murid": m.nama,
+        "Kelas": m.kelas,
+        "NIS": m.nis,
+        "NISN": m.nisn,
+        "No. SK Lulus": "", // Kosongkan untuk diisi manual
+        "No. Ijazah": ""    // Kosongkan untuk diisi manual
+    }));
+
+    if (dataExcel.length === 0) {
+        alert("Tidak ada data murid kelas 6 yang ditemukan!");
+        return;
+    }
+
+    // 4. Proses pembuatan file XLSX
+    const worksheet = XLSX.utils.json_to_sheet(dataExcel);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Lulus");
+
+    // Atur lebar kolom agar rapi
+    worksheet['!cols'] = [
+        { wch: 30 }, // Nama
+        { wch: 10 }, // Kelas
+        { wch: 15 }, // NIS
+        { wch: 15 }, // NISN
+        { wch: 25 }, // SK
+        { wch: 25 }  // Ijazah
+    ];
+
+    // 5. Download file
+    XLSX.writeFile(workbook, `Format_Lulus_SDNRT_2026.xlsx`);
 }
 
 // 2. Fungsi Eksekusi Impor
@@ -1255,36 +1287,32 @@ async function eksekusiImporLulus() {
     const fileInput = document.getElementById('masal-file');
     
     if (!tapel || !tgl || fileInput.files.length === 0) {
-        return alert("Lengkapi data dan pilih file dulu, Pak Hikmat!");
+        return alert("Lengkapi data dan pilih file Excel-nya dulu, Pak.");
     }
 
     const btn = document.getElementById('btnEksekusiImpor');
     const originalText = btn.innerText;
-    
-    // Baca file CSV
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses Excel...`;
+
     const file = fileInput.files[0];
     const reader = new FileReader();
-    
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Membaca File...`;
 
     reader.onload = async function(e) {
-        const text = e.target.result;
-        const rows = text.split('\n').slice(1); // Lewati header
-        const dataImpor = rows.filter(r => r.trim() !== "").map(row => {
-            const cols = row.split(',');
-            return {
-                nama: cols[0]?.trim(),
-                nis: cols[1]?.trim(),
-                nisn: cols[2]?.trim(),
-                skLulus: cols[3]?.trim(),
-                noIjazah: cols[4]?.trim()
-            };
-        });
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-        // Kirim ke Google Apps Script (Aksi: IMPOR_LULUS)
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengirim Data...`;
-        
+        // Mapping agar sesuai dengan variabel di code.gs
+        const dataImpor = rows.map(r => ({
+            nama: r["Nama Murid"],
+            nis: r["NIS"],
+            nisn: r["NISN"],
+            skLulus: r["No. SK Lulus"],
+            noIjazah: r["No. Ijazah"]
+        }));
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -1298,21 +1326,21 @@ async function eksekusiImporLulus() {
             const result = await response.json();
             
             if(result.status === "success") {
-                alert("Alhamdulillah! " + result.message);
+                alert("Alhamdulillah, Kelulusan Masal Berhasil!");
                 tutupModal('modal-lulus-masal');
-                loadData(); // Refresh tabel
+                loadData(); 
             } else {
                 alert("Gagal: " + result.message);
             }
         } catch (err) {
-            alert("Terjadi kesalahan saat kirim data.");
+            alert("Koneksi bermasalah saat mengirim data.");
         } finally {
             btn.disabled = false;
             btn.innerText = originalText;
         }
     };
 
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
 }
 </script>
 </body>
