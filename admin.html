@@ -1207,28 +1207,29 @@ function setTipeInput(tipe) {
 
 // Fungsi Simpan
 async function simpanMuridBaru(event) {
-    event.preventDefault(); // Supaya halaman tidak reload
+    event.preventDefault();
 
-    // Ambil data dari form dengan aman (pakai || "" agar tidak error jika element sembunyi)
+    // Mengambil data dengan proteksi anti-undefined
     const dataSiswa = {
-        tipe: tipeMuridAktif, // Variabel ini pastikan sudah ada (BARU/PINDAHAN)
-        nama: document.getElementById('in-nama').value,
-        jk: document.getElementById('in-jk').value,
-        kelas: document.getElementById('in-kelas').value,
-        // Data Murid Baru
+        tipe: tipeMuridAktif,
+        nama: document.getElementById('in-nama').value || "",
+        jk: document.getElementById('in-jk').value || "",
+        kelas: document.getElementById('in-kelas').value || "",
+        // Data Identitas
         nik: document.getElementById('in-nik')?.value || "",
         tmpt_lahir: document.getElementById('in-tmpt')?.value || "",
         tgl_lahir: document.getElementById('in-tgl')?.value || "",
-        // Data Pindahan
+        // Data Administrasi
         nisn: document.getElementById('in-nisn')?.value || "",
+        nis: "", // NIS dikosongkan dulu sesuai permintaan
         sekolah_asal: document.getElementById('in-asal')?.value || "",
         tgl_masuk: document.getElementById('in-tgl-masuk')?.value || "",
         tapel: document.getElementById('in-tapel')?.value || "",
         alasan: document.getElementById('in-alasan')?.value || ""
     };
 
-    // Efek loading pada tombol
-    const btn = event.submitter; // Mengambil tombol yang diklik
+    // Efek Loading pada Tombol
+    const btn = event.submitter;
     const originalText = btn.innerText;
     btn.disabled = true;
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan...`;
@@ -1245,16 +1246,15 @@ async function simpanMuridBaru(event) {
         const res = await response.json();
         
         if (res.status === "success") {
-            alert("✅ " + res.message);
+            alert("Alhamdulillah, data berhasil disimpan!");
             tutupModal('modal-tambah-siswa');
             document.getElementById('form-tambah-siswa').reset();
-            loadData(); // Refresh tabel murid
+            if (typeof loadData === "function") loadData(); // Refresh tabel jika ada fungsinya
         } else {
-            alert("❌ Gagal: " + res.message);
+            alert("Gagal: " + res.message);
         }
     } catch (err) {
-        alert("❌ Terjadi kesalahan koneksi.");
-        console.error(err);
+        alert("Terjadi kesalahan koneksi ke server.");
     } finally {
         btn.disabled = false;
         btn.innerText = originalText;
