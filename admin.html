@@ -726,14 +726,14 @@ window.onload = loadData();
     
     // 2. Tentukan sumber data berdasarkan menu aktif
     let sourceData = [];
-    if (currentMenu === 'siswa-lulus') {
-        sourceData = masterDataLulus || [];
-    } else if (currentMenu === 'mutasi-masuk') {
-        sourceData = masterDataMutasiMasuk || [];
-        } else if (currentMenu === 'mutasi-keluar') {
-        sourceData = masterDataMutasiMasuk || [];
+    if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk; // Dari sheet mutasi_masuk
+    } else if (currentMenu === 'mutasi-keluar') {
+        sourceData = masterData; // Tetap dari masterData (siswa aktif)
+    } else if (currentMenu === 'siswa-lulus') {
+        sourceData = masterDataLulus;
     } else {
-        sourceData = masterData || []; // Default: Siswa Aktif & Mutasi Keluar
+        sourceData = masterData;
     }
 
     // 3. Proses Filtering
@@ -759,11 +759,12 @@ window.onload = loadData();
         }
 
         // 4. Penggabungan Logika Berdasarkan Menu
-        if (currentMenu === 'mutasi-keluar') {
-            // Filter siswa yang punya tanggal keluar saja
-            return matchNama && matchKelas && matchTapel && matchBulan && s.tgl_keluar && s.tgl_keluar !== '-';
+       f (currentMenu === 'mutasi-keluar') {
+            // Hanya tampilkan yang punya tanggal keluar dan status bukan 'Aktif'
+            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
         }
-
+        
+        // KHUSUS MUTASI MASUK / LULUS (Tampilkan semua dari sumbernya)
         if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus') {
             return matchNama && matchKelas && matchTapel && matchBulan;
         }
@@ -867,52 +868,43 @@ window.onload = loadData();
 }
 
     function showSection(id) {
-    // 1. Ambil elemen-elemen penting
-    
+    // 1. UPDATE MENU AKTIF PALING AWAL
+    currentMenu = id; 
+    console.log("Menu aktif sekarang:", currentMenu);
+
     const dashboard = document.getElementById('section-dashboard');
     const tabelContainer = document.getElementById('section-tabel-container');
     const headerTitle = document.getElementById('section-title');
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
 
-    // 2. Sembunyikan semua dulu agar tidak tumpang tindih
-    dashboard.classList.add('hidden');
-    tabelContainer.classList.add('hidden');
+    // Sembunyikan semua
+    if (dashboard) dashboard.classList.add('hidden');
+    if (tabelContainer) tabelContainer.classList.add('hidden');
 
     if (id === 'dashboard') {
-        dashboard.classList.remove('hidden');
-        headerTitle.innerText = "DASHBOARD";
-        currentMenu = 'dashboard';
-        initCharts(); // Jalankan grafik
+        if (dashboard) dashboard.classList.remove('hidden');
+        if (headerTitle) headerTitle.innerText = "DASHBOARD";
+        initCharts(); 
     } else {
-        // 3. Tampilkan kontainer tabel
-        tabelContainer.classList.remove('hidden');
-        
-        // Ganti judul header (contoh: mutasi-masuk jadi MUTASI MASUK)
-        headerTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
+        if (tabelContainer) tabelContainer.classList.remove('hidden');
+        if (headerTitle) headerTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
 
-        // 4. Update variabel menu aktif (PENTING agar filterData tahu harus nampilin apa)
-        currentMenu = id;
-
-        // 5. Logika Filter: Hanya muncul di menu tertentu
+        // Tampilkan/Sembunyikan Filter
         const listMenuFilter = ['mutasi-masuk', 'mutasi-keluar', 'siswa-lulus'];
-        if (listMenuFilter.includes(id)) {
-            filterBulan?.classList.remove('hidden');
-            filterTapel?.classList.remove('hidden');
-        } else {
-            filterBulan?.classList.add('hidden');
-            filterTapel?.classList.add('hidden');
-        }
+        const isFilterMenu = listMenuFilter.includes(id);
+        
+        if (filterBulan) isFilterMenu ? filterBulan.classList.remove('hidden') : filterBulan.classList.add('hidden');
+        if (filterTapel) isFilterMenu ? filterTapel.classList.remove('hidden') : filterTapel.classList.add('hidden');
 
-        // 6. Reset filter dan jalankan pembersihan data
+        // Reset Filter UI
         if (filterBulan) filterBulan.value = "";
         if (filterTapel) filterTapel.value = "";
         
-        // Panggil fungsi filter untuk menggambar ulang tabel sesuai menu yang diklik
+        // JALANKAN PROSES FILTER & RENDER
         resetAndFilter(); 
     }
 
-    // Update tampilan sidebar (warna menu aktif)
     updateSidebarUI(id);
 }
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
