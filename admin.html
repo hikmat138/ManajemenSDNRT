@@ -607,9 +607,9 @@
         'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
         'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan': 'Alasan',
+        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
         'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan'
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status'
     };
 
     function formatTanggalIndo(dateStr) {
@@ -728,7 +728,7 @@ window.onload = loadData;
     // Menampilkan identitas dasar + data mutasi
     cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
     } else {
-        cols = ['nama', 'kelas', 'status_aktif', 'alasan'];
+        cols = ['nama', 'kelas', 'status_masuk', 'alasan_masuk'];
     }
 
     // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
