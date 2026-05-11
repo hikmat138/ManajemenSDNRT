@@ -689,7 +689,6 @@
 // Inisialisasi saat halaman selesai dimuat
   
 window.onload = loadData();
-    generateTapelOptions(); // Jalankan ini dulu
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
