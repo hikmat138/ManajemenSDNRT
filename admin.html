@@ -1482,35 +1482,6 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
-    function generateTapelOptions() {
-    const selectTapel = document.getElementById('filter-tapel');
-    if (!selectTapel) return;
-
-    // Bersihkan isi sebelumnya kecuali "Semua Tapel"
-    selectTapel.innerHTML = '<option value="">Semua Tapel</option>';
-
-    const startYear = 2019;
-    const endYear = 2029;
-
-    for (let i = startYear; i <= endYear; i++) {
-        let thnAwal = i;
-        let thnAkhir = i + 1;
-        let label = `${thnAwal}/${thnAkhir}`;
-        
-        let opt = document.createElement('option');
-        opt.value = label;
-        opt.text = label;
-        
-        // Opsional: Set default ke tahun sekarang jika ingin
-        // if (label === "2025/2026") opt.selected = true; 
-
-        selectTapel.add(opt);
-    }
-}
-
-// Panggil fungsi ini saat halaman dimuat
-// Tambahkan baris ini di dalam window.onload = loadData atau di bawahnya
-generateTapelOptions();
 </script>
 </body>
 </html>
