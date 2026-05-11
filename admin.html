@@ -669,7 +669,7 @@
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
-            
+            generateTapelOptions();
             setTimeout(() => {
                 if (typeof initCharts === "function") {
                     initCharts(); 
@@ -688,6 +688,7 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
+    
 window.onload = loadData;
 
     function updateStats() {
@@ -710,6 +711,9 @@ window.onload = loadData;
 
     const blnEl = document.getElementById('filter-bulan');
     const bln = blnEl ? blnEl.value : "";
+
+    const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
+    const matchTapel = tapel === "" || valTapel === tapel;
 
     // 2. Tentukan sumber data berdasarkan menu aktif
     let sourceData = [];
@@ -1520,6 +1524,35 @@ async function eksekusiImporLulus() {
         }
     };
     reader.readAsArrayBuffer(file);
+}
+    function generateTapelOptions() {
+    const selectTapel = document.getElementById('filter-tapel');
+    const selectTapelMasal = document.getElementById('masal-tapel'); // Untuk modal lulus masal
+    
+    if (!selectTapel) return;
+
+    // Bersihkan dulu
+    selectTapel.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
+    
+    const startYear = 2023; // Bisa Bapak sesuaikan
+    const endYear = 2030;
+    
+    for (let i = startYear; i <= endYear; i++) {
+        let label = `${i}/${i + 1}`;
+        let opt = document.createElement('option');
+        opt.value = label;
+        opt.text = label;
+        selectTapel.add(opt);
+
+        // Jika ada dropdown di modal masal, ikut diisi
+        if (selectTapelMasal) {
+            let optMasal = document.createElement('option');
+            optMasal.value = label;
+            optMasal.text = label;
+            selectTapelMasal.add(optMasal);
+        }
+    }
+    console.log("Dropdown Tapel SDN Ranca Tales siap!");
 }
 </script>
 </body>
