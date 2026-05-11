@@ -1520,26 +1520,31 @@ async function eksekusiImporLulus() {
 }
     function generateTapelOptions() {
     const selectTapel = document.getElementById('filter-tapel');
-    const selectTapelMasal = document.getElementById('masal-tapel'); // Untuk modal lulus masal
+    const selectTapelMasal = document.getElementById('masal-tapel'); 
     
-    if (!selectTapel) return;
+    // 1. BERSIHKAN DULU DI LUAR LOOP (Hanya sekali saja)
+    if (selectTapel) {
+        selectTapel.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
+    }
+    if (selectTapelMasal) {
+        selectTapelMasal.innerHTML = '<option value="">Pilih Tapel</option>';
+    }
 
-    // Bersihkan dulu
-    selectTapel.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
-    
-    const startYear = 2019; // Bisa Bapak sesuaikan
+    const startYear = 2019; 
     const endYear = 2030;
     
     for (let i = startYear; i <= endYear; i++) {
         let label = `${i}/${i + 1}`;
         
-        // 1. Buat option untuk filter utama
-        let opt = document.createElement('option');
-        opt.value = label;
-        opt.text = label;
-        selectTapel.add(opt);
+        // 2. Buat untuk Filter Utama
+        if (selectTapel) {
+            let opt = document.createElement('option');
+            opt.value = label;
+            opt.text = label;
+            selectTapel.add(opt);
+        }
 
-        // 2. Buat option TERPISAH untuk modal masal (supaya tidak rebutan)
+        // 3. Buat untuk Modal Masal
         if (selectTapelMasal) {
             let optMasal = document.createElement('option');
             optMasal.value = label;
@@ -1547,7 +1552,7 @@ async function eksekusiImporLulus() {
             selectTapelMasal.add(optMasal);
         }
     }
-    console.log("Dropdown Tapel SDN Ranca Tales siap!");
+    console.log("Dropdown Tapel SDN Ranca Tales Berhasil Dimuat!");
 }
     window.onload = function() {
     // 1. Isi pilihan dropdown dulu
