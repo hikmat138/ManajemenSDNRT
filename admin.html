@@ -1532,12 +1532,14 @@ async function eksekusiImporLulus() {
     
     for (let i = startYear; i <= endYear; i++) {
         let label = `${i}/${i + 1}`;
+        
+        // 1. Buat option untuk filter utama
         let opt = document.createElement('option');
         opt.value = label;
         opt.text = label;
         selectTapel.add(opt);
 
-        // Jika ada dropdown di modal masal, ikut diisi
+        // 2. Buat option TERPISAH untuk modal masal (supaya tidak rebutan)
         if (selectTapelMasal) {
             let optMasal = document.createElement('option');
             optMasal.value = label;
