@@ -528,82 +528,45 @@
         </div>
 
         <!-- 2. SECTION TABEL (Hidden secara Default) -->
-        <div id="section-tabel-container" class="hidden space-y-4">
-            <div id="container-aksi-masal" class="hidden flex flex-wrap gap-2">
-        <button onclick="prosesMasal('NAIK_SEMUA')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
-            <i class="fas fa-users"></i> Naik Semua (1-5)
-        </button>
-        <button onclick="openModalLulusMasal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
-            <i class="fas fa-graduation-cap"></i> Luluskan Semua (Kelas 6)
-        </button>
-        <button onclick="bukaModalTambahSiswa()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
-            <i class="fas fa-user-plus"></i> Tambah Murid
-        </button>
-    </div>
-            
-            <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                <!-- Header Filter -->
-                <div class="flex flex-wrap gap-4 justify-between items-center p-4 border-b bg-gray-50/50">
-                    <h3 class="text-lg font-bold text-blue-800">DATA MURID</h3>
-                    <div class="flex gap-2 items-center">
-                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
-                            <option value="10">10 Baris</option>
-                            <option value="50">50 Baris</option>
-                            <option value="100">100 Baris</option>
-                        </select>
-                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
-                            <option value="">Semua Kelas</option>
-                            <option value="1A">1A</option><option value="1B">1B</option>
-                            <option value="2A">2A</option><option value="2B">2B</option>
-                            <option value="3A">3A</option><option value="3B">3B</option>
-                            <option value="4A">4A</option><option value="4B">4B</option>
-                            <option value="5A">5A</option><option value="5B">5B</option>
-                            <option value="6A">6A</option><option value="6B">6B</option>
-                        </select>
-                        <select id="filter-bulan" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
-    <option value="">Semua Bulan</option>
-    <option value="01">Januari</option>
-    <option value="02">Februari</option>
-    <option value="03">Maret</option>
-    <option value="04">April</option>
-    <option value="05">Mei</option>
-    <option value="06">Juni</option>
-    <option value="07">Juli</option>
-    <option value="08">Agustus</option>
-    <option value="09">September</option>
-    <option value="10">Oktober</option>
-    <option value="11">November</option>
-    <option value="12">Desember</option>
-</select>
-
-<select id="filter-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
-    <option value="">Semua Tapel</option>
+        <div class="flex gap-2 items-center">
+    <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
+        <option value="10">10 Baris</option>
+        <option value="50">50 Baris</option>
+        <option value="100">100 Baris</option>
     </select>
-                        <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
-                    </div>
-                </div>
 
-                <!-- Tabel Area -->
-                <div class="overflow-x-auto" style="max-height: 65vh;">
-                    <table class="w-full text-left border-collapse">
-                        <thead id="thead-data" class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold"></thead>
-                        <tbody id="tbody-data" class="text-sm divide-y"></tbody>
-                    </table>
-                </div>
+    <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
+        <option value="">Semua Kelas</option>
+        <option value="1A">1A</option><option value="1B">1B</option>
+        <option value="2A">2A</option><option value="2B">2B</option>
+        <option value="3A">3A</option><option value="3B">3B</option>
+        <option value="4A">4A</option><option value="4B">4B</option>
+        <option value="5A">5A</option><option value="5B">5B</option>
+        <option value="6A">6A</option><option value="6B">6B</option>
+    </select>
 
-                <!-- Footer Pagination -->
-                <div class="p-4 border-t flex justify-between items-center bg-gray-50">
-                    <div id="pagination-info" class="text-sm text-gray-500 font-medium">
-                        Menampilkan 0 - 0 dari 0 murid
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Sebelumnya</button>
-                        <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Selanjutnya</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <select id="filter-bulan" onchange="resetAndFilter()" class="hidden p-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">Semua Bulan</option>
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+        <option value="03">Maret</option>
+        <option value="04">April</option>
+        <option value="05">Mei</option>
+        <option value="06">Juni</option>
+        <option value="07">Juli</option>
+        <option value="08">Agustus</option>
+        <option value="09">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Desember</option>
+    </select>
 
+    <select id="filter-tapel" onchange="resetAndFilter()" class="hidden p-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">Semua Tapel</option>
+    </select>
+
+    <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none focus:ring-2 focus:ring-blue-500">
+</div>
     </div>
 </main>
 </div>
@@ -629,7 +592,7 @@
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
         'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran','sekolah_tujuan':'Sekolah Tujuan'
     };
 
     function formatTanggalIndo(dateStr) {
@@ -699,36 +662,56 @@ window.onload = loadData;
     function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
+    const bln = document.getElementById('filter-bulan').value; // Mengambil "01", "02" dst
     const tapel = document.getElementById('filter-tapel').value;
-    // Tentukan sumber data
+
+    // 1. Tentukan Sumber Data Berdasarkan Menu
     let sourceData = [];
-    if (currentMenu === 'siswa-lulus') {
+    if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk; // Ambil variabel khusus Mutasi Masuk
+    } else if (currentMenu === 'siswa-lulus') {
         sourceData = masterDataLulus;
-    } else if (currentMenu === 'mutasi-masuk') {
-        sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
     } else {
-        sourceData = masterData; // Siswa Aktif
+        sourceData = masterData; // Default ke data siswa aktif
     }
 
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
-let matchTapel = true;
-        if (tapel) {
-        // Gunakan properti 'tapel' (pastikan di code.gs Bapak kolom F sudah diberi nama 'tapel')
-        matchTapel = (s.tapel || "") === tapel;
-    }
-    
-    // Khusus mutasi masuk:
-    if (currentMenu === 'mutasi-masuk') {
-        return matchNama && matchKelas && matchWaktu && matchTapel;
-    }
-        // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
-        if (currentMenu === 'mutasi-keluar') {
-            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
-        }
         
-        return matchNama && matchKelas;
+        // 2. Logika Filter Tahun Ajaran (Tapel)
+        // Mengecek properti 'tahun_ajaran' atau 'thn_ajaran_lulus'
+        const valTapel = s.tahun_ajaran || s.thn_ajaran_lulus || "";
+        const matchTapel = tapel === "" || valTapel === tapel;
+
+        // 3. Logika Filter Bulan (PENTING: Ambil dari tgl yang sesuai menu)
+        let matchBulan = true;
+        if (bln !== "") {
+            let tglCek = "";
+            if (currentMenu === 'mutasi-masuk') tglCek = s.tgl_masuk;
+            else if (currentMenu === 'mutasi-keluar') tglCek = s.tgl_keluar;
+            else if (currentMenu === 'siswa-lulus') tglCek = s.tgl_lulus;
+
+            if (tglCek && tglCek !== "-") {
+                const dateObj = new Date(tglCek);
+                if (!isNaN(dateObj.getTime())) {
+                    // Ambil angka bulan (1-12) dan jadikan format 2 digit (01, 02...)
+                    const bulanData = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    matchBulan = (bulanData === bln);
+                } else {
+                    matchBulan = false;
+                }
+            } else {
+                matchBulan = false; 
+            }
+        }
+
+        // 4. Logika Khusus Mutasi Keluar (Jika data bercampur di masterData)
+        if (currentMenu === 'mutasi-keluar') {
+            return matchNama && matchKelas && matchTapel && matchBulan && s.tgl_keluar && s.tgl_keluar !== '-';
+        }
+
+        return matchNama && matchKelas && matchTapel && matchBulan;
     });
 
     updatePagination();
@@ -759,9 +742,9 @@ let matchTapel = true;
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
     // Menampilkan identitas dasar + data mutasi
-    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
+    cols = ['nama', 'jk', 'nisn','tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar','tahun_ajaran','sekolah_tujuan' 'alasan_mutasi', 'status_aktif'];
     } else {
-        cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+        cols = ['nama','jk','nisn','tmpt_lahir','tgl_lahir','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
     }
 
     // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
@@ -819,62 +802,39 @@ let matchTapel = true;
 }
 
     function showSection(id) {
-    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
+    // 1. Sembunyikan kontainer utama
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
 
-    // 2. Ambil elemen judul & tombol aksi
     const headerTitle = document.getElementById('section-title');
-    const containerAksi = document.getElementById('container-aksi-masal');
-    
-    // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
 
-    // 3. Logika pemindahan menu
-    if (id === 'dashboard') {
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        headerTitle.innerText = "DASHBOARD UTAMA";
-        if (containerAksi) containerAksi.classList.add('hidden');
-        
+   if (id === 'dashboard') {
+        // ...
     } else {
         document.getElementById('section-tabel-container').classList.remove('hidden');
-        
-        // --- LOGIKA TOMBOL AKSI MASAL (Registrasi) ---
-        if (id === 'siswa-registrasi') {
-            if (containerAksi) containerAksi.classList.remove('hidden');
+        headerTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
+
+        // RESET NILAI FILTER saat pindah menu agar tidak "nyangkut"
+        if (filterBulan) filterBulan.value = "";
+        if (filterTapel) filterTapel.value = "";
+
+        const listMenuFilter = ['mutasi-masuk', 'mutasi-keluar', 'siswa-lulus'];
+        if (listMenuFilter.includes(id)) {
+            filterBulan?.classList.remove('hidden');
+            filterTapel?.classList.remove('hidden');
         } else {
-            if (containerAksi) containerAksi.classList.add('hidden');
+            filterBulan?.classList.add('hidden');
+            filterTapel?.classList.add('hidden');
         }
 
-        // --- LOGIKA TAMPIL/SEMBUNYI FILTER MUTASI ---
-        // Kita munculkan filter Bulan & Tapel hanya di menu Mutasi atau Lulus
-        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
-            if (filterBulan) filterBulan.classList.remove('hidden');
-            if (filterTapel) filterTapel.classList.remove('hidden');
-        } else {
-            // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
-            if (filterBulan) filterBulan.classList.add('hidden');
-            if (filterTapel) filterTapel.classList.add('hidden');
-        }
-        
-        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
-        headerTitle.innerText = formattedTitle;
-
-        // SET MENU SEKARANG & REFRESH DATA
         currentMenu = id;
-        
-        // Pastikan dropdown Tahun Ajaran sudah terisi sebelum filter jalan
-        if (typeof generateTapelOptions === "function") {
-            generateTapelOptions();
-        }
-        
-        resetAndFilter();
+        resetAndFilter(); 
     }
-
-    // 4. Update tampilan aktif di Sidebar
     updateSidebarUI(id);
 }
+
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
     function resetAndFilter() { currentPage = 1; filterData(); }
