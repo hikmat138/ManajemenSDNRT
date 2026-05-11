@@ -631,7 +631,7 @@
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
-            
+            generateTapelOptions();
             setTimeout(() => {
                 if (typeof initCharts === "function") {
                     initCharts(); 
@@ -652,12 +652,17 @@
 // Inisialisasi saat halaman selesai dimuat
 window.onload = loadData;
 
-    function updateStats() {
-        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-        document.getElementById('stat-murid').innerText = aktif;
-        document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-        document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-    }
+   function updateStats() {
+    // Stat Murid Aktif (dari sheet siswa)
+    const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+    document.getElementById('stat-murid').innerText = aktif;
+
+    // Stat Mutasi Masuk (ambil dari masterDataMutasiMasuk agar akurat)
+    document.getElementById('stat-masuk').innerText = masterDataMutasiMasuk.length;
+
+    // Stat Mutasi Keluar (ambil dari masterData yang punya tgl_keluar)
+    document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+}
 
     function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
@@ -742,7 +747,7 @@ window.onload = loadData;
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
     // Menampilkan identitas dasar + data mutasi
-    cols = ['nama', 'jk', 'nisn','tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar','tahun_ajaran','sekolah_tujuan' 'alasan_mutasi', 'status_aktif'];
+    cols = ['nama', 'jk', 'nisn','tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar','tahun_ajaran','sekolah_tujuan', 'alasan_mutasi', 'status_aktif'];
     } else {
         cols = ['nama','jk','nisn','tmpt_lahir','tgl_lahir','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
     }
@@ -948,9 +953,9 @@ window.onload = loadData;
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
-        tujuan: document.getElementById('m-tujuan')?.value || ""
-    };
+        alasan: document.getElementById('m-alasan')?.value || document.getElementById('m-alasan-mutasi')?.value || "",
+    tujuan: document.getElementById('m-tujuan')?.value || document.getElementById('m-sekolah-tujuan')?.value || ""
+};
 
     // 3. Validasi singkat
     if (actionType === "LULUS" && !payload.tapel) return alert("Tahun Ajaran Kelulusan harus diisi!");
@@ -1321,7 +1326,7 @@ async function eksekusiLulusMasal() {
         dataImpor: [] 
     };
 
-    const btn = event?.target || document.querySelector('#modal-lulus-masal button.bg-green-700');
+    const btn = event?.currentTarget || document.getElementById('btn-eksekusi-masal');
     const originalText = btn.innerText;
     
     btn.disabled = true;
@@ -1442,6 +1447,20 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
+    function generateTapelOptions() {
+        const selectTapel = document.getElementById('filter-tapel');
+        if (!selectTapel) return;
+        selectTapel.innerHTML = '<option value="">Semua Tapel</option>';
+        const startYear = 2019;
+        const endYear = 2029;
+        for (let i = startYear; i <= endYear; i++) {
+            let label = `${i}/${i + 1}`;
+            let opt = document.createElement('option');
+            opt.value = label;
+            opt.text = label;
+            selectTapel.add(opt);
+        }
+    }
 </script>
 </body>
 </html>
