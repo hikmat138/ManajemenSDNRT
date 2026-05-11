@@ -576,7 +576,7 @@
     <option value="12">Desember</option>
 </select>
 
-<select id="masal-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
+<select id="filter-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
     <option value="">Semua Tapel</option>
     </select>
                         <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
@@ -1519,40 +1519,35 @@ async function eksekusiImporLulus() {
     reader.readAsArrayBuffer(file);
 }
     function generateTapelOptions() {
-    const selectTapel = document.getElementById('filter-tapel');
-    const selectTapelMasal = document.getElementById('masal-tapel'); 
-    
-    // 1. BERSIHKAN DULU DI LUAR LOOP (Hanya sekali saja)
-    if (selectTapel) {
-        selectTapel.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
-    }
-    if (selectTapelMasal) {
-        selectTapelMasal.innerHTML = '<option value="">Pilih Tapel</option>';
-    }
+    const selectFilter = document.getElementById('filter-tapel'); // Filter Utama
+    const selectMasal = document.getElementById('masal-tapel');   // Di Modal
 
-    const startYear = 2019; 
+    // BERSIHKAN SEKALI DI AWAL (DI LUAR FOR)
+    if (selectFilter) selectFilter.innerHTML = '<option value="">Semua Tapel</option>';
+    if (selectMasal) selectMasal.innerHTML = '<option value="">Pilih Tapel</option>';
+
+    const startYear = 2019;
     const endYear = 2030;
-    
+
     for (let i = startYear; i <= endYear; i++) {
         let label = `${i}/${i + 1}`;
         
-        // 2. Buat untuk Filter Utama
-        if (selectTapel) {
+        // Isi Dropdown Filter
+        if (selectFilter) {
             let opt = document.createElement('option');
             opt.value = label;
             opt.text = label;
-            selectTapel.add(opt);
+            selectFilter.add(opt);
         }
 
-        // 3. Buat untuk Modal Masal
-        if (selectTapelMasal) {
-            let optMasal = document.createElement('option');
-            optMasal.value = label;
-            optMasal.text = label;
-            selectTapelMasal.add(optMasal);
+        // Isi Dropdown Modal
+        if (selectMasal) {
+            let opt2 = document.createElement('option');
+            opt2.value = label;
+            opt2.text = label;
+            selectMasal.add(opt2);
         }
     }
-    console.log("Dropdown Tapel SDN Ranca Tales Berhasil Dimuat!");
 }
     window.onload = function() {
     // 1. Isi pilihan dropdown dulu
