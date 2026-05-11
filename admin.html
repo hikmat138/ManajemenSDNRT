@@ -597,6 +597,7 @@
     let currentPage = 1;
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
+    let masterDataMutasiMasuk = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -620,51 +621,50 @@
         return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
     }
 
-    async function loadData() {
-    try {
-        // Beri indikasi loading pada UI
-        const statMuridEl = document.getElementById('stat-murid');
-        if (statMuridEl) statMuridEl.innerText = "Memuat...";
+   async function loadData() {
+    try {
+        const statMuridEl = document.getElementById('stat-murid');
+        if (statMuridEl) statMuridEl.innerText = "Memuat...";
 
-        const res = await fetch(`${API_URL}?action=getAllData`);
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            // Mengambil data siswa dari database
-            masterData = result.data.siswa || [];
+        const res = await fetch(`${API_URL}?action=getAllData`);
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            // 1. Ambil data dari database (sesuai sheet masing-masing)
+            masterData = result.data.siswa || [];
             masterDataLulus = result.data.siswa_lulus || [];
-            
-            // 1. Update Profil Admin (Guru/Operator)
-            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
-            if (userData && userData.nama) {
-                const nameEl = document.getElementById('admin-name');
-                const btnEl = document.getElementById('userMenuBtn');
-                if (nameEl) nameEl.innerText = userData.nama;
-                if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
-            }
+            
+            // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
+            masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
+            
+            // 2. Update Profil Admin
+            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
+            if (userData && userData.nama) {
+                const nameEl = document.getElementById('admin-name');
+                const btnEl = document.getElementById('userMenuBtn');
+                if (nameEl) nameEl.innerText = userData.nama;
+                if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
+            }
 
-            // 2. Jalankan fungsi pendukung secara berurutan
-            updateStats(); // Hitung total murid aktif dsb.
-            filterData();  // Render baris tabel pertama kali
-            
-            // 3. Render Grafik (Gunakan sedikit delay agar DOM tabel siap)
-            setTimeout(() => {
-                if (typeof initCharts === "function") {
-                    initCharts(); 
-                }
-            }, 200);
+            // 3. Jalankan fungsi pendukung
+            updateStats(); 
+            filterData();  
+            
+            setTimeout(() => {
+                if (typeof initCharts === "function") {
+                    initCharts(); 
+                }
+            }, 200);
 
-        } else {
-            throw new Error("Respon server tidak sukses");
-        }
-    } catch (e) { 
-    console.error("Detail Error:", e); // Ini akan memunculkan alasan error di Console F12
-    const statMuridEl = document.getElementById('stat-murid');
-    if (statMuridEl) statMuridEl.innerText = "Koneksi Gagal";
-    
-    // Memberikan informasi lebih detail ke pengguna
-    alert("Koneksi ke server SDN Ranca Tales gagal. Periksa apakah URL API sudah benar dan izin akses sudah diatur ke 'Anyone'.");
-}
+        } else {
+            throw new Error("Respon server tidak sukses");
+        }
+    } catch (e) { 
+        console.error("Detail Error:", e);
+        const statMuridEl = document.getElementById('stat-murid');
+        if (statMuridEl) statMuridEl.innerText = "Koneksi Gagal";
+        alert("Koneksi ke server SDN Ranca Tales gagal.");
+    }
 }
 
 // Inisialisasi saat halaman selesai dimuat
@@ -681,25 +681,30 @@ window.onload = loadData;
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
 
-    // 1. Tentukan sumbernya: sourceData sudah benar
-    let sourceData = (currentMenu === 'siswa-lulus') ? masterDataLulus : masterData;
+    // Tentukan sumber data
+    let sourceData = [];
+    if (currentMenu === 'siswa-lulus') {
+        sourceData = masterDataLulus;
+    } else if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
+    } else {
+        sourceData = masterData; // Siswa Aktif
+    }
 
-    // 2. PERBAIKAN: Gunakan sourceData.filter, JANGAN masterData.filter
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
 
-        // Logika tambahan untuk menu mutasi
-        if (currentMenu === 'mutasi-masuk') return matchNama && matchKelas && s.tgl_masuk && s.tgl_masuk !== '-';
-        if (currentMenu === 'mutasi-keluar') return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+        // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
+        if (currentMenu === 'mutasi-keluar') {
+            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+        }
         
-        // Untuk menu lainnya (termasuk siswa-lulus), langsung return hasil pencarian
         return matchNama && matchKelas;
     });
 
     updatePagination();
 }
-
     function renderTable(list) {
     const thead = document.getElementById('thead-data');
     const tbody = document.getElementById('tbody-data');
