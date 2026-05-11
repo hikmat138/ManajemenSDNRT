@@ -688,7 +688,7 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
-    
+   
 window.onload = loadData;
 
     function updateStats() {
@@ -712,9 +712,7 @@ window.onload = loadData;
     const blnEl = document.getElementById('filter-bulan');
     const bln = blnEl ? blnEl.value : "";
 
-    const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
-    const matchTapel = tapel === "" || valTapel === tapel;
-
+    
     // 2. Tentukan sumber data berdasarkan menu aktif
     let sourceData = [];
     if (currentMenu === 'siswa-lulus') {
