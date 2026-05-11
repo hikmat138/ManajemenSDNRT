@@ -728,7 +728,6 @@ window.onload = loadData;
 
     let cols = [];
     
-    // 1. DAFTAR KOLOM LENGKAP SESUAI REQUEST BAPAK
     if (currentMenu === 'siswa-pribadi') {
         cols = [
             'nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'kk', 'akte', 
@@ -742,17 +741,17 @@ window.onload = loadData;
         cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
     } else if (currentMenu === 'siswa-registrasi') {
         cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
-   } else if (currentMenu === 'siswa-lulus') {
-        // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
+    } else if (currentMenu === 'siswa-lulus') {
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
-    // Menampilkan identitas dasar + data mutasi
-    cols = ['nama', 'jk', 'nisn','tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar','tahun_ajaran','sekolah_tujuan', 'alasan_mutasi', 'status_aktif'];
+        // PERBAIKAN: Tambah koma di antara sekolah_tujuan dan alasan_mutasi
+        cols = ['nama', 'jk', 'nisn', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'tahun_ajaran', 'sekolah_tujuan', 'alasan_mutasi', 'status_aktif'];
     } else {
-        cols = ['nama','jk','nisn','tmpt_lahir','tgl_lahir','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+        // Ini untuk Mutasi Masuk
+        cols = ['nama', 'jk', 'nisn', 'tmpt_lahir', 'tgl_lahir', 'tgl_masuk', 'kelas', 'tahun_ajaran', 'sekolah_asal', 'alasan_masuk', 'status_masuk'];
     }
 
-    // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
+    // 2. RENDER HEADER
     thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100">${colMap[c] || c}</th>`).join('')}</tr>`;
     
     // 3. RENDER BODY
@@ -766,7 +765,6 @@ window.onload = loadData;
         
         cols.forEach(c => {
             if (c === 'aksi') {
-                // LOGIKA TOMBOL AKSI (Aman & Ramping)
                 const kelasSekarang = String(s.kelas || "").substring(0, 1);
                 let iconAksi, warnaAksi, labelAksi;
 
@@ -792,7 +790,6 @@ window.onload = loadData;
                         </div>
                     </td>`;
             } else {
-                // LOGIKA DATA BIASA
                 let val = s[c] || '-';
                 if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
                 
@@ -953,9 +950,9 @@ window.onload = loadData;
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-        alasan: document.getElementById('m-alasan')?.value || document.getElementById('m-alasan-mutasi')?.value || "",
-    tujuan: document.getElementById('m-tujuan')?.value || document.getElementById('m-sekolah-tujuan')?.value || ""
-};
+        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
+        tujuan: document.getElementById('m-tujuan')?.value || ""
+    };
 
     // 3. Validasi singkat
     if (actionType === "LULUS" && !payload.tapel) return alert("Tahun Ajaran Kelulusan harus diisi!");
@@ -1326,7 +1323,7 @@ async function eksekusiLulusMasal() {
         dataImpor: [] 
     };
 
-    const btn = event?.currentTarget || document.getElementById('btn-eksekusi-masal');
+    const btn = event?.target || document.querySelector('#modal-lulus-masal button.bg-green-700');
     const originalText = btn.innerText;
     
     btn.disabled = true;
