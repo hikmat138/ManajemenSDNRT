@@ -560,6 +560,25 @@
                             <option value="5A">5A</option><option value="5B">5B</option>
                             <option value="6A">6A</option><option value="6B">6B</option>
                         </select>
+                        <select id="filter-bulan" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
+    <option value="">Semua Bulan</option>
+    <option value="01">Januari</option>
+    <option value="02">Februari</option>
+    <option value="03">Maret</option>
+    <option value="04">April</option>
+    <option value="05">Mei</option>
+    <option value="06">Juni</option>
+    <option value="07">Juli</option>
+    <option value="08">Agustus</option>
+    <option value="09">September</option>
+    <option value="10">Oktober</option>
+    <option value="11">November</option>
+    <option value="12">Desember</option>
+</select>
+
+<select id="filter-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
+    <option value="">Semua Tapel</option>
+    </select>
                         <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
                     </div>
                 </div>
@@ -680,7 +699,7 @@ window.onload = loadData;
     function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
-
+    const tapel = document.getElementById('filter-tapel').value;
     // Tentukan sumber data
     let sourceData = [];
     if (currentMenu === 'siswa-lulus') {
@@ -694,7 +713,16 @@ window.onload = loadData;
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
-
+let matchTapel = true;
+        if (tapel) {
+        // Gunakan properti 'tapel' (pastikan di code.gs Bapak kolom F sudah diberi nama 'tapel')
+        matchTapel = (s.tapel || "") === tapel;
+    }
+    
+    // Khusus mutasi masuk:
+    if (currentMenu === 'mutasi-masuk') {
+        return matchNama && matchKelas && matchWaktu && matchTapel;
+    }
         // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
         if (currentMenu === 'mutasi-keluar') {
             return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
@@ -1438,6 +1466,35 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
+    function generateTapelOptions() {
+    const selectTapel = document.getElementById('filter-tapel');
+    if (!selectTapel) return;
+
+    // Bersihkan isi sebelumnya kecuali "Semua Tapel"
+    selectTapel.innerHTML = '<option value="">Semua Tapel</option>';
+
+    const startYear = 2019;
+    const endYear = 2029;
+
+    for (let i = startYear; i <= endYear; i++) {
+        let thnAwal = i;
+        let thnAkhir = i + 1;
+        let label = `${thnAwal}/${thnAkhir}`;
+        
+        let opt = document.createElement('option');
+        opt.value = label;
+        opt.text = label;
+        
+        // Opsional: Set default ke tahun sekarang jika ingin
+        // if (label === "2025/2026") opt.selected = true; 
+
+        selectTapel.add(opt);
+    }
+}
+
+// Panggil fungsi ini saat halaman dimuat
+// Tambahkan baris ini di dalam window.onload = loadData atau di bawahnya
+generateTapelOptions();
 </script>
 </body>
 </html>
