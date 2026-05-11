@@ -689,10 +689,8 @@
 
 // Inisialisasi saat halaman selesai dimuat
   
-window.onload = function() {
+window.onload = loadData();
     generateTapelOptions(); // Jalankan ini dulu
-    loadData();             // Baru tarik data dari Sheets
-};
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
