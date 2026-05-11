@@ -1530,44 +1530,6 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
-    function generateTapelOptions() {
-    const selectFilter = document.getElementById('filter-tapel'); // Filter Utama
-    const selectMasal = document.getElementById('masal-tapel');   // Di Modal
-
-    // BERSIHKAN SEKALI DI AWAL (DI LUAR FOR)
-    if (selectFilter) selectFilter.innerHTML = '<option value="">Semua Tapel</option>';
-    if (selectMasal) selectMasal.innerHTML = '<option value="">Pilih Tapel</option>';
-
-    const startYear = 2019;
-    const endYear = 2030;
-
-    for (let i = startYear; i <= endYear; i++) {
-        let label = `${i}/${i + 1}`;
-        
-        // Isi Dropdown Filter
-        if (selectFilter) {
-            let opt = document.createElement('option');
-            opt.value = label;
-            opt.text = label;
-            selectFilter.add(opt);
-        }
-
-        // Isi Dropdown Modal
-        if (selectMasal) {
-            let opt2 = document.createElement('option');
-            opt2.value = label;
-            opt2.text = label;
-            selectMasal.add(opt2);
-        }
-    }
-}
-    window.onload = function() {
-    // 1. Isi pilihan dropdown dulu
-    generateTapelOptions(); 
-    
-    // 2. Baru tarik data dari server
-    loadData(); 
-};
 </script>
 </body>
 </html>
