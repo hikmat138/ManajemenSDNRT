@@ -816,12 +816,6 @@ let matchTapel = true;
         rowHtml += `</tr>`;
         return rowHtml;
     }).join('');
-        let html = '<tr>';
-    headers.forEach(key => {
-        html += `<th class="p-3">${colMap[key] || key}</th>`;
-    });
-    html += '</tr>';
-    thead.innerHTML = html;
 }
 
     function showSection(id) {
