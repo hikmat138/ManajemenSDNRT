@@ -1209,31 +1209,28 @@ function setTipeInput(tipe) {
 async function simpanMuridBaru(event) {
     event.preventDefault();
 
-    // 1. Ambil data dengan proteksi anti-undefined
+    // 1. Ambil data dari semua input (termasuk yang baru kita tambahkan)
     const dataSiswa = {
         tipe: tipeMuridAktif,
         nama: document.getElementById('in-nama').value || "",
         jk: document.getElementById('in-jk').value || "",
         kelas: document.getElementById('in-kelas').value || "",
         
-        // Data Identitas
+        // Data Identitas (Sekarang diambil semua baik BARU maupun PINDAHAN)
         nik: document.getElementById('in-nik')?.value || "",
         tmpt_lahir: document.getElementById('in-tmpt')?.value || "",
         tgl_lahir: document.getElementById('in-tgl')?.value || "",
         
         // Data Administrasi
         nisn: document.getElementById('in-nisn')?.value || "",
-        // --- POIN PENTING ---
-        // Jika Bapak punya input NIS di modal, ganti "" jadi document.getElementById('in-nis')?.value
-        nis: document.getElementById('in-nis')?.value || "", 
-        
+        nis: document.getElementById('in-nis')?.value || "", // Pastikan ID ini ada jika ada input NIS
         sekolah_asal: document.getElementById('in-asal')?.value || "",
         tgl_masuk: document.getElementById('in-tgl-masuk')?.value || "",
         tapel: document.getElementById('in-tapel')?.value || "",
         alasan: document.getElementById('in-alasan')?.value || ""
     };
 
-    // Efek Loading pada Tombol
+    // Efek Loading Tombol
     const btn = event.submitter;
     const originalText = btn.innerText;
     btn.disabled = true;
@@ -1251,15 +1248,15 @@ async function simpanMuridBaru(event) {
         const res = await response.json();
         
         if (res.status === "success") {
-            alert("Alhamdulillah, data berhasil disimpan!");
+            alert("Alhamdulillah, data berhasil disimpan ke SD Negeri Ranca Tales!");
             tutupModal('modal-tambah-siswa');
             document.getElementById('form-tambah-siswa').reset();
-            if (typeof loadData === "function") loadData(); // Refresh tabel jika ada fungsinya
+            if (typeof loadData === "function") loadData(); 
         } else {
             alert("Gagal: " + res.message);
         }
     } catch (err) {
-        alert("Terjadi kesalahan koneksi ke server.");
+        alert("Terjadi kesalahan koneksi. Pastikan API_URL benar.");
     } finally {
         btn.disabled = false;
         btn.innerText = originalText;
