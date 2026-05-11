@@ -1209,19 +1209,24 @@ function setTipeInput(tipe) {
 async function simpanMuridBaru(event) {
     event.preventDefault();
 
-    // Mengambil data dengan proteksi anti-undefined
+    // 1. Ambil data dengan proteksi anti-undefined
     const dataSiswa = {
         tipe: tipeMuridAktif,
         nama: document.getElementById('in-nama').value || "",
         jk: document.getElementById('in-jk').value || "",
         kelas: document.getElementById('in-kelas').value || "",
+        
         // Data Identitas
         nik: document.getElementById('in-nik')?.value || "",
         tmpt_lahir: document.getElementById('in-tmpt')?.value || "",
         tgl_lahir: document.getElementById('in-tgl')?.value || "",
+        
         // Data Administrasi
         nisn: document.getElementById('in-nisn')?.value || "",
-        nis: "", // NIS dikosongkan dulu sesuai permintaan
+        // --- POIN PENTING ---
+        // Jika Bapak punya input NIS di modal, ganti "" jadi document.getElementById('in-nis')?.value
+        nis: document.getElementById('in-nis')?.value || "", 
+        
         sekolah_asal: document.getElementById('in-asal')?.value || "",
         tgl_masuk: document.getElementById('in-tgl-masuk')?.value || "",
         tapel: document.getElementById('in-tapel')?.value || "",
