@@ -1547,6 +1547,13 @@ async function eksekusiImporLulus() {
     }
     console.log("Dropdown Tapel SDN Ranca Tales siap!");
 }
+    window.onload = function() {
+    // 1. Isi pilihan dropdown dulu
+    generateTapelOptions(); 
+    
+    // 2. Baru tarik data dari server
+    loadData(); 
+};
 </script>
 </body>
 </html>
