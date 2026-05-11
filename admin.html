@@ -629,6 +629,7 @@
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
+    let masterDataMutasiKeluar = []
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -667,7 +668,7 @@
             
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
-            
+             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -729,7 +730,7 @@ window.onload = loadData();
     if (currentMenu === 'mutasi-masuk') {
         sourceData = masterDataMutasiMasuk; // Dari sheet mutasi_masuk
     } else if (currentMenu === 'mutasi-keluar') {
-        sourceData = masterData; // Tetap dari masterData (siswa aktif)
+        sourceData = masterDataMutasiKeluar; // Tetap dari masterData (siswa aktif)
     } else if (currentMenu === 'siswa-lulus') {
         sourceData = masterDataLulus;
     } else {
@@ -759,7 +760,7 @@ window.onload = loadData();
         }
 
         // 4. Penggabungan Logika Berdasarkan Menu
-       f (currentMenu === 'mutasi-keluar') {
+       if (currentMenu === 'mutasi-keluar') {
             // Hanya tampilkan yang punya tanggal keluar dan status bukan 'Aktif'
             return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
         }
