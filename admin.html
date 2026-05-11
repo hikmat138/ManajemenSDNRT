@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - SDN Ranca Tales</title>
      <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -528,82 +529,119 @@
         </div>
 
         <!-- 2. SECTION TABEL (Hidden secara Default) -->
-        <div class="flex gap-2 items-center">
-    <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
-        <option value="10">10 Baris</option>
-        <option value="50">50 Baris</option>
-        <option value="100">100 Baris</option>
-    </select>
+        <div id="section-tabel-container" class="hidden space-y-4">
+            <div id="container-aksi-masal" class="hidden flex flex-wrap gap-2">
+        <button onclick="prosesMasal('NAIK_SEMUA')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-users"></i> Naik Semua (1-5)
+        </button>
+        <button onclick="openModalLulusMasal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-graduation-cap"></i> Luluskan Semua (Kelas 6)
+        </button>
+        <button onclick="bukaModalTambahSiswa()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <i class="fas fa-user-plus"></i> Tambah Murid
+        </button>
+    </div>
+            
+            <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                <!-- Header Filter -->
+                <div class="flex flex-wrap gap-4 justify-between items-center p-4 border-b bg-gray-50/50">
+                    <h3 class="text-lg font-bold text-blue-800">DATA MURID</h3>
+                    <div class="flex gap-2 items-center">
+                        <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
+                            <option value="10">10 Baris</option>
+                            <option value="50">50 Baris</option>
+                            <option value="100">100 Baris</option>
+                        </select>
+                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
+                            <option value="">Semua Kelas</option>
+                            <option value="1A">1A</option><option value="1B">1B</option>
+                            <option value="2A">2A</option><option value="2B">2B</option>
+                            <option value="3A">3A</option><option value="3B">3B</option>
+                            <option value="4A">4A</option><option value="4B">4B</option>
+                            <option value="5A">5A</option><option value="5B">5B</option>
+                            <option value="6A">6A</option><option value="6B">6B</option>
+                        </select>
+                        <select id="filter-bulan" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
+    <option value="">Semua Bulan</option>
+    <option value="01">Januari</option>
+    <option value="02">Februari</option>
+    <option value="03">Maret</option>
+    <option value="04">April</option>
+    <option value="05">Mei</option>
+    <option value="06">Juni</option>
+    <option value="07">Juli</option>
+    <option value="08">Agustus</option>
+    <option value="09">September</option>
+    <option value="10">Oktober</option>
+    <option value="11">November</option>
+    <option value="12">Desember</option>
+</select>
 
-    <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
-        <option value="">Semua Kelas</option>
-        <option value="1A">1A</option><option value="1B">1B</option>
-        <option value="2A">2A</option><option value="2B">2B</option>
-        <option value="3A">3A</option><option value="3B">3B</option>
-        <option value="4A">4A</option><option value="4B">4B</option>
-        <option value="5A">5A</option><option value="5B">5B</option>
-        <option value="6A">6A</option><option value="6B">6B</option>
+<select id="filter-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
+    <option value="">Semua Tapel</option>
     </select>
+                        <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
+                    </div>
+                </div>
 
-    <select id="filter-bulan" onchange="resetAndFilter()" class="hidden p-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">Semua Bulan</option>
-        <option value="01">Januari</option>
-        <option value="02">Februari</option>
-        <option value="03">Maret</option>
-        <option value="04">April</option>
-        <option value="05">Mei</option>
-        <option value="06">Juni</option>
-        <option value="07">Juli</option>
-        <option value="08">Agustus</option>
-        <option value="09">September</option>
-        <option value="10">Oktober</option>
-        <option value="11">November</option>
-        <option value="12">Desember</option>
-    </select>
+                <!-- Tabel Area -->
+                <div class="overflow-x-auto" style="max-height: 65vh;">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="thead-data" class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold"></thead>
+                        <tbody id="tbody-data" class="text-sm divide-y"></tbody>
+                    </table>
+                </div>
 
-    <select id="filter-tapel" onchange="resetAndFilter()" class="hidden p-2 border rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">Semua Tapel</option>
-    </select>
+                <!-- Footer Pagination -->
+                <div class="p-4 border-t flex justify-between items-center bg-gray-50">
+                    <div id="pagination-info" class="text-sm text-gray-500 font-medium">
+                        Menampilkan 0 - 0 dari 0 murid
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Sebelumnya</button>
+                        <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white transition">Selanjutnya</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none focus:ring-2 focus:ring-blue-500">
-</div>
     </div>
 </main>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
-    let masterData = [];
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+    let masterData = [];
     let masterDataLulus = [];
-    let filteredData = [];
-    let currentPage = 1;
-    let rowsPerPage = 10;
-    let currentMenu = 'siswa-pribadi';
+    let filteredData = [];
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
 
-    const colMap = {
-        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'layak_pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
-        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
-        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran','sekolah_tujuan':'Sekolah Tujuan'
-    };
+    const colMap = {
+        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
+        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'layak_pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
+        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
+        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
+        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
+    };
 
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
-        let date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
-    }
+    function formatTanggalIndo(dateStr) {
+        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
+        let date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
+    }
 
-   async function loadData() {
+   async function loadData() {
     try {
         const statMuridEl = document.getElementById('stat-murid');
         if (statMuridEl) statMuridEl.innerText = "Memuat...";
@@ -631,7 +669,7 @@
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
-            generateTapelOptions();
+            
             setTimeout(() => {
                 if (typeof initCharts === "function") {
                     initCharts(); 
@@ -652,82 +690,59 @@
 // Inisialisasi saat halaman selesai dimuat
 window.onload = loadData;
 
-   function updateStats() {
-    // Stat Murid Aktif (dari sheet siswa)
-    const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-    document.getElementById('stat-murid').innerText = aktif;
+    function updateStats() {
+        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+        document.getElementById('stat-murid').innerText = aktif;
+        document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
+        document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
+    }
 
-    // Stat Mutasi Masuk (ambil dari masterDataMutasiMasuk agar akurat)
-    document.getElementById('stat-masuk').innerText = masterDataMutasiMasuk.length;
-
-    // Stat Mutasi Keluar (ambil dari masterData yang punya tgl_keluar)
-    document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-}
-
-    function filterData() {
+    function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
-    const bln = document.getElementById('filter-bulan').value; // Mengambil "01", "02" dst
     const tapel = document.getElementById('filter-tapel').value;
-
-    // 1. Tentukan Sumber Data Berdasarkan Menu
+    // Tentukan sumber data
     let sourceData = [];
-    if (currentMenu === 'mutasi-masuk') {
-        sourceData = masterDataMutasiMasuk; // Ambil variabel khusus Mutasi Masuk
-    } else if (currentMenu === 'siswa-lulus') {
+    if (currentMenu === 'siswa-lulus') {
         sourceData = masterDataLulus;
+    } else if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
     } else {
-        sourceData = masterData; // Default ke data siswa aktif
+        sourceData = masterData; // Siswa Aktif
     }
 
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
-        
-        // 2. Logika Filter Tahun Ajaran (Tapel)
-        // Mengecek properti 'tahun_ajaran' atau 'thn_ajaran_lulus'
-        const valTapel = s.tahun_ajaran || s.thn_ajaran_lulus || "";
-        const matchTapel = tapel === "" || valTapel === tapel;
-
-        // 3. Logika Filter Bulan (PENTING: Ambil dari tgl yang sesuai menu)
-        let matchBulan = true;
-        if (bln !== "") {
-            let tglCek = "";
-            if (currentMenu === 'mutasi-masuk') tglCek = s.tgl_masuk;
-            else if (currentMenu === 'mutasi-keluar') tglCek = s.tgl_keluar;
-            else if (currentMenu === 'siswa-lulus') tglCek = s.tgl_lulus;
-
-            if (tglCek && tglCek !== "-") {
-                const dateObj = new Date(tglCek);
-                if (!isNaN(dateObj.getTime())) {
-                    // Ambil angka bulan (1-12) dan jadikan format 2 digit (01, 02...)
-                    const bulanData = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    matchBulan = (bulanData === bln);
-                } else {
-                    matchBulan = false;
-                }
-            } else {
-                matchBulan = false; 
-            }
-        }
-
-        // 4. Logika Khusus Mutasi Keluar (Jika data bercampur di masterData)
+let matchTapel = true;
+        if (tapel) {
+        // Gunakan properti 'tapel' (pastikan di code.gs Bapak kolom F sudah diberi nama 'tapel')
+        matchTapel = (s.tapel || "") === tapel;
+    }
+    
+    // Khusus mutasi masuk:
+    if (currentMenu === 'mutasi-masuk') {
+        return matchNama && matchKelas && matchWaktu && matchTapel;
+    }
+        // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
         if (currentMenu === 'mutasi-keluar') {
-            return matchNama && matchKelas && matchTapel && matchBulan && s.tgl_keluar && s.tgl_keluar !== '-';
+            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
         }
-
-        return matchNama && matchKelas && matchTapel && matchBulan;
+        
+        return matchNama && matchKelas;
     });
-
+console.log("Hasil Filter:", filteredData);
+        currentPage = 1;
     updatePagination();
 }
-    function renderTable(list) {
+    function renderTable(list) {
     const thead = document.getElementById('thead-data');
     const tbody = document.getElementById('tbody-data');
     if (!thead || !tbody) return;
 
     let cols = [];
     
+    // 1. DAFTAR KOLOM LENGKAP SESUAI REQUEST BAPAK
     if (currentMenu === 'siswa-pribadi') {
         cols = [
             'nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'kk', 'akte', 
@@ -741,17 +756,17 @@ window.onload = loadData;
         cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
     } else if (currentMenu === 'siswa-registrasi') {
         cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
-    } else if (currentMenu === 'siswa-lulus') {
+   } else if (currentMenu === 'siswa-lulus') {
+        // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
-        // PERBAIKAN: Tambah koma di antara sekolah_tujuan dan alasan_mutasi
-        cols = ['nama', 'jk', 'nisn', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'tahun_ajaran', 'sekolah_tujuan', 'alasan_mutasi', 'status_aktif'];
+    // Menampilkan identitas dasar + data mutasi
+    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
     } else {
-        // Ini untuk Mutasi Masuk
-        cols = ['nama', 'jk', 'nisn', 'tmpt_lahir', 'tgl_lahir', 'tgl_masuk', 'kelas', 'tahun_ajaran', 'sekolah_asal', 'alasan_masuk', 'status_masuk'];
+        cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
     }
 
-    // 2. RENDER HEADER
+    // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
     thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100">${colMap[c] || c}</th>`).join('')}</tr>`;
     
     // 3. RENDER BODY
@@ -765,6 +780,7 @@ window.onload = loadData;
         
         cols.forEach(c => {
             if (c === 'aksi') {
+                // LOGIKA TOMBOL AKSI (Aman & Ramping)
                 const kelasSekarang = String(s.kelas || "").substring(0, 1);
                 let iconAksi, warnaAksi, labelAksi;
 
@@ -790,6 +806,7 @@ window.onload = loadData;
                         </div>
                     </td>`;
             } else {
+                // LOGIKA DATA BIASA
                 let val = s[c] || '-';
                 if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
                 
@@ -803,67 +820,105 @@ window.onload = loadData;
     }).join('');
 }
 
-    function showSection(id) {
-    // 1. Sembunyikan kontainer utama
+    function showSection(id) {
+    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
 
+    // 2. Ambil elemen judul & tombol aksi
     const headerTitle = document.getElementById('section-title');
+    const containerAksi = document.getElementById('container-aksi-masal');
+    
+    // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
 
-   if (id === 'dashboard') {
-        // ...
+    // 3. Logika pemindahan menu
+    if (id === 'dashboard') {
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        headerTitle.innerText = "DASHBOARD UTAMA";
+        if (containerAksi) containerAksi.classList.add('hidden');
+        
     } else {
         document.getElementById('section-tabel-container').classList.remove('hidden');
-        headerTitle.innerText = id.replace(/-/g, ' ').toUpperCase();
-
-        // RESET NILAI FILTER saat pindah menu agar tidak "nyangkut"
-        if (filterBulan) filterBulan.value = "";
-        if (filterTapel) filterTapel.value = "";
-
-        const listMenuFilter = ['mutasi-masuk', 'mutasi-keluar', 'siswa-lulus'];
-        if (listMenuFilter.includes(id)) {
-            filterBulan?.classList.remove('hidden');
-            filterTapel?.classList.remove('hidden');
+        
+        // --- LOGIKA TOMBOL AKSI MASAL (Registrasi) ---
+        if (id === 'siswa-registrasi') {
+            if (containerAksi) containerAksi.classList.remove('hidden');
         } else {
-            filterBulan?.classList.add('hidden');
-            filterTapel?.classList.add('hidden');
+            if (containerAksi) containerAksi.classList.add('hidden');
         }
 
+        // --- LOGIKA TAMPIL/SEMBUNYI FILTER MUTASI ---
+        // Kita munculkan filter Bulan & Tapel hanya di menu Mutasi atau Lulus
+        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
+            if (filterBulan) filterBulan.classList.remove('hidden');
+            if (filterTapel) filterTapel.classList.remove('hidden');
+        } else {
+            // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
+            if (filterBulan) filterBulan.classList.add('hidden');
+            if (filterTapel) filterTapel.classList.add('hidden');
+        }
+        
+        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
+        headerTitle.innerText = formattedTitle;
+
+        // SET MENU SEKARANG & REFRESH DATA
         currentMenu = id;
-        resetAndFilter(); 
+        
+        // Pastikan dropdown Tahun Ajaran sudah terisi sebelum filter jalan
+        if (typeof generateTapelOptions === "function") {
+            generateTapelOptions();
+        }
+        
+        resetAndFilter();
     }
+
+    // 4. Update tampilan aktif di Sidebar
     updateSidebarUI(id);
 }
+    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
+    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
+    function resetAndFilter() { currentPage = 1; filterData(); }
+    function updatePagination() {
+    // 1. Cek apakah variabel data sudah ada atau masih kosong
+    if (typeof filteredData === 'undefined') {
+        console.error("Variabel filteredData belum didefinisikan!");
+        return;
+    }
 
-    function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
-    function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
-    function resetAndFilter() { currentPage = 1; filterData(); }
-    function updatePagination() {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = Math.min(start + rowsPerPage, filteredData.length);
-    const dataToRender = filteredData.slice(start, end);
-    
-    renderTable(dataToRender);
+    // 2. Jika data benar-benar kosong (0 murid)
+    if (filteredData.length === 0) {
+        const tbody = document.getElementById('tbody-data');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="100%" class="p-10 text-center text-gray-400">Data tidak ditemukan. Silakan cek filter atau pastikan data sudah terload.</td></tr>`;
+        }
+        const infoEl = document.getElementById('pagination-info');
+        if (infoEl) infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
+        return;
+    }
 
-    // Update teks info pagination
-    const infoEl = document.getElementById('pagination-info');
-    if (infoEl) {
-        if (filteredData.length > 0) {
-            infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
-        } else {
-            infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
-        }
-    }
+    // 3. Logika pemotongan data (Pagination)
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = Math.min(start + rowsPerPage, filteredData.length);
+    const dataToRender = filteredData.slice(start, end);
+    
+    // 4. Kirim ke tabel
+    renderTable(dataToRender);
+
+    // 5. Update teks info
+    const infoEl = document.getElementById('pagination-info');
+    if (infoEl) {
+        infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
+    }
 }
-    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
-    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
-    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
+    function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
+    function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
+    function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
 
-    // Logika Modal
-    let selectedMuridId = null;
-    function openModal(id, tipe) {
+    // Logika Modal
+    let selectedMuridId = null;
+    function openModal(id, tipe) {
     selectedMuridId = id;
     const s = masterData.find(item => item.id == id);
     if (!s) return;
@@ -985,170 +1040,170 @@ window.onload = loadData;
         btn.innerText = originalText;
     }
 }
-    let charts = {}; 
+    let charts = {}; 
 function initCharts() {
-    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    if (!masterData || masterData.length === 0) return;
-    // --- 1. PROSES DATA UMUR ---
-    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
-    dataAktif.forEach(s => {
-        if (!s.umur) return;
-        const thn = parseInt((s.umur || "0").split(' ')[0]);
-        if (isNaN(thn)) return;
-        if (thn < 7) katUmur["< 7"]++;
-        else if (thn < 8) katUmur["7-8"]++;
-        else if (thn < 9) katUmur["8-9"]++;
-        else if (thn < 10) katUmur["9-10"]++;
-        else if (thn < 11) katUmur["10-11"]++;
-        else if (thn < 12) katUmur["11-12"]++;
-        else katUmur["> 12"]++;
-    });
-    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
-    // Panggil renderChart dengan data yang sudah dihitung
-    renderChart('chartUmur', 'pie', 'Grafik Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
+    const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
+    if (!masterData || masterData.length === 0) return;
+    // --- 1. PROSES DATA UMUR ---
+    let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
+    dataAktif.forEach(s => {
+        if (!s.umur) return;
+        const thn = parseInt((s.umur || "0").split(' ')[0]);
+        if (isNaN(thn)) return;
+        if (thn < 7) katUmur["< 7"]++;
+        else if (thn < 8) katUmur["7-8"]++;
+        else if (thn < 9) katUmur["8-9"]++;
+        else if (thn < 10) katUmur["9-10"]++;
+        else if (thn < 11) katUmur["10-11"]++;
+        else if (thn < 12) katUmur["11-12"]++;
+        else katUmur["> 12"]++;
+    });
+    const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
+    // Panggil renderChart dengan data yang sudah dihitung
+    renderChart('chartUmur', 'pie', 'Grafik Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
 
-    // --- 2. PROSES DATA AGAMA ---
-    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
-    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
-    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
+    // --- 2. PROSES DATA AGAMA ---
+    const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
+    let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
+    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
 
-    // --- 3. PROSES DATA BULAN LAHIR ---
-    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    let statsBulan = Array(12).fill(0);
-    dataAktif.forEach(s => {
-        if (s.tgl_lahir && s.tgl_lahir !== '-') {
-            const d = new Date(s.tgl_lahir);
-            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
-        }
-    });
-    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444', 50);
+    // --- 3. PROSES DATA BULAN LAHIR ---
+    const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    let statsBulan = Array(12).fill(0);
+    dataAktif.forEach(s => {
+        if (s.tgl_lahir && s.tgl_lahir !== '-') {
+            const d = new Date(s.tgl_lahir);
+            if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
+        }
+    });
+    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444', 50);
 
-    // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
-   const helperCount = (arr) => arr.reduce((acc, val) => { 
-        let key = (val && val !== '-' && val !== '') ? val : 'Tidak Diisi';
-        acc[key] = (acc[key] || 0) + 1; 
-        return acc; 
-    }, {});
+    // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
+   const helperCount = (arr) => arr.reduce((acc, val) => { 
+        let key = (val && val !== '-' && val !== '') ? val : 'Tidak Diisi';
+        acc[key] = (acc[key] || 0) + 1; 
+        return acc; 
+    }, {});
 
-    const cKerjaAyah = helperCount(dataAktif.map(s => s.ayah_pekerjaan));
-    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb', 50);
+    const cKerjaAyah = helperCount(dataAktif.map(s => s.ayah_pekerjaan));
+    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb', 50);
 
-    const cKerjaIbu = helperCount(dataAktif.map(s => s.ibu_pekerjaan));
-    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777', 50);
+    const cKerjaIbu = helperCount(dataAktif.map(s => s.ibu_pekerjaan));
+    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777', 50);
 
-    // --- 2. GRAFIK PENDIDIKAN (DIPISAH) ---
-    const cPendAyah = helperCount(dataAktif.map(s => s.ayah_pendidikan));
-    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5', 50);
+    // --- 2. GRAFIK PENDIDIKAN (DIPISAH) ---
+    const cPendAyah = helperCount(dataAktif.map(s => s.ayah_pendidikan));
+    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5', 50);
 
-    const cPendIbu = helperCount(dataAktif.map(s => s.ibu_pendidikan));
-    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea', 50);
+    const cPendIbu = helperCount(dataAktif.map(s => s.ibu_pendidikan));
+    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea', 50);
 
-    // --- 3. GRAFIK PENGHASILAN (DIPISAH) ---
-    const cHasilAyah = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669', 50);
+    // --- 3. GRAFIK PENGHASILAN (DIPISAH) ---
+    const cHasilAyah = helperCount(dataAktif.map(s => s.ayah_penghasilan));
+    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669', 50);
 
-    const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
-    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981', 50);
+    const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
+    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981', 50);
 
-    // --- 4. GRAFIK LAYAK PIP (KOLOM Z / penerima_kps) ---
-    // Mengasumsikan kolom Z dipetakan ke property 'penerima_kps' atau 'layak_pip'
-    let dataPIP = { "Ya": 0, "Tidak": 0 };
-    dataAktif.forEach(s => {
-    // Memanggil properti s.layak_pip sesuai header baru di Spreadsheet
-    let status = String(s.layak_pip || "").trim().toUpperCase(); 
-    
-    if (status === 'YA' || status === 'YES') {
-        dataPIP["Ya"]++;
-    } else {
-        dataPIP["Tidak"]++;
-    }
+    // --- 4. GRAFIK LAYAK PIP (KOLOM Z / penerima_kps) ---
+    // Mengasumsikan kolom Z dipetakan ke property 'penerima_kps' atau 'layak_pip'
+    let dataPIP = { "Ya": 0, "Tidak": 0 };
+    dataAktif.forEach(s => {
+    // Memanggil properti s.layak_pip sesuai header baru di Spreadsheet
+    let status = String(s.layak_pip || "").trim().toUpperCase(); 
+    
+    if (status === 'YA' || status === 'YES') {
+        dataPIP["Ya"]++;
+    } else {
+        dataPIP["Tidak"]++;
+    }
 });
-    renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
+    renderChart('chartPIP', 'pie', 'Persentase Layak PIP', Object.keys(dataPIP), Object.values(dataPIP), ['#22c55e', '#ef4444']);
 }
 
 function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
-    
-    if (charts[canvasId]) charts[canvasId].destroy();
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    
+    if (charts[canvasId]) charts[canvasId].destroy();
 
-    const total = data.reduce((a, b) => a + b, 0);
-    const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
+    const total = data.reduce((a, b) => a + b, 0);
+    const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
 
-    charts[canvasId] = new Chart(ctx, {
-        type: type,
-        data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: data,
-                backgroundColor: bgColor,
-                borderWidth: 1
-            }]
-        },
-        plugins: isPluginAvailable ? [ChartDataLabels] : [],
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: label.toUpperCase(),
-                    font: { size: 14, weight: 'bold' }
-                },
-                datalabels: {
-                    display: (type === 'pie' || type === 'doughnut'),
-                    color: '#fff',
-                    font: { weight: 'bold' },
-                    formatter: (value) => {
-                        return total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
-                    }
-                },
-                legend: { 
-                    display: (type === 'pie' || type === 'doughnut'),
-                    position: 'bottom' 
-                }
-            },
-            scales: (type === 'bar' || type === 'line') ? {
-                y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 450, 
-                    ticks: { 
-                        stepSize: 50,
-                        autoSkip: false, // Memaksa semua kelipatan 50 muncul
-                        precision: 0,
-                        font: { size: 9 } 
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)' // Garis halus agar tidak kotor
-                    }
-                },
-                x: {
-                    ticks: { font: { size: 10 } }
-                }
-            } : {}
-        }
-    });
+    charts[canvasId] = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: bgColor,
+                borderWidth: 1
+            }]
+        },
+        plugins: isPluginAvailable ? [ChartDataLabels] : [],
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: label.toUpperCase(),
+                    font: { size: 14, weight: 'bold' }
+                },
+                datalabels: {
+                    display: (type === 'pie' || type === 'doughnut'),
+                    color: '#fff',
+                    font: { weight: 'bold' },
+                    formatter: (value) => {
+                        return total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
+                    }
+                },
+                legend: { 
+                    display: (type === 'pie' || type === 'doughnut'),
+                    position: 'bottom' 
+                }
+            },
+            scales: (type === 'bar' || type === 'line') ? {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 450, 
+                    ticks: { 
+                        stepSize: 50,
+                        autoSkip: false, // Memaksa semua kelipatan 50 muncul
+                        precision: 0,
+                        font: { size: 9 } 
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)' // Garis halus agar tidak kotor
+                    }
+                },
+                x: {
+                    ticks: { font: { size: 10 } }
+                }
+            } : {}
+        }
+    });
 }
-    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
-    function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    
-    // Toggle class untuk sembunyikan/tampilkan
-    sidebar.classList.toggle('w-72');
-    sidebar.classList.toggle('w-0');
-    sidebar.classList.toggle('opacity-0');
+    function closeModal() { document.getElementById('modalAction').classList.add('hidden'); }
+    function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    
+    // Toggle class untuk sembunyikan/tampilkan
+    sidebar.classList.toggle('w-72');
+    sidebar.classList.toggle('w-0');
+    sidebar.classList.toggle('opacity-0');
 
-    // Paksa semua chart (murid, agama, dll) untuk menyesuaikan lebar layar baru
-    setTimeout(() => {
-        // Asumsi variabel chart bapak disimpan dalam objek bernama 'charts'
-        if (typeof charts !== 'undefined') {
-            Object.values(charts).forEach(chart => {
-                chart.resize();
-            });
-        }
-    }, 300); // 300ms sesuai durasi transition-all sidebar
+    // Paksa semua chart (murid, agama, dll) untuk menyesuaikan lebar layar baru
+    setTimeout(() => {
+        // Asumsi variabel chart bapak disimpan dalam objek bernama 'charts'
+        if (typeof charts !== 'undefined') {
+            Object.values(charts).forEach(chart => {
+                chart.resize();
+            });
+        }
+    }, 300); // 300ms sesuai durasi transition-all sidebar
 }
     // --- FUNGSI KONTROL MODAL ---
 function bukaModalTambahSiswa() {
@@ -1444,20 +1499,6 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
-    function generateTapelOptions() {
-        const selectTapel = document.getElementById('filter-tapel');
-        if (!selectTapel) return;
-        selectTapel.innerHTML = '<option value="">Semua Tapel</option>';
-        const startYear = 2019;
-        const endYear = 2029;
-        for (let i = startYear; i <= endYear; i++) {
-            let label = `${i}/${i + 1}`;
-            let opt = document.createElement('option');
-            opt.value = label;
-            opt.text = label;
-            selectTapel.add(opt);
-        }
-    }
 </script>
 </body>
 </html>
