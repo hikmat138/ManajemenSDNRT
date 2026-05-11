@@ -669,7 +669,7 @@
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
-            generateTapelOptions();
+           
             setTimeout(() => {
                 if (typeof initCharts === "function") {
                     initCharts(); 
@@ -688,9 +688,9 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
-   
+  
 window.onload = loadData;
-
+generateTapelOptions();  
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
         document.getElementById('stat-murid').innerText = aktif;
