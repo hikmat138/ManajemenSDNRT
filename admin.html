@@ -689,8 +689,11 @@
 
 // Inisialisasi saat halaman selesai dimuat
   
-window.onload = loadData;
-generateTapelOptions();  
+window.onload = function() {
+    generateTapelOptions(); // Jalankan ini dulu
+    loadData();             // Baru tarik data dari Sheets
+};
+
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
         document.getElementById('stat-murid').innerText = aktif;
@@ -1528,7 +1531,7 @@ async function eksekusiImporLulus() {
     // Bersihkan dulu
     selectTapel.innerHTML = '<option value="">Semua Tahun Ajaran</option>';
     
-    const startYear = 2023; // Bisa Bapak sesuaikan
+    const startYear = 2019; // Bisa Bapak sesuaikan
     const endYear = 2030;
     
     for (let i = startYear; i <= endYear; i++) {
