@@ -800,10 +800,14 @@ window.onload = loadData();
         // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
-    // Menampilkan identitas dasar + data mutasi
-    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
-    } else {
+        // KOLOM KHUSUS KELUAR
+        cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
+    } else if (currentMenu === 'mutasi-masuk') {
+        // KOLOM KHUSUS MASUK
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+    } else {
+        // Cadangan jika menu tidak dikenal
+        cols = ['nama', 'jk', 'kelas', 'status_aktif'];
     }
 
     // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
@@ -862,6 +866,7 @@ window.onload = loadData();
 
     function showSection(id) {
     // 1. Ambil elemen-elemen penting
+    
     const dashboard = document.getElementById('section-dashboard');
     const tabelContainer = document.getElementById('section-tabel-container');
     const headerTitle = document.getElementById('section-title');
