@@ -830,7 +830,7 @@ window.onload = loadData();
         cols.forEach(c => {
             if (c === 'aksi') {
     // 1. Jika menunya adalah Lulus atau Mutasi Keluar, kolom aksi diisi strip saja
-    if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
+             if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
         rowHtml += `<td class="p-2 border-r text-center text-gray-400">-</td>`;
     } 
     else {
@@ -860,7 +860,7 @@ window.onload = loadData();
                     </button>
                 </div>
             </td>`;
-            } else {
+    } } else {
                 // LOGIKA DATA BIASA
                 let val = s[c] || '-';
                 if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
