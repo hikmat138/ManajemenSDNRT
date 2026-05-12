@@ -823,58 +823,42 @@ let matchTapel = true;
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
 
-    // 2. Ambil elemen judul & tombol aksi
+    // 2. Ambil elemen judul di Header
     const headerTitle = document.getElementById('section-title');
-    const containerAksi = document.getElementById('container-aksi-masal');
     
-    // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
-    const filterBulan = document.getElementById('filter-bulan');
-    const filterTapel = document.getElementById('filter-tapel');
+    // --- TAMBAHAN: Ambil elemen tombol aksi masal ---
+    const containerAksi = document.getElementById('container-aksi-masal');
 
     // 3. Logika pemindahan menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
+        
+        // Sembunyikan tombol aksi jika balik ke dashboard
         if (containerAksi) containerAksi.classList.add('hidden');
         
     } else {
         document.getElementById('section-tabel-container').classList.remove('hidden');
         
-        // --- LOGIKA TOMBOL AKSI MASAL (Registrasi) ---
+        // --- LOGIKA TOMBOL AKSI MASAL ---
+        // Jika menu yang diklik adalah 'siswa-registrasi', munculkan tombol sakti
         if (id === 'siswa-registrasi') {
-            if (containerAksi) containerAksi.classList.remove('hidden');
+            containerAksi.classList.remove('hidden');
         } else {
-            if (containerAksi) containerAksi.classList.add('hidden');
-        }
-
-        // --- LOGIKA TAMPIL/SEMBUNYI FILTER MUTASI ---
-        // Kita munculkan filter Bulan & Tapel hanya di menu Mutasi atau Lulus
-        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
-            if (filterBulan) filterBulan.classList.remove('hidden');
-            if (filterTapel) filterTapel.classList.remove('hidden');
-        } else {
-            // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
-            if (filterBulan) filterBulan.classList.add('hidden');
-            if (filterTapel) filterTapel.classList.add('hidden');
+            containerAksi.classList.add('hidden');
         }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
         headerTitle.innerText = formattedTitle;
 
-        // SET MENU SEKARANG & REFRESH DATA
         currentMenu = id;
-        
-        // Pastikan dropdown Tahun Ajaran sudah terisi sebelum filter jalan
-        if (typeof generateTapelOptions === "function") {
-            generateTapelOptions();
-        }
-        
         resetAndFilter();
     }
 
     // 4. Update tampilan aktif di Sidebar
     updateSidebarUI(id);
 }
+
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
     function resetAndFilter() { currentPage = 1; filterData(); }
@@ -1482,6 +1466,35 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
+    function generateTapelOptions() {
+    const selectTapel = document.getElementById('filter-tapel');
+    if (!selectTapel) return;
+
+    // Bersihkan isi sebelumnya kecuali "Semua Tapel"
+    selectTapel.innerHTML = '<option value="">Semua Tapel</option>';
+
+    const startYear = 2019;
+    const endYear = 2029;
+
+    for (let i = startYear; i <= endYear; i++) {
+        let thnAwal = i;
+        let thnAkhir = i + 1;
+        let label = `${thnAwal}/${thnAkhir}`;
+        
+        let opt = document.createElement('option');
+        opt.value = label;
+        opt.text = label;
+        
+        // Opsional: Set default ke tahun sekarang jika ingin
+        // if (label === "2025/2026") opt.selected = true; 
+
+        selectTapel.add(opt);
+    }
+}
+
+// Panggil fungsi ini saat halaman dimuat
+// Tambahkan baris ini di dalam window.onload = loadData atau di bawahnya
+generateTapelOptions();
 </script>
 </body>
 </html>
