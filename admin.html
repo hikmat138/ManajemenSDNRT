@@ -629,6 +629,7 @@
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
+    let masterDataMutasiKeluar = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -667,7 +668,7 @@
             
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
-            
+            masterDataMutasiMasuk = result.data.mutasi_keluar || []; 
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -718,29 +719,34 @@ window.onload = loadData ();
         sourceData = masterDataLulus;
     } else if (currentMenu === 'mutasi-masuk') {
         sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
-    } else (currentMenu === 'mutasi-keluar') {
-        sourceData = masterData; // Siswa Aktif
-    }
+    } else if (currentMenu === 'mutasi-keluar') {
+        sourceData = masterDataMutasiKeluar; // Siswa Aktif
+    } else {sourceData = MasterData;
 
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
+        const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
+        const matchTapel = tapel === "" || valTapel === tapel;
 let matchTapel = true;
-        if (tapel) {
-        // Gunakan properti 'tapel' (pastikan di code.gs Bapak kolom F sudah diberi nama 'tapel')
-        matchTapel = (s.tapel || "") === tapel;
-    }
+        let matchBulan = true;
+        if (bln !== "") {
+            let tglCek = s.tgl_masuk || s.tgl_keluar || s.tgl_lulus || "";
+            if (tglCek && tglCek !== "-") {
+                const dateObj = new Date(tglCek);
+                const bulanData = String(dateObj.getMonth() + 1).padStart(2, '0');
+                matchBulan = (bulanData === bln);
+            } else {
+                matchBulan = false;
+            }
+        }
     
     // Khusus mutasi masuk:
-    if (currentMenu === 'mutasi-masuk') {
-        return matchNama && matchKelas && matchWaktu && matchTapel;
-    }
-        // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
-        if (currentMenu === 'mutasi-keluar') {
-            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
+    if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus') {
+            return matchNama && matchKelas && matchTapel && matchBulan;
         }
-        
-        return matchNama && matchKelas;
+        const isAktif = (s.status_aktif || "").toLowerCase() === 'aktif';
+        return matchNama && matchKelas && isAktif;
     });
 
     updatePagination();
@@ -772,8 +778,10 @@ let matchTapel = true;
     } else if (currentMenu === 'mutasi-keluar') {
     // Menampilkan identitas dasar + data mutasi
     cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
-    } else (currentMenu === 'mutasi-masuk') {
+    } else if (currentMenu === 'mutasi-masuk') {
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+    } else {
+        cols = ['nama']
     }
 
     // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
