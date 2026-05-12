@@ -629,7 +629,6 @@
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
-    let masterDataMutasiKeluar = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -668,7 +667,6 @@
             
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
-             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
