@@ -701,7 +701,7 @@
 
 // Inisialisasi saat halaman selesai dimuat
   
-window.onload = loadData;
+window.onload = loadData();
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -954,7 +954,7 @@ if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
     function openModal(id, tipe) {
     selectedMuridId = id;
     // Ganti baris di openModal menjadi:
-    const s = filteredData.find(item => item.id == id);
+    const s = Masterdata.find(item => item.id == id);
     if (!s) return;
 
     const header = document.getElementById('modalHeader');
