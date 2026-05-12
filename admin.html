@@ -832,8 +832,9 @@ window.onload = loadData;
                 // LOGIKA TOMBOL AKSI (Aman & Ramping)
                 const kelasSekarang = String(s.kelas || "").substring(0, 1);
                 let iconAksi, warnaAksi, labelAksi;
-
-                if (kelasSekarang === "6") {
+if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
+        rowHtml += `<td class="p-2 border-r text-center">-</td>`;
+    } else if (kelasSekarang === "6") {
                     iconAksi = "fa-user-graduate";
                     warnaAksi = "bg-green-600 hover:bg-green-700";
                     labelAksi = "Luluskan";
@@ -952,7 +953,8 @@ window.onload = loadData;
     let selectedMuridId = null;
     function openModal(id, tipe) {
     selectedMuridId = id;
-    const s = masterData.find(item => item.id == id);
+    // Ganti baris di openModal menjadi:
+    const s = filteredData.find(item => item.id == id);
     if (!s) return;
 
     const header = document.getElementById('modalHeader');
@@ -1037,7 +1039,7 @@ window.onload = loadData;
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
+       alasan: document.getElementById('m-alasan')?.value || "",
         tujuan: document.getElementById('m-tujuan')?.value || ""
     };
 
