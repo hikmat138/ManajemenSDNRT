@@ -668,7 +668,7 @@
             
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
-            masterDataMutasiMasuk = result.data.mutasi_keluar || []; 
+            masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -703,16 +703,24 @@
 window.onload = loadData ();
 
     function updateStats() {
-        const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
-        document.getElementById('stat-murid').innerText = aktif;
-        document.getElementById('stat-masuk').innerText = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-').length;
-        document.getElementById('stat-keluar').innerText = masterData.filter(s => s.tgl_keluar && s.tgl_keluar !== '-').length;
-    }
+    const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+    
+    // Pastikan ID ini ada di HTML Bapak
+    if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
+    
+    // Filter untuk siswa masuk (punya tgl_masuk dan status aktif)
+    const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
+    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
+    
+    // Keluar diambil dari masterDataMutasiKeluar yang sudah kita perbaiki di loadData
+    if(document.getElementById('stat-keluar')) document.getElementById('stat-keluar').innerText = masterDataMutasiKeluar.length;
+}
 
     function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
     const tapel = document.getElementById('filter-tapel').value;
+    const bln = document.getElementById('filter-bulan') ? document.getElementById('filter-bulan').value : "";
     // Tentukan sumber data
     let sourceData = [];
     if (currentMenu === 'siswa-lulus') {
@@ -721,14 +729,14 @@ window.onload = loadData ();
         sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
     } else if (currentMenu === 'mutasi-keluar') {
         sourceData = masterDataMutasiKeluar; // Siswa Aktif
-    } else {sourceData = MasterData;
+    } else {sourceData = masterData;
 
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
         const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
-        const matchTapel = tapel === "" || valTapel === tapel;
-let matchTapel = true;
+        const matchTapel = tapel === "" || valTapel === tapel; // Hapus baris "let matchTapel = true" di bawahnya
+        
         let matchBulan = true;
         if (bln !== "") {
             let tglCek = s.tgl_masuk || s.tgl_keluar || s.tgl_lulus || "";
@@ -740,15 +748,15 @@ let matchTapel = true;
                 matchBulan = false;
             }
         }
-    
-    // Khusus mutasi masuk:
-    if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus') {
+        
+        // Sesuaikan return-nya
+        if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
             return matchNama && matchKelas && matchTapel && matchBulan;
         }
-        const isAktif = (s.status_aktif || "").toLowerCase() === 'aktif';
+        
+        const isAktif = (String(s.status_aktif) || "").toLowerCase() === 'aktif';
         return matchNama && matchKelas && isAktif;
     });
-
     updatePagination();
 }
     function renderTable(list) {
@@ -1169,10 +1177,11 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
             },
             scales: (type === 'bar' || type === 'line') ? {
                 y: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 450, 
-                    ticks: { 
+    beginAtZero: true,
+    min: 0,
+    max: 450, 
+    ticks: { stepSize: 50, ... }
+} 
                         stepSize: 50,
                         autoSkip: false, // Memaksa semua kelipatan 50 muncul
                         precision: 0,
@@ -1362,7 +1371,7 @@ function openModalLulusMasal() {
 }
 
 // Eksekusi pengiriman data ke GAS
-async function eksekusiLulusMasal() {
+async function eksekusiLulusMasal(event) {
     const tapel = document.getElementById('masal-tapel').value;
     const tgl = document.getElementById('masal-tgl').value;
 
