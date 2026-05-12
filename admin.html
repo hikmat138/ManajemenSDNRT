@@ -811,73 +811,128 @@ window.onload = loadData();
 
     // Logika Modal
     let selectedMuridId = null;
+    // Perbaikan: Pastikan variabel 'masterData' (m kecil) konsisten
     function openModal(id, tipe) {
-    selectedMuridId = id;
-    // Ganti baris di openModal menjadi:
-    const s = Masterdata.find(item => item.id == id);
-    if (!s) return;
-
-    const header = document.getElementById('modalHeader');
-    const formLulus = document.getElementById('form-lulus');
-    const formNaikKelas = document.getElementById('form-naik-kelas');
-    const formMutasi = document.getElementById('form-mutasi');
-    const btnKonfirmasi = document.getElementById('btnKonfirmasi');
-
-    // 1. Reset Input (Gunakan ID yang ada di HTML terbaru Bapak)
-    const inputsToReset = ['m-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 'm-tgl-keluar', 'm-alasan', 'm-tujuan'];
-    inputsToReset.forEach(idInput => {
-        const el = document.getElementById(idInput);
-        if (el) el.value = "";
-    });
-
-    // 2. Isi Identitas Dasar
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    
-
-    // Sembunyikan semua form dulu
-    [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
-
-    // 3. Logika Tampilan Berdasarkan Tipe
-    if (tipe === 'lulus') {
-        const tingkat = parseInt(s.kelas);
-
-        if (tingkat === 6) {
-            // MODE LULUS
-            header.innerText = 'PROSES KELULUSAN MURID';
-            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase shadow-md';
-            formLulus.classList.remove('hidden');
-            
-            document.getElementById('m-nis').innerText = s.nis || '-';
-            document.getElementById('m-nisn').innerText = s.nisn || '-';
-            document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${s.tgl_lahir || ''}`;
-            
-            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
-            btnKonfirmasi.className = "flex-1 py-3 bg-green-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-green-700 transition";
-        } else {
-            // MODE NAIK KELAS (Jika klik lulus tapi bukan kelas 6)
-            header.innerText = 'PROSES KENAIKAN KELAS';
-            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase shadow-md';
-            formNaikKelas.classList.remove('hidden');
-            
-            // Logika target kelas (Misal: 1A -> 2A)
-            const angka = tingkat;
-            const huruf = s.kelas.replace(/[0-9]/g, '');
-            document.getElementById('m-target-kelas').innerText = (angka + 1) + huruf;
-
-            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
-            btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-blue-700 transition";
+        selectedMuridId = id;
+        // Cari data di masterData (pastikan m kecil sesuai deklarasi di atas)
+        const s = masterData.find(item => item.id == id); 
+        if (!s) {
+            alert("Data murid tidak ditemukan!");
+            return;
         }
-    } else if (tipe === 'keluar') {
-        // MODE MUTASI
-        header.innerText = 'MUTASI KELUAR';
-        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase shadow-md';
-        formMutasi.classList.remove('hidden');
 
-        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
-        btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
+        const modal = document.getElementById('modalAction');
+        const header = document.getElementById('modalHeader');
+        const formLulus = document.getElementById('form-lulus');
+        const formNaikKelas = document.getElementById('form-naik-kelas');
+        const formMutasi = document.getElementById('form-mutasi');
+        const btnKonfirmasi = document.getElementById('btnKonfirmasi');
+
+        // Tampilkan Modal
+        modal.classList.remove('hidden');
+
+        // 1. Reset Input
+        ['m-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 'm-tgl-keluar', 'm-alasan', 'm-tujuan'].forEach(idInput => {
+            const el = document.getElementById(idInput);
+            if (el) el.value = "";
+        });
+
+        // 2. Isi Identitas Dasar
+        document.getElementById('m-nama').innerText = s.nama;
+        document.getElementById('m-kelas').innerText = s.kelas;
+
+        // Sembunyikan semua form dulu
+        [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
+
+        // 3. Logika Tampilan Berdasarkan Tipe
+        if (tipe === 'lulus') {
+            const tingkat = parseInt(s.kelas) || 0;
+
+            if (tingkat === 6) {
+                header.innerText = 'PROSES KELULUSAN MURID';
+                header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase shadow-md';
+                formLulus.classList.remove('hidden');
+                
+                document.getElementById('m-nis').innerText = s.nis || '-';
+                document.getElementById('m-nisn').innerText = s.nisn || '-';
+                document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${s.tgl_lahir || ''}`;
+                
+                btnKonfirmasi.innerText = "KONFIRMASI LULUS";
+                btnKonfirmasi.className = "flex-1 py-3 bg-green-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-green-700 transition";
+                btnKonfirmasi.onclick = () => eksekusiAksi('lulus');
+            } else {
+                header.innerText = 'PROSES KENAIKAN KELAS';
+                header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase shadow-md';
+                formNaikKelas.classList.remove('hidden');
+                
+                const angka = tingkat;
+                const huruf = String(s.kelas).replace(/[0-9]/g, '');
+                document.getElementById('m-target-kelas').innerText = (angka + 1) + huruf;
+
+                btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
+                btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-blue-700 transition";
+                btnKonfirmasi.onclick = () => eksekusiAksi('naik');
+            }
+        } else if (tipe === 'keluar') {
+            header.innerText = 'MUTASI KELUAR';
+            header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase shadow-md';
+            formMutasi.classList.remove('hidden');
+
+            btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
+            btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
+            btnKonfirmasi.onclick = () => eksekusiAksi('mutasi');
+        }
     }
-}
+
+    function closeModal() {
+        document.getElementById('modalAction').classList.add('hidden');
+    }
+
+    // Fungsi untuk kirim data ke Google Sheets
+    async function eksekusiAksi(tipe) {
+        const btn = document.getElementById('btnKonfirmasi');
+        const originalText = btn.innerText;
+        
+        // Ambil data tambahan dari form
+        const payload = {
+            action: 'updateStatusMurid',
+            id: selectedMuridId,
+            tipe: tipe,
+            tapel: document.getElementById('m-tapel').value,
+            tgl_lulus: document.getElementById('m-tgl-lulus').value,
+            no_ijazah: document.getElementById('m-ijazah').value,
+            sk_lulus: document.getElementById('m-sk-lulus').value,
+            tgl_keluar: document.getElementById('m-tgl-keluar').value,
+            alasan: document.getElementById('m-alasan').value,
+            tujuan: document.getElementById('m-tujuan').value
+        };
+
+        if (!confirm(`Yakin ingin memproses data ini?`)) return;
+
+        btn.disabled = true;
+        btn.innerText = "PROSESING...";
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.status === "success") {
+                alert("Berhasil memperbarui data murid!");
+                closeModal();
+                loadData(); // Refresh data
+            } else {
+                alert("Gagal: " + result.message);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Terjadi kesalahan koneksi saat mengirim data.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    }
     async function konfirmasiProses() {
     if (!selectedMuridId) return;
 
