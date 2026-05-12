@@ -577,20 +577,8 @@
 </select>
 
 <select id="filter-tapel" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
-    <option value="">Semua Tape;</option>
-    <option value="2019/2020">2019/2020</option>
-    <option value="2020/2021">2020/2021</option>
-    <option value="2021/2022">2021/2022</option>
-    <option value="2022/2023">2022/2023</option>
-    <option value="2023/2024">2023/2024</option>
-    <option value="2024/2025">2024/2025</option>
-    <option value="2025/2026">2025/2026</option>
-    <option value="2026/2027">2026/2027</option>
-    <option value="2027/2028">2027/2028</option>
-    <option value="2028/2029">2028/2029</option>
-    <option value="2029/2030">2029/2030</option>
-    <option value="2030/2031">2030/3031</option>
-</select>
+    <option value="">Semua Tapel</option>
+    </select>
                         <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama..." class="border p-2 rounded-lg text-sm w-64 outline-none">
                     </div>
                 </div>
@@ -629,7 +617,6 @@
     let rowsPerPage = 10;
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
-    let masterDataMutasiKeluar = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -668,6 +655,7 @@
             
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
+            
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -680,7 +668,7 @@
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
-           
+            
             setTimeout(() => {
                 if (typeof initCharts === "function") {
                     initCharts(); 
@@ -699,8 +687,7 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
-  
-window.onload = loadData();
+window.onload = loadData;
 
     function updateStats() {
         const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -710,98 +697,202 @@ window.onload = loadData();
     }
 
     function filterData() {
-    // 1. Ambil input dari elemen UI
-    const keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
-    const kls = document.getElementById('filter-kelas')?.value || "";
-    const tapel = document.getElementById('filter-tapel')?.value || "";
-    const bln = document.getElementById('filter-bulan')?.value || "";
-
-    // 2. Tentukan sumber data berdasarkan menu aktif
+    const keyword = document.getElementById('search-data').value.toLowerCase();
+    const kls = document.getElementById('filter-kelas').value;
+    const tapel = document.getElementById('filter-tapel').value;
+    // Tentukan sumber data
     let sourceData = [];
-    if (currentMenu === 'mutasi-keluar') {
-        sourceData = masterDataMutasiKeluar; // PASTIKAN VARIABEL INI ADA & TERISI
-    } else if (currentMenu === 'mutasi-masuk') {
-        sourceData = masterDataMutasiMasuk;
-    } else if (currentMenu === 'siswa-lulus') {
+    if (currentMenu === 'siswa-lulus') {
         sourceData = masterDataLulus;
+    } else if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
     } else {
         sourceData = masterData; // Siswa Aktif
     }
 
-    // 3. Proses Filtering (Satu pintu di sini)
     filteredData = sourceData.filter(s => {
-        // A. Filter Nama & Kelas (Umum)
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
-
-        // B. Logika Tapel (Tahun Ajaran)
-        const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
-        const matchTapel = tapel === "" || valTapel === tapel;
-
-        // C. Logika Bulan
-        let matchBulan = true;
-        if (bln !== "") {
-            let tglCek = s.tgl_masuk || s.tgl_keluar || s.tgl_lulus || "";
-            if (tglCek && tglCek !== "-") {
-                const dateObj = new Date(tglCek);
-                const bulanData = String(dateObj.getMonth() + 1).padStart(2, '0');
-                matchBulan = (bulanData === bln);
-            } else {
-                matchBulan = false;
-            }
-        }
-
-        // D. Filter Berdasarkan Status Menu
+let matchTapel = true;
+        if (tapel) {
+        // Gunakan properti 'tapel' (pastikan di code.gs Bapak kolom F sudah diberi nama 'tapel')
+        matchTapel = (s.tapel || "") === tapel;
+    }
+    
+    // Khusus mutasi masuk:
+    if (currentMenu === 'mutasi-masuk') {
+        return matchNama && matchKelas && matchWaktu && matchTapel;
+    }
+        // Mutasi keluar tetap dari masterData (siswa aktif yang statusnya keluar)
         if (currentMenu === 'mutasi-keluar') {
-            // Hanya muncul jika data valid (punya tgl keluar)
-            return matchNama && matchKelas && matchTapel && matchBulan && s.tgl_keluar && s.tgl_keluar !== '-';
-        } 
-        
-        if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus') {
-            return matchNama && matchKelas && matchTapel && matchBulan;
+            return matchNama && matchKelas && s.tgl_keluar && s.tgl_keluar !== '-';
         }
-
-        // Default: Siswa Aktif
-        const isAktif = (s.status_aktif || "").toLowerCase() === 'aktif';
-        return matchNama && matchKelas && isAktif;
+        
+        return matchNama && matchKelas;
     });
 
-    // 4. Jalankan Update UI
     updatePagination();
+}
+    function renderTable(list) {
+    const thead = document.getElementById('thead-data');
+    const tbody = document.getElementById('tbody-data');
+    if (!thead || !tbody) return;
+
+    let cols = [];
+    
+    // 1. DAFTAR KOLOM LENGKAP SESUAI REQUEST BAPAK
+    if (currentMenu === 'siswa-pribadi') {
+        cols = [
+            'nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'kk', 'akte', 
+            'anak_ke', 'saudara', 'jns_tinggal', 'ayah_nama', 'ayah_nik', 'ayah_thn_lahir', 'ayah_pendidikan', 
+            'ayah_pekerjaan', 'ayah_penghasilan', 'ayah_disabilitas', 'ibu_nama', 'ibu_nik', 'ibu_thn_lahir', 
+            'ibu_pendidikan', 'ibu_pekerjaan', 'ibu_penghasilan', 'ibu_disabilitas', 'wali_nama', 'alamat', 
+            'rt', 'rw', 'kelurahan', 'kecamatan', 'sekolah_asal', 'transportasi', 'jarak', 'kip', 
+            'layak_pip', 'alasan_pip', 'hp', 'email', 'status_aktif'
+        ];
+    } else if (currentMenu === 'siswa-periodik') {
+        cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
+    } else if (currentMenu === 'siswa-registrasi') {
+        cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
+   } else if (currentMenu === 'siswa-lulus') {
+        // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
+        cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
+    } else if (currentMenu === 'mutasi-keluar') {
+    // Menampilkan identitas dasar + data mutasi
+    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
+    } else {
+        cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+    }
+
+    // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
+    thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100">${colMap[c] || c}</th>`).join('')}</tr>`;
+    
+    // 3. RENDER BODY
+    if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${cols.length}" class="p-10 text-center text-gray-400">Data Tidak Ditemukan</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(s => {
+        let rowHtml = `<tr class="hover:bg-blue-50 border-b">`;
+        
+        cols.forEach(c => {
+            if (c === 'aksi') {
+                // LOGIKA TOMBOL AKSI (Aman & Ramping)
+                const kelasSekarang = String(s.kelas || "").substring(0, 1);
+                let iconAksi, warnaAksi, labelAksi;
+
+                if (kelasSekarang === "6") {
+                    iconAksi = "fa-user-graduate";
+                    warnaAksi = "bg-green-600 hover:bg-green-700";
+                    labelAksi = "Luluskan";
+                } else {
+                    iconAksi = "fa-level-up-alt";
+                    warnaAksi = "bg-blue-600 hover:bg-blue-700";
+                    labelAksi = "Naik Kelas";
+                }
+
+                rowHtml += `
+                    <td class="p-2 border-r text-center" style="width: 110px; min-width: 110px;">
+                        <div class="flex gap-1 justify-center">
+                            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white w-9 h-9 rounded-lg hover:bg-orange-600 transition shadow-sm" title="Mutasi Keluar">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                            <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white w-9 h-9 rounded-lg transition shadow-sm" title="${labelAksi}">
+                                <i class="fas ${iconAksi}"></i>
+                            </button>
+                        </div>
+                    </td>`;
+            } else {
+                // LOGIKA DATA BIASA
+                let val = s[c] || '-';
+                if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
+                
+                const textStyle = (val === 'Aktif') ? 'text-green-600 font-bold' : '';
+                rowHtml += `<td class="p-3 border-r whitespace-nowrap ${textStyle}">${val}</td>`;
+            }
+        });
+
+        rowHtml += `</tr>`;
+        return rowHtml;
+    }).join('');
+}
+
+    function showSection(id) {
+    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
+    document.getElementById('section-dashboard').classList.add('hidden');
+    document.getElementById('section-tabel-container').classList.add('hidden');
+
+    // 2. Ambil elemen judul & tombol aksi
+    const headerTitle = document.getElementById('section-title');
+    const containerAksi = document.getElementById('container-aksi-masal');
+    
+    // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
+    const filterBulan = document.getElementById('filter-bulan');
+    const filterTapel = document.getElementById('filter-tapel');
+
+    // 3. Logika pemindahan menu
+    if (id === 'dashboard') {
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        headerTitle.innerText = "DASHBOARD UTAMA";
+        if (containerAksi) containerAksi.classList.add('hidden');
+        
+    } else {
+        document.getElementById('section-tabel-container').classList.remove('hidden');
+        
+        // --- LOGIKA TOMBOL AKSI MASAL (Registrasi) ---
+        if (id === 'siswa-registrasi') {
+            if (containerAksi) containerAksi.classList.remove('hidden');
+        } else {
+            if (containerAksi) containerAksi.classList.add('hidden');
+        }
+
+        // --- LOGIKA TAMPIL/SEMBUNYI FILTER MUTASI ---
+        // Kita munculkan filter Bulan & Tapel hanya di menu Mutasi atau Lulus
+        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
+            if (filterBulan) filterBulan.classList.remove('hidden');
+            if (filterTapel) filterTapel.classList.remove('hidden');
+        } else {
+            // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
+            if (filterBulan) filterBulan.classList.add('hidden');
+            if (filterTapel) filterTapel.classList.add('hidden');
+        }
+        
+        const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
+        headerTitle.innerText = formattedTitle;
+
+        // SET MENU SEKARANG & REFRESH DATA
+        currentMenu = id;
+        
+        // Pastikan dropdown Tahun Ajaran sudah terisi sebelum filter jalan
+        if (typeof generateTapelOptions === "function") {
+            generateTapelOptions();
+        }
+        
+        resetAndFilter();
+    }
+
+    // 4. Update tampilan aktif di Sidebar
+    updateSidebarUI(id);
 }
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
     function changeRowsPerPage() { rowsPerPage = parseInt(document.getElementById('row-per-page').value); currentPage = 1; updatePagination(); }
     function resetAndFilter() { currentPage = 1; filterData(); }
     function updatePagination() {
-    // 1. Cek apakah variabel data sudah ada atau masih kosong
-    if (typeof filteredData === 'undefined') {
-        console.error("Variabel filteredData belum didefinisikan!");
-        return;
-    }
-
-    // 2. Jika data benar-benar kosong (0 murid)
-    if (filteredData.length === 0) {
-        const tbody = document.getElementById('tbody-data');
-        if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="100%" class="p-10 text-center text-gray-400">Data tidak ditemukan. Silakan cek filter atau pastikan data sudah terload.</td></tr>`;
-        }
-        const infoEl = document.getElementById('pagination-info');
-        if (infoEl) infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
-        return;
-    }
-
-    // 3. Logika pemotongan data (Pagination)
     const start = (currentPage - 1) * rowsPerPage;
     const end = Math.min(start + rowsPerPage, filteredData.length);
     const dataToRender = filteredData.slice(start, end);
     
-    // 4. Kirim ke tabel
     renderTable(dataToRender);
 
-    // 5. Update teks info
+    // Update teks info pagination
     const infoEl = document.getElementById('pagination-info');
     if (infoEl) {
-        infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
+        if (filteredData.length > 0) {
+            infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
+        } else {
+            infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
+        }
     }
 }
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
@@ -810,128 +901,72 @@ window.onload = loadData();
 
     // Logika Modal
     let selectedMuridId = null;
-    // Perbaikan: Pastikan variabel 'masterData' (m kecil) konsisten
     function openModal(id, tipe) {
-        selectedMuridId = id;
-        // Cari data di masterData (pastikan m kecil sesuai deklarasi di atas)
-        const s = masterData.find(item => item.id == id); 
-        if (!s) {
-            alert("Data murid tidak ditemukan!");
-            return;
+    selectedMuridId = id;
+    const s = masterData.find(item => item.id == id);
+    if (!s) return;
+
+    const header = document.getElementById('modalHeader');
+    const formLulus = document.getElementById('form-lulus');
+    const formNaikKelas = document.getElementById('form-naik-kelas');
+    const formMutasi = document.getElementById('form-mutasi');
+    const btnKonfirmasi = document.getElementById('btnKonfirmasi');
+
+    // 1. Reset Input (Gunakan ID yang ada di HTML terbaru Bapak)
+    const inputsToReset = ['m-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 'm-tgl-keluar', 'm-alasan', 'm-tujuan'];
+    inputsToReset.forEach(idInput => {
+        const el = document.getElementById(idInput);
+        if (el) el.value = "";
+    });
+
+    // 2. Isi Identitas Dasar
+    document.getElementById('m-nama').innerText = s.nama;
+    document.getElementById('m-kelas').innerText = s.kelas;
+    document.getElementById('modalAction').classList.remove('hidden');
+
+    // Sembunyikan semua form dulu
+    [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
+
+    // 3. Logika Tampilan Berdasarkan Tipe
+    if (tipe === 'lulus') {
+        const tingkat = parseInt(s.kelas);
+
+        if (tingkat === 6) {
+            // MODE LULUS
+            header.innerText = 'PROSES KELULUSAN MURID';
+            header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase shadow-md';
+            formLulus.classList.remove('hidden');
+            
+            document.getElementById('m-nis').innerText = s.nis || '-';
+            document.getElementById('m-nisn').innerText = s.nisn || '-';
+            document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${s.tgl_lahir || ''}`;
+            
+            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
+            btnKonfirmasi.className = "flex-1 py-3 bg-green-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-green-700 transition";
+        } else {
+            // MODE NAIK KELAS (Jika klik lulus tapi bukan kelas 6)
+            header.innerText = 'PROSES KENAIKAN KELAS';
+            header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase shadow-md';
+            formNaikKelas.classList.remove('hidden');
+            
+            // Logika target kelas (Misal: 1A -> 2A)
+            const angka = tingkat;
+            const huruf = s.kelas.replace(/[0-9]/g, '');
+            document.getElementById('m-target-kelas').innerText = (angka + 1) + huruf;
+
+            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
+            btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-blue-700 transition";
         }
+    } else if (tipe === 'keluar') {
+        // MODE MUTASI
+        header.innerText = 'MUTASI KELUAR';
+        header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase shadow-md';
+        formMutasi.classList.remove('hidden');
 
-        const modal = document.getElementById('modalAction');
-        const header = document.getElementById('modalHeader');
-        const formLulus = document.getElementById('form-lulus');
-        const formNaikKelas = document.getElementById('form-naik-kelas');
-        const formMutasi = document.getElementById('form-mutasi');
-        const btnKonfirmasi = document.getElementById('btnKonfirmasi');
-
-        // Tampilkan Modal
-        modal.classList.remove('hidden');
-
-        // 1. Reset Input
-        ['m-tapel', 'm-ijazah', 'm-sk-lulus', 'm-tgl-lulus', 'm-tgl-keluar', 'm-alasan', 'm-tujuan'].forEach(idInput => {
-            const el = document.getElementById(idInput);
-            if (el) el.value = "";
-        });
-
-        // 2. Isi Identitas Dasar
-        document.getElementById('m-nama').innerText = s.nama;
-        document.getElementById('m-kelas').innerText = s.kelas;
-
-        // Sembunyikan semua form dulu
-        [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
-
-        // 3. Logika Tampilan Berdasarkan Tipe
-        if (tipe === 'lulus') {
-            const tingkat = parseInt(s.kelas) || 0;
-
-            if (tingkat === 6) {
-                header.innerText = 'PROSES KELULUSAN MURID';
-                header.className = 'p-4 text-white font-bold bg-green-600 text-center uppercase shadow-md';
-                formLulus.classList.remove('hidden');
-                
-                document.getElementById('m-nis').innerText = s.nis || '-';
-                document.getElementById('m-nisn').innerText = s.nisn || '-';
-                document.getElementById('m-ttl').innerText = `${s.tmpt_lahir || ''}, ${s.tgl_lahir || ''}`;
-                
-                btnKonfirmasi.innerText = "KONFIRMASI LULUS";
-                btnKonfirmasi.className = "flex-1 py-3 bg-green-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-green-700 transition";
-                btnKonfirmasi.onclick = () => eksekusiAksi('lulus');
-            } else {
-                header.innerText = 'PROSES KENAIKAN KELAS';
-                header.className = 'p-4 text-white font-bold bg-blue-600 text-center uppercase shadow-md';
-                formNaikKelas.classList.remove('hidden');
-                
-                const angka = tingkat;
-                const huruf = String(s.kelas).replace(/[0-9]/g, '');
-                document.getElementById('m-target-kelas').innerText = (angka + 1) + huruf;
-
-                btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
-                btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-blue-700 transition";
-                btnKonfirmasi.onclick = () => eksekusiAksi('naik');
-            }
-        } else if (tipe === 'keluar') {
-            header.innerText = 'MUTASI KELUAR';
-            header.className = 'p-4 text-white font-bold bg-orange-500 text-center uppercase shadow-md';
-            formMutasi.classList.remove('hidden');
-
-            btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
-            btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
-            btnKonfirmasi.onclick = () => eksekusiAksi('mutasi');
-        }
+        btnKonfirmasi.innerText = "KONFIRMASI MUTASI KELUAR";
+        btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
     }
-
-    function closeModal() {
-        document.getElementById('modalAction').classList.add('hidden');
-    }
-
-    // Fungsi untuk kirim data ke Google Sheets
-    async function eksekusiAksi(tipe) {
-        const btn = document.getElementById('btnKonfirmasi');
-        const originalText = btn.innerText;
-        
-        // Ambil data tambahan dari form
-        const payload = {
-            action: 'updateStatusMurid',
-            id: selectedMuridId,
-            tipe: tipe,
-            tapel: document.getElementById('m-tapel').value,
-            tgl_lulus: document.getElementById('m-tgl-lulus').value,
-            no_ijazah: document.getElementById('m-ijazah').value,
-            sk_lulus: document.getElementById('m-sk-lulus').value,
-            tgl_keluar: document.getElementById('m-tgl-keluar').value,
-            alasan: document.getElementById('m-alasan').value,
-            tujuan: document.getElementById('m-tujuan').value
-        };
-
-        if (!confirm(`Yakin ingin memproses data ini?`)) return;
-
-        btn.disabled = true;
-        btn.innerText = "PROSESING...";
-
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            const result = await res.json();
-            if (result.status === "success") {
-                alert("Berhasil memperbarui data murid!");
-                closeModal();
-                loadData(); // Refresh data
-            } else {
-                alert("Gagal: " + result.message);
-            }
-        } catch (e) {
-            console.error(e);
-            alert("Terjadi kesalahan koneksi saat mengirim data.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = originalText;
-        }
-    }
+}
     async function konfirmasiProses() {
     if (!selectedMuridId) return;
 
@@ -953,7 +988,7 @@ window.onload = loadData();
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-       alasan: document.getElementById('m-alasan')?.value || "",
+        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
         tujuan: document.getElementById('m-tujuan')?.value || ""
     };
 
