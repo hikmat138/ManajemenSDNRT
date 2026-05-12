@@ -829,32 +829,37 @@ window.onload = loadData();
         
         cols.forEach(c => {
             if (c === 'aksi') {
-                // LOGIKA TOMBOL AKSI (Aman & Ramping)
-                const kelasSekarang = String(s.kelas || "").substring(0, 1);
-                let iconAksi, warnaAksi, labelAksi;
-if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
-        rowHtml += `<td class="p-2 border-r text-center">-</td>`;
-    } else if (kelasSekarang === "6") {
-                    iconAksi = "fa-user-graduate";
-                    warnaAksi = "bg-green-600 hover:bg-green-700";
-                    labelAksi = "Luluskan";
-                } else {
-                    iconAksi = "fa-level-up-alt";
-                    warnaAksi = "bg-blue-600 hover:bg-blue-700";
-                    labelAksi = "Naik Kelas";
-                }
+    // 1. Jika menunya adalah Lulus atau Mutasi Keluar, kolom aksi diisi strip saja
+    if (currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
+        rowHtml += `<td class="p-2 border-r text-center text-gray-400">-</td>`;
+    } 
+    else {
+        // 2. Jika menu aktif (Registrasi/Siswa), tentukan icon berdasarkan kelas
+        const kelasSekarang = String(s.kelas || "").substring(0, 1);
+        let iconAksi, warnaAksi, labelAksi;
 
-                rowHtml += `
-                    <td class="p-2 border-r text-center" style="width: 110px; min-width: 110px;">
-                        <div class="flex gap-1 justify-center">
-                            <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white w-9 h-9 rounded-lg hover:bg-orange-600 transition shadow-sm" title="Mutasi Keluar">
-                                <i class="fas fa-exchange-alt"></i>
-                            </button>
-                            <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white w-9 h-9 rounded-lg transition shadow-sm" title="${labelAksi}">
-                                <i class="fas ${iconAksi}"></i>
-                            </button>
-                        </div>
-                    </td>`;
+        if (kelasSekarang === "6") {
+            iconAksi = "fa-user-graduate";
+            warnaAksi = "bg-green-600 hover:bg-green-700";
+            labelAksi = "Luluskan";
+        } else {
+            iconAksi = "fa-level-up-alt";
+            warnaAksi = "bg-blue-600 hover:bg-blue-700";
+            labelAksi = "Naik Kelas";
+        }
+
+        // 3. Gabungkan tombol Mutasi & Lulus/Naik dalam satu cell
+        rowHtml += `
+            <td class="p-2 border-r text-center" style="width: 110px; min-width: 110px;">
+                <div class="flex gap-1 justify-center">
+                    <button onclick="openModal('${s.id}', 'keluar')" class="bg-orange-500 text-white w-8 h-8 rounded-lg hover:bg-orange-600 transition shadow-sm" title="Mutasi Keluar">
+                        <i class="fas fa-exchange-alt text-[10px]"></i>
+                    </button>
+                    <button onclick="openModal('${s.id}', 'lulus')" class="${warnaAksi} text-white w-8 h-8 rounded-lg transition shadow-sm" title="${labelAksi}">
+                        <i class="fas ${iconAksi} text-[10px]"></i>
+                    </button>
+                </div>
+            </td>`;
             } else {
                 // LOGIKA DATA BIASA
                 let val = s[c] || '-';
