@@ -1081,7 +1081,7 @@ function initCharts() {
     // --- 2. PROSES DATA AGAMA ---
     const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
     let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
-    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9', 50);
+    renderChart('chartAgama', 'bar', 'Agama Murid', listAgama, dataAgama, '#0ea5e9');
 
     // --- 3. PROSES DATA BULAN LAHIR ---
     const namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -1092,7 +1092,7 @@ function initCharts() {
             if (!isNaN(d.getTime())) statsBulan[d.getMonth()]++;
         }
     });
-    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444');
+    renderChart('chartBulanLahir', 'bar', 'Bulan Kelahiran', namaBulan, statsBulan, '#ef4444',100,10);
 
     // --- 4. PROSES PEKERJAAN, PENGHASILAN & PENDIDIKAN ---
    const helperCount = (arr) => arr.reduce((acc, val) => { 
@@ -1102,24 +1102,24 @@ function initCharts() {
     }, {});
 
     const cKerjaAyah = helperCount(dataAktif.map(s => s.ayah_pekerjaan));
-    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb');
+    renderChart('chartPekerjaanAyah', 'bar', 'Pekerjaan Ayah', Object.keys(cKerjaAyah), Object.values(cKerjaAyah), '#2563eb',450,50);
 
     const cKerjaIbu = helperCount(dataAktif.map(s => s.ibu_pekerjaan));
-    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777');
+    renderChart('chartPekerjaanIbu', 'bar', 'Pekerjaan Ibu', Object.keys(cKerjaIbu), Object.values(cKerjaIbu), '#db2777',450,50);
 
     // --- 2. GRAFIK PENDIDIKAN (DIPISAH) ---
     const cPendAyah = helperCount(dataAktif.map(s => s.ayah_pendidikan));
-    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5');
+    renderChart('chartPendidikanAyah', 'bar', 'Pendidikan Ayah', Object.keys(cPendAyah), Object.values(cPendAyah), '#4f46e5',450,50);
 
     const cPendIbu = helperCount(dataAktif.map(s => s.ibu_pendidikan));
-    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea');
+    renderChart('chartPendidikanIbu', 'bar', 'Pendidikan Ibu', Object.keys(cPendIbu), Object.values(cPendIbu), '#9333ea',450,50);
 
     // --- 3. GRAFIK PENGHASILAN (DIPISAH) ---
     const cHasilAyah = helperCount(dataAktif.map(s => s.ayah_penghasilan));
-    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669');
+    renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669',450,50);
 
     const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
-    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981');
+    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981'450,50);
     const daftarKelas = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B'];
 let dataPerKelas = daftarKelas.map(kls => {
     return dataAktif.filter(s => String(s.kelas).toUpperCase() === kls).length;
