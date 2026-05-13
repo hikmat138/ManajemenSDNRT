@@ -700,7 +700,7 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
-window.onload = loadData;
+window.onload = loadData();
 
     function updateStats() {
     const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -757,8 +757,10 @@ window.onload = loadData;
         const isAktif = (String(s.status_aktif) || "").toLowerCase() === 'aktif';
         return matchNama && matchKelas && isAktif;
     });
+    currentPage = 1; // Reset ke hal 1 setiap filter berubah
     updatePagination();
 }
+
     function renderTable(list) {
     const thead = document.getElementById('thead-data');
     const tbody = document.getElementById('tbody-data');
@@ -999,15 +1001,16 @@ window.onload = loadData;
     if (!selectedMuridId) return;
 
     const btn = document.getElementById('btnKonfirmasi');
-    const originalText = btn.innerText;
+    // Gunakan innerText dan hapus spasi tambahan
+    const txt = btn.innerText.toUpperCase();
 
-    // 1. Tentukan jenis aksi
     let actionType = "";
-    if (originalText.includes("LULUS")) actionType = "LULUS";
-    else if (originalText.includes("NAIK")) actionType = "NAIK_KELAS";
-    else if (originalText.includes("MUTASI")) actionType = "MUTASI_KELUAR";
+    if (txt.includes("LULUS")) actionType = "LULUS";
+    else if (txt.includes("NAIK")) actionType = "NAIK_KELAS";
+    else if (txt.includes("MUTASI")) actionType = "MUTASI_KELUAR";
 
-    // 2. Ambil data payload (Sesuai dengan code.gs Bapak)
+    if (!actionType) return alert("Jenis aksi tidak dikenali!");
+
     const payload = {
         id: selectedMuridId,
         action: actionType,
@@ -1016,15 +1019,14 @@ window.onload = loadData;
         skLulus: document.getElementById('m-sk-lulus')?.value || "",
         noIjazah: document.getElementById('m-ijazah')?.value || "",
         tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
-        alasan: document.getElementById('m-alasan')?.value || "", // Sesuai ID baru Bapak
+        alasan: document.getElementById('m-alasan')?.value || "",
         tujuan: document.getElementById('m-tujuan')?.value || ""
     };
 
-    // 3. Validasi singkat
     if (actionType === "LULUS" && !payload.tapel) return alert("Tahun Ajaran Kelulusan harus diisi!");
     if (actionType === "MUTASI_KELUAR" && !payload.tglKeluar) return alert("Tanggal Mutasi harus diisi!");
 
-    // 4. Kirim ke Google Apps Script
+    const originalHTML = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
 
@@ -1039,16 +1041,16 @@ window.onload = loadData;
         if (res.status === "success") {
             alert(`✅ Berhasil di-update: ${actionType.replace('_', ' ')}`);
             closeModal();
-            loadData(); // Refresh tabel SDN Ranca Tales
+            loadData(); 
         } else {
             alert("❌ Gagal: " + res.message);
         }
     } catch (err) {
         console.error(err);
-        alert("❌ Gagal terhubung ke server. Coba lagi, Pak.");
+        alert("❌ Gagal terhubung ke server.");
     } finally {
         btn.disabled = false;
-        btn.innerText = originalText;
+        btn.innerHTML = originalHTML;
     }
 }
     let charts = {}; 
@@ -1177,18 +1179,17 @@ function renderChart(canvasId, type, label, labels, data, bgColor, stepSize = 50
             },
             scales: (type === 'bar' || type === 'line') ? {
                 y: {
-    beginAtZero: true,
-    min: 0,
-    max: 450, 
-    ticks: { stepSize: 50, ... }
-} 
+                    beginAtZero: true,
+                    min: 0,
+                    max: 450, 
+                    ticks: { 
                         stepSize: 50,
-                        autoSkip: false, // Memaksa semua kelipatan 50 muncul
+                        autoSkip: false,
                         precision: 0,
-                        font: { size: 9 } 
+                        font: { size: 9 }
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)' // Garis halus agar tidak kotor
+                        color: 'rgba(0, 0, 0, 0.05)'
                     }
                 },
                 x: {
