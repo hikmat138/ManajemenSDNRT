@@ -660,7 +660,10 @@
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
         'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran','nama_guru':'Nama Guru','tmpt_lahir_guru':'Tempat Lahir Guru','tgl_lahir_guru':'Tanggal Lahir Guru','nik_guru':'NIK Guru','nip':'NIP','nuptk':'NUPTK','nrg':'NRG','jk_guru':'Jenis Kelamin','status_kawin':'Status Kawin',
+        'agama_guru':'AGAMA','Ijazah_pns':'Ijazah Awal PNS':'Ijazah_terakhir':'Ijazah Terakhir','jurusan':'Jurusan','jabatan':'Jabatan','gol':'Golongan','pangkat':'Pangkat','tmt_pns','TMT PNS','tmt_sekolah':'TMT Sekolah','mengajar_kelas':'Mengajar Kelas','status_pegawai':'Status Pegawai','jenis_pegawai':'Jenis Pegawai',
+        'tahun_pensiun':'Tahun Pensiun','masa_pns':'Masa PNS','masa_sekolah':'Masa Sekolah'
+        
     };
 
     function formatTanggalIndo(dateStr) {
@@ -814,10 +817,10 @@ window.onload = loadData();
     // --- TAMBAHAN KHUSUS GURU & TENDIK ---
     else if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
         cols = [
-            'nama', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 
+            'nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 
             'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 
             'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 
-            'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_mengajar', 'masa_menjadi_pns'
+            'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'
         ];
     } else {
         cols = ['nama'];
