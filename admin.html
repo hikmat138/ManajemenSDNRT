@@ -1119,7 +1119,7 @@ function initCharts() {
     renderChart('chartPenghasilanAyah', 'bar', 'Penghasilan Ayah', Object.keys(cHasilAyah), Object.values(cHasilAyah), '#059669',450,50);
 
     const cHasilIbu = helperCount(dataAktif.map(s => s.ibu_penghasilan));
-    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981'450,50);
+    renderChart('chartPenghasilanIbu', 'bar', 'Penghasilan Ibu', Object.keys(cHasilIbu), Object.values(cHasilIbu), '#10b981',450,50);
     const daftarKelas = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B'];
 let dataPerKelas = daftarKelas.map(kls => {
     return dataAktif.filter(s => String(s.kelas).toUpperCase() === kls).length;
