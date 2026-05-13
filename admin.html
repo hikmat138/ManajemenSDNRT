@@ -700,7 +700,7 @@
 }
 
 // Inisialisasi saat halaman selesai dimuat
-window.onload = loadData ();
+window.onload = loadData;
 
     function updateStats() {
     const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -730,7 +730,7 @@ window.onload = loadData ();
     } else if (currentMenu === 'mutasi-keluar') {
         sourceData = masterDataMutasiKeluar; // Siswa Aktif
     } else {sourceData = masterData;
-
+           }
     filteredData = sourceData.filter(s => {
         const matchNama = (s.nama || "").toLowerCase().includes(keyword);
         const matchKelas = kls === "" || String(s.kelas) === kls;
