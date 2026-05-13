@@ -425,6 +425,24 @@
                     <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                 </div>
             </div>
+            <div class="px-4 mb-2">
+    <button onclick="toggleSubmenu('submenu-tendik')" class="w-full flex items-center justify-between p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl transition-all group">
+        <div class="flex items-center">
+            <i class="fas fa-chalkboard-teacher mr-3 text-lg group-hover:scale-110 transition"></i>
+            <span class="font-semibold text-sm">Tenaga Pendidikan</span>
+        </div>
+        <i class="fas fa-chevron-down text-xs opacity-50"></i>
+    </button>
+    
+    <div id="submenu-tendik" class="hidden pl-10 mt-2 space-y-2">
+        <button onclick="showSection('data-guru')" class="w-full text-left p-2 text-xs font-medium text-gray-500 hover:text-indigo-600 flex items-center">
+            <i class="fas fa-user-tie mr-2"></i> Guru
+        </button>
+        <button onclick="showSection('data-staff')" class="w-full text-left p-2 text-xs font-medium text-gray-500 hover:text-indigo-600 flex items-center">
+            <i class="fas fa-user-cog mr-2"></i> Tenaga Kependidikan
+        </button>
+    </div>
+</div>
         </nav>
     </aside>
 
