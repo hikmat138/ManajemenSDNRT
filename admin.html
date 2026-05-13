@@ -768,19 +768,25 @@ window.onload = loadData();
     const bln = document.getElementById('filter-bulan') ? document.getElementById('filter-bulan').value : "";
     // Tentukan sumber data
     let sourceData = [];
-    if (currentMenu === 'siswa-lulus') {
-        sourceData = masterDataLulus;
-    } else if (currentMenu === 'mutasi-masuk') {
-        sourceData = masterDataMutasiMasuk; // Ambil dari variabel mutasi
-    } else if (currentMenu === 'mutasi-keluar') {
-        sourceData = masterDataMutasiKeluar; // Siswa Aktif
-    } else {sourceData = masterData;
-           }
+        if (currentMenu === 'siswa-lulus') {
+            sourceData = masterDataLulus;
+        } else if (currentMenu === 'mutasi-masuk') {
+            sourceData = masterDataMutasiMasuk;
+        } else if (currentMenu === 'mutasi-keluar') {
+            sourceData = masterDataMutasiKeluar;
+        } else if (currentMenu === 'data-guru') {
+            sourceData = masterDataGuru;
+        } else if (currentMenu === 'data-tendik') {
+            sourceData = masterDataTendik;
+        } else {
+            sourceData = masterData;
+        }
     filteredData = sourceData.filter(s => {
-        const matchNama = (s.nama || "").toLowerCase().includes(keyword);
-        const matchKelas = kls === "" || String(s.kelas) === kls;
-        const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
-        const matchTapel = tapel === "" || valTapel === tapel; // Hapus baris "let matchTapel = true" di bawahnya
+        const namaField = s.nama || s.nama_guru || "";
+            const matchNama = namaField.toLowerCase().includes(keyword);
+            const matchKelas = kls === "" || String(s.kelas) === kls;
+            const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
+            const matchTapel = tapel === "" || valTapel === tapel;
         
         let matchBulan = true;
         if (bln !== "") {
@@ -796,8 +802,11 @@ window.onload = loadData();
         
         // Sesuaikan return-nya
         if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
-            return matchNama && matchKelas && matchTapel && matchBulan;
-        }
+                return matchNama && matchKelas && matchTapel && matchBulan;
+            }
+            if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
+                return matchNama;
+            }
         
         const isAktif = (String(s.status_aktif) || "").toLowerCase() === 'aktif';
         return matchNama && matchKelas && isAktif;
@@ -835,16 +844,11 @@ window.onload = loadData();
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
     } 
     // --- TAMBAHAN KHUSUS GURU & TENDIK ---
-    else if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
-        cols = [
-            'nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 
-            'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 
-            'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 
-            'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'
-        ];
-    } else {
-        cols = ['nama'];
-    }
+    } else if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
+            cols = ['nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'];
+        } else {
+            cols = ['nama'];
+        }
 
     // 2. RENDER HEADER
     thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100 uppercase text-[10px]">${colMap[c] || c.replace(/_/g, ' ')}</th>`).join('')}</tr>`;
