@@ -646,6 +646,8 @@
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
     let masterDataMutasiKeluar = [];
+    let masterDataGuru = [];
+    let masterDataTendik = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -685,6 +687,8 @@
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
+            masterDataGuru = result.data.guru || [];
+            masterDataTendik = result.data.tendik || [];
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -723,7 +727,9 @@ window.onload = loadData();
     
     // Pastikan ID ini ada di HTML Bapak
     if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
-    
+    if(document.getElementById('stat-guru')) {
+        document.getElementById('stat-guru').innerText = masterDataGuru.length;
+    }
     // Filter untuk siswa masuk (punya tgl_masuk dan status aktif)
     const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
     if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
@@ -784,7 +790,7 @@ window.onload = loadData();
 
     let cols = [];
     
-    // 1. DAFTAR KOLOM LENGKAP SESUAI REQUEST BAPAK
+    // 1. DAFTAR KOLOM (Disesuaikan dengan menu yang dipilih)
     if (currentMenu === 'siswa-pribadi') {
         cols = [
             'nama', 'kelas', 'nis', 'nisn', 'nik', 'jk', 'tmpt_lahir', 'tgl_lahir', 'agama', 'kk', 'akte', 
@@ -798,20 +804,27 @@ window.onload = loadData();
         cols = ['nama', 'jk', 'bb', 'tb', 'hobi', 'cita_cita', 'umur'];
     } else if (currentMenu === 'siswa-registrasi') {
         cols = ['nama', 'jk', 'kelas', 'sekolah_asal', 'tgl_masuk', 'keterangan_siswa', 'aksi'];
-   } else if (currentMenu === 'siswa-lulus') {
-        // Kolom sesuai dengan 'rowBaru' di Apps Script Bapak
+    } else if (currentMenu === 'siswa-lulus') {
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'nis', 'nisn', 'thn_ajaran_lulus', 'tgl_lulus', 'sk_kelulusan', 'no_ijazah', 'status_aktif'];
     } else if (currentMenu === 'mutasi-keluar') {
-    // Menampilkan identitas dasar + data mutasi
-    cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
+        cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
     } else if (currentMenu === 'mutasi-masuk') {
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
+    } 
+    // --- TAMBAHAN KHUSUS GURU & TENDIK ---
+    else if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
+        cols = [
+            'nama', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 
+            'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 
+            'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 
+            'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_mengajar', 'masa_menjadi_pns'
+        ];
     } else {
-        cols = ['nama']
+        cols = ['nama'];
     }
 
-    // 2. RENDER HEADER (Tetap Pakai whitespace-nowrap supaya judul kolom tidak patah)
-    thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100">${colMap[c] || c}</th>`).join('')}</tr>`;
+    // 2. RENDER HEADER
+    thead.innerHTML = `<tr>${cols.map(c => `<th class="p-3 border-r whitespace-nowrap text-center bg-gray-100 uppercase text-[10px]">${colMap[c] || c.replace(/_/g, ' ')}</th>`).join('')}</tr>`;
     
     // 3. RENDER BODY
     if (list.length === 0) {
@@ -824,19 +837,10 @@ window.onload = loadData();
         
         cols.forEach(c => {
             if (c === 'aksi') {
-                // LOGIKA TOMBOL AKSI (Aman & Ramping)
                 const kelasSekarang = String(s.kelas || "").substring(0, 1);
-                let iconAksi, warnaAksi, labelAksi;
-
-                if (kelasSekarang === "6") {
-                    iconAksi = "fa-user-graduate";
-                    warnaAksi = "bg-green-600 hover:bg-green-700";
-                    labelAksi = "Luluskan";
-                } else {
-                    iconAksi = "fa-level-up-alt";
-                    warnaAksi = "bg-blue-600 hover:bg-blue-700";
-                    labelAksi = "Naik Kelas";
-                }
+                let iconAksi = kelasSekarang === "6" ? "fa-user-graduate" : "fa-level-up-alt";
+                let warnaAksi = kelasSekarang === "6" ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700";
+                let labelAksi = kelasSekarang === "6" ? "Luluskan" : "Naik Kelas";
 
                 rowHtml += `
                     <td class="p-2 border-r text-center" style="width: 110px; min-width: 110px;">
@@ -850,12 +854,15 @@ window.onload = loadData();
                         </div>
                     </td>`;
             } else {
-                // LOGIKA DATA BIASA
                 let val = s[c] || '-';
-                if (['tgl_lahir', 'tgl_masuk', 'tgl_keluar','tgl_lulus'].includes(c)) val = formatTanggalIndo(val);
+                
+                // Format Tanggal Otomatis jika nama kolom mengandung 'tgl' atau 'tmt'
+                if (c.includes('tgl') || c.includes('tmt')) {
+                    val = formatTanggalIndo(val);
+                }
                 
                 const textStyle = (val === 'Aktif') ? 'text-green-600 font-bold' : '';
-                rowHtml += `<td class="p-3 border-r whitespace-nowrap ${textStyle}">${val}</td>`;
+                rowHtml += `<td class="p-3 border-r whitespace-nowrap text-xs ${textStyle}">${val}</td>`;
             }
         });
 
