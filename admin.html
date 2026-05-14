@@ -1325,6 +1325,7 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
     // --- FUNGSI KONTROL MODAL ---
 function bukaModalTambahSiswa() {
     document.getElementById('modal-tambah-siswa').classList.remove('hidden');
+    setTipeInput('BARU'); // Inisialisasi awal
 }
 
 function tutupModal(id) {
@@ -1345,45 +1346,58 @@ let tipeMuridAktif = "BARU"; // Default
 // Fungsi Ganti Tab
 function setTipeInput(tipe) {
     tipeMuridAktif = tipe;
-    const boxNik = document.getElementById('box-nik');
-    const boxNisn = document.getElementById('box-nisn');
-    const boxAsal = document.getElementById('box-asal');
-    const boxAlasan = document.getElementById('box-alasan');
-    const selectKelas = document.getElementById('in-kelas');
+    
+    // Ambil semua elemen yang akan dimanipulasi
+    const elements = {
+        boxNik: document.getElementById('box-nik'),
+        boxNisn: document.getElementById('box-nisn'),
+        boxAsal: document.getElementById('box-asal-input'), // Sesuaikan ID dengan HTML Bapak
+        boxAlasan: document.getElementById('box-alasan'),
+        selectKelas: document.getElementById('in-kelas'),
+        tabBaru: document.getElementById('tab-baru'),
+        tabPindahan: document.getElementById('tab-pindahan')
+    };
 
-    selectKelas.innerHTML = '';
+    // Bersihkan isi dropdown kelas
+    elements.selectKelas.innerHTML = '';
 
     if (tipe === 'BARU') {
-        // Tab Style
-        document.getElementById('tab-baru').className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
-        document.getElementById('tab-pindahan').className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
+        // 1. Atur Tampilan Tab
+        elements.tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
+        elements.tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
         
-        // Munculkan NIK, Sembunyikan data pindahan
-        boxNik.classList.remove('hidden');
-        boxNisn.classList.add('hidden');
-        boxAsal.classList.add('hidden');
-        boxAlasan.classList.add('hidden');
+        // 2. Logika Input: BARU = NIK Muncul, NISN Hilang
+        elements.boxNik.classList.remove('hidden');
+        elements.boxNisn.classList.add('hidden');
+        if(elements.boxAsal) elements.boxAsal.classList.add('hidden');
+        if(elements.boxAlasan) elements.boxAlasan.classList.add('hidden');
 
+        // 3. Isi Dropdown (Hanya Kelas 1)
         ['1A', '1B'].forEach(k => {
             let opt = document.createElement('option');
-            opt.value = k; opt.text = k;
-            selectKelas.add(opt);
+            opt.value = k;
+            opt.textContent = k; // Pakai textContent lebih stabil
+            elements.selectKelas.appendChild(opt);
         });
-    } else {
-        // Tab Style
-        document.getElementById('tab-pindahan').className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
-        document.getElementById('tab-baru').className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
-        
-        // Sembunyikan NIK, Munculkan data pindahan
-        boxNik.classList.add('hidden');
-        boxNisn.classList.remove('hidden');
-        boxAsal.classList.remove('hidden');
-        boxAlasan.classList.remove('hidden');
 
-        ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B'].forEach(k => {
+    } else {
+        // 1. Atur Tampilan Tab
+        elements.tabPindahan.className = "flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50";
+        elements.tabBaru.className = "flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50";
+        
+        // 2. Logika Input: PINDAHAN = NIK Hilang, NISN Muncul
+        elements.boxNik.classList.add('hidden');
+        elements.boxNisn.classList.remove('hidden');
+        if(elements.boxAsal) elements.boxAsal.classList.remove('hidden');
+        if(elements.boxAlasan) elements.boxAlasan.classList.remove('hidden');
+
+        // 3. Isi Dropdown (Semua Kelas)
+        const daftarKelas = ['1A', '1B', '2A', '2B', '3A', '3B', '4A', '4B', '5A', '5B', '6A', '6B'];
+        daftarKelas.forEach(k => {
             let opt = document.createElement('option');
-            opt.value = k; opt.text = k;
-            selectKelas.add(opt);
+            opt.value = k;
+            opt.textContent = k;
+            elements.selectKelas.appendChild(opt);
         });
     }
 }
