@@ -731,8 +731,8 @@
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
-            masterDataGuru = result.data.guru || [];
-            masterDataTendik = result.data.tendik || [];
+            masterDataGuru = (result.data.guru || []).filter(g => g.nama_guru);
+            masterDataTendik = (result.data.tendik || []).filter(t => t.nama_tendik);
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
