@@ -171,8 +171,7 @@
    
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Modal Mutasi/Lulus -->
-    <div id="modal-tambah-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+<div id="modal-tambah-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__fadeInDown">
         <div class="bg-indigo-700 p-4 text-white flex justify-between items-center">
             <h3 class="font-bold uppercase"><i class="fas fa-user-plus mr-2"></i> Tambah Murid</h3>
@@ -184,75 +183,86 @@
             <button onclick="setTipeInput('PINDAHAN')" id="tab-pindahan" class="flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50">Murid Pindahan</button>
         </div>
 
-        <form id="form-tambah-siswa" onsubmit="simpanMuridBaru(event)" class="p-6 space-y-4">
-    <div class="grid grid-cols-2 gap-4">
-        <div class="col-span-2">
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
-            <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500 text-sm" placeholder="Nama Lengkap Murid">
-        </div>
+        <form id="form-tambah-siswa" onsubmit="simpanMuridBaru(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
+                    <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500 text-sm" placeholder="Nama Lengkap Murid">
+                </div>
 
-        <div id="box-nik" class="col-span-2">
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK (Nomor Induk Kependudukan)</label>
-            <input type="number" id="in-nik" class="w-full border p-2 rounded-lg text-sm" placeholder="16 Digit NIK">
-        </div>
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIS (Nomor Induk Siswa)</label>
+                    <input type="number" id="in-nis" class="w-full border p-2 rounded-lg text-sm" placeholder="NIS Lokal">
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK</label>
+                    <input type="number" id="in-nik" class="w-full border p-2 rounded-lg text-sm" placeholder="16 Digit NIK">
+                </div>
 
-        <div id="box-nisn" class="col-span-2 hidden">
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN</label>
-            <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="Nomor Induk Siswa Nasional">
-        </div>
+                <div id="box-nisn" class="col-span-2 hidden">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN</label>
+                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="Nomor Induk Siswa Nasional">
+                </div>
 
-        <div id="box-ttl" class="col-span-2 grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tempat Lahir</label>
-                <input type="text" id="in-tmpt" class="w-full border p-2 rounded-lg text-sm" placeholder="Kota Lahir">
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tempat Lahir</label>
+                    <input type="text" id="in-tmpt" class="w-full border p-2 rounded-lg text-sm" placeholder="Kota Lahir">
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lahir</label>
+                    <input type="date" id="in-tgl" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jenis Kelamin</label>
+                    <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Agama</label>
+                    <select id="in-agama" class="w-full border p-2 rounded-lg text-sm bg-white">
+                        <option value="Islam">Islam</option>
+                        <option value="Kristen">Kristen</option>
+                        <option value="Katolik">Katolik</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Budha">Budha</option>
+                        <option value="Khonghucu">Khonghucu</option>
+                    </select>
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
+                    <select id="in-kelas" required class="w-full border p-2 rounded-lg text-sm bg-white"></select>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Masuk</label>
+                    <input type="date" id="in-tgl-masuk" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Ajaran</label>
+                    <input type="text" id="in-tapel" placeholder="2025/2026" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+                <div id="box-asal-input" class="col-span-1 hidden">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal</label>
+                    <input type="text" id="in-asal" placeholder="Nama SD Asal" class="w-full border p-2 rounded-lg text-sm">
+                </div>
+
+                <div id="box-alasan" class="col-span-2 hidden">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alasan Mutasi</label>
+                    <input type="text" id="in-alasan" placeholder="Ikut Orang Tua / Pindah Domisili" class="w-full border p-2 rounded-lg text-sm">
+                </div>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lahir</label>
-                <input type="date" id="in-tgl" class="w-full border p-2 rounded-lg text-sm">
+
+            <div class="flex gap-2 pt-4">
+                <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
+                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg">Simpan Data</button>
             </div>
-        </div>
-
-        <div>
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
-            <select id="in-kelas" required class="w-full border p-2 rounded-lg text-sm bg-white"></select>
-        </div>
-        <div>
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jenis Kelamin</label>
-            <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
-                <option value="L">Laki-laki</option>
-                <option value="P">Perempuan</option>
-            </select>
-        </div>
-
-        <div id="box-adm-masuk" class="col-span-2 grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Masuk</label>
-                <input type="date" id="in-tgl-masuk" class="w-full border p-2 rounded-lg text-sm">
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Ajaran</label>
-                <input type="text" id="in-tapel" placeholder="2025/2026" class="w-full border p-2 rounded-lg text-sm">
-            </div>
-        </div>
-
-        <div id="box-asal" class="col-span-2 hidden">
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal</label>
-            <input type="text" id="in-asal" placeholder="SD Negeri sebelumnya..." class="w-full border p-2 rounded-lg text-sm">
-        </div>
-        <div id="box-alasan" class="col-span-2 hidden">
-            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alasan Mutasi</label>
-            <input type="text" id="in-alasan" placeholder="Ikut Orang Tua / Pindah Domisili" class="w-full border p-2 rounded-lg text-sm">
-        </div>
-    </div>
-
-    <div class="flex gap-2 pt-4">
-        <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
-        <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg">Simpan Data</button>
-    </div>
-</form>
+        </form>
     </div>
 </div>
-
 <div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn animate__faster">
         <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center shadow-md"></div>
@@ -1397,6 +1407,7 @@ async function simpanMuridBaru(event) {
         // Data Administrasi
         nisn: document.getElementById('in-nisn')?.value || "",
         nis: document.getElementById('in-nis')?.value || "", // Pastikan ID ini ada jika ada input NIS
+        agama: document.getElementById('in-agama').value,
         sekolah_asal: document.getElementById('in-asal')?.value || "",
         tgl_masuk: document.getElementById('in-tgl-masuk')?.value || "",
         tapel: document.getElementById('in-tapel')?.value || "",
