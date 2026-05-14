@@ -664,6 +664,7 @@
         'tmpt_lahir_guru': 'Tempat Lahir Guru',
         'tgl_lahir_guru': 'Tanggal Lahir Guru',
         'nik_guru': 'NIK Guru',
+        'kk_guru':'KK Guru',
         'nip': 'NIP',
         'nuptk': 'NUPTK',
         'nrg': 'NRG',
@@ -683,7 +684,28 @@
         'jenis_pegawai': 'Jenis Pegawai',
         'tahun_pensiun': 'Tahun Pensiun',
         'masa_pns': 'Masa PNS',
-        'masa_sekolah': 'Masa Sekolah'
+        'masa_sekolah': 'Masa Sekolah','nama_tendik': 'Nama Tendik',
+        'tmpt_lahir_tendik': 'Tempat Lahir Tendik',
+        'tgl_lahir_tendik': 'Tanggal Lahir Tendik',
+        'nik_tendik': 'NIK Temdik',
+        'nip_tendik': 'NIP Tendik',
+        'nuptk_tendik': 'NUPTK Tendik',
+        'jk_tendik': 'Jenis Kelamin',
+        'status_kawin_tendik': 'Status Kawin',
+        'agama_tendik': 'AGAMA',
+        'ijazah_pns_tendik': 'Ijazah Awal PNS',
+        'ijazah_terakhir_tendik': 'Ijazah Terakhir',
+        'jurusan_tendik': 'Jurusan',
+        'jabatan_tendik': 'Jabatan',
+        'gol_tendik': 'Golongan',
+        'pangkat_tendik': 'Pangkat',
+        'tmt_pns_tendik': 'TMT PNS',
+        'tmt_sekolah_tendik': 'TMT Sekolah',
+        'status_pegawai_tendik': 'Status Pegawai',
+        'jenis_pegawai_tendik': 'Jenis Pegawai',
+        'tahun_pensiun_tendik': 'Tahun Pensiun',
+        'masa_pns_tendik': 'Masa PNS',
+        'masa_sekolah_tendik': 'Masa Sekolah'
     };   
 
     function formatTanggalIndo(dateStr) {
@@ -752,6 +774,9 @@ window.onload = loadData();
     if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
     if(document.getElementById('stat-guru')) {
         document.getElementById('stat-guru').innerText = masterDataGuru.length;
+    }
+     if(document.getElementById('stat-tendik')) {
+        document.getElementById('stat-tendik').innerText = masterDataTendik.length;
     }
     // Filter untuk siswa masuk (punya tgl_masuk dan status aktif)
     const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
@@ -842,9 +867,11 @@ window.onload = loadData();
         cols = ['nama', 'jk', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'status_aktif'];
     } else if (currentMenu === 'mutasi-masuk') {
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
-    } else if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
+    } else if (currentMenu === 'data-guru') {
             cols = ['nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'];
-        } else {
+    else if (currentMenu === 'data-tendik') {
+            cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
+    } else {
             cols = ['nama'];
         }
 
@@ -908,7 +935,7 @@ window.onload = loadData();
     // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
-
+    const filterKelas = document.getElementByid('filter-kelas');
     // 3. Logika pemindahan menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
@@ -934,6 +961,11 @@ window.onload = loadData();
             // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
             if (filterBulan) filterBulan.classList.add('hidden');
             if (filterTapel) filterTapel.classList.add('hidden');
+        }
+        if(id==='data-guru'||id==='data-tendik'){
+            if(filterKelas) filterKelas.classList.add('hidden');
+        } else {
+            if(filterKelas) filterKelas.classList.remove('hidden');
         }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
