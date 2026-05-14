@@ -767,24 +767,26 @@
 window.onload = loadData();
 
     function updateStats() {
-    const aktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif').length;
+    // Hanya hitung yang ada namanya (biar baris kosong di Excel nggak ikut)
+    const aktif = masterData.filter(s => s.nama && String(s.status_aktif).toLowerCase() === 'aktif').length;
     
-    // Pastikan ID ini ada di HTML Bapak
+    // Untuk Guru & Tendik, pastikan kolom nama_guru / nama_tendik tidak kosong
+    const jmlGuru = masterDataGuru.filter(g => g.nama_guru).length; 
+    const jmlTendik = masterDataTendik.filter(t => t.nama_tendik).length;
+    
+    // ... sisa kode pengisian innerText ...
     if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
-    if(document.getElementById('stat-guru')) {
-        document.getElementById('stat-guru').innerText = masterDataGuru.length;
-    }
-     if(document.getElementById('stat-tendik')) {
-        document.getElementById('stat-tendik').innerText = masterDataTendik.length;
-    }
-    // Filter untuk siswa masuk (punya tgl_masuk dan status aktif)
-    const masuk = masterData.filter(s => s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
-    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
-    
-    // Keluar diambil dari masterDataMutasiKeluar yang sudah kita perbaiki di loadData
-    if(document.getElementById('stat-keluar')) document.getElementById('stat-keluar').innerText = masterDataMutasiKeluar.length;
-}
+    if(document.getElementById('stat-guru')) document.getElementById('stat-guru').innerText = jmlGuru;
+    if(document.getElementById('stat-tendik')) document.getElementById('stat-tendik').innerText = jmlTendik;
 
+    // Filter masuk (tambahkan cek nama agar akurat)
+    const masuk = masterData.filter(s => s.nama && s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
+    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
+
+    // Keluar (filter juga baris kosongnya)
+    const jmlKeluar = masterDataMutasiKeluar.filter(m => m.nama).length;
+    if(document.getElementById('stat-keluar')) document.getElementById('stat-keluar').innerText = jmlKeluar;
+}
     function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
     const kls = document.getElementById('filter-kelas').value;
