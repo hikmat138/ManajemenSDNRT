@@ -998,14 +998,23 @@ window.onload = loadData();
 
     // Update teks info pagination
     const infoEl = document.getElementById('pagination-info');
-    if (infoEl) {
-        if (filteredData.length > 0) {
-            infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} murid`;
-        } else {
-            infoEl.innerText = "Menampilkan 0 - 0 dari 0 murid";
-        }
+if (infoEl) {
+    // Tentukan label berdasarkan menu aktif
+    let labelSubjek = "Murid"; // Default
+    if (currentMenu === 'data-guru') {
+        labelSubjek = "Guru";
+    } else if (currentMenu === 'data-tendik') {
+        labelSubjek = "Tendik";
+    }
+
+    if (filteredData.length > 0) {
+        // Pakai labelSubjek supaya teksnya dinamis
+        infoEl.innerText = `Menampilkan ${start + 1} - ${end} dari ${filteredData.length} ${labelSubjek}`;
+    } else {
+        infoEl.innerText = `Menampilkan 0 - 0 dari 0 ${labelSubjek}`;
     }
 }
+
     function prevPage() { if (currentPage > 1) { currentPage--; updatePagination(); } }
     function nextPage() { if (currentPage * rowsPerPage < filteredData.length) { currentPage++; updatePagination(); } }
     function toggleUserMenu() { document.getElementById('userDropdown').classList.toggle('hidden'); }
