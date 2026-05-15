@@ -436,6 +436,21 @@
                 </div>
             </div>
             <div>
+    <button onclick="toggleSubmenu('sub-laporan')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+        <span class="flex items-center">
+            <i class="fas fa-chart-bar mr-3 w-5"></i> Laporan
+        </span>
+        <i class="fas fa-chevron-down text-[10px]"></i>
+    </button>
+    
+    <div id="sub-laporan" class="hidden space-y-1 mt-1">
+        <div onclick="showSection('section-kohort'); renderKohortAnalysis();" class="submenu-link">
+            <i class="fas fa-users-class mr-2 text-[10px]"></i> Kohort Siswa
+        </span>
+    </div>
+</div>
+            </div>
+            <div>
     <button onclick="toggleSubmenu('submenu-tendik')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
         <span class="flex items-center">
             <i class="fas fa-chalkboard-teacher mr-3 w-5"></i> Tenaga Pendidikan
