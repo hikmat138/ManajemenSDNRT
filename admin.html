@@ -435,18 +435,7 @@
                     <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                 </div>
             </div>
-            <div>
-    <button onclick="toggleSubmenu('sub-laporan')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-        <span class="flex items-center">
-            <i class="fas fa-chart-bar mr-3 w-5"></i> Laporan
-        </span>
-        <i class="fas fa-chevron-down text-[10px]"></i>
-    </button>
-    
-    <div id="sub-laporan" class="hidden space-y-1 mt-1">
-        <div onclick="showSection('section-kohort')" class="submenu-link"> Kohort Siswa </div>
-</div>
-            </div>
+            
             <div>
     <button onclick="toggleSubmenu('submenu-tendik')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
         <span class="flex items-center">
@@ -460,6 +449,18 @@
         <div onclick="showSection('data-tendik')" class="submenu-link">Tenaga Kependidikan</div>
     </div>
 </div>
+            <div>
+    <button onclick="toggleSubmenu('sub-laporan')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+        <span class="flex items-center">
+            <i class="fas fa-chart-bar mr-3 w-5"></i> Laporan
+        </span>
+        <i class="fas fa-chevron-down text-[10px]"></i>
+    </button>
+    
+    <div id="sub-laporan" class="hidden space-y-1 mt-1">
+        <div onclick="showSection('section-kohort')" class="submenu-link"> Kohort Siswa </div>
+</div>
+            </div>
         </nav>
     </aside>
 
@@ -895,6 +896,8 @@ window.onload = loadData();
             cols = ['nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'];
     }else if (currentMenu === 'data-tendik') {
             cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
+    } else if {currentMenu === 'section-kohort'{
+        cols = ['tahun_ajaran','thn_ajaran_lulus'];
     } else {
             cols = ['nama'];
         }
