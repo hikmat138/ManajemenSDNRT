@@ -1705,23 +1705,24 @@ async function eksekusiImporLulus() {
         tbody.innerHTML = html;
     }
     function updateSidebarUI(activeId) {
-    // 1. Ambil semua elemen yang bisa diklik (Link Utama & Submenu)
+    // 1. Bersihkan semua status active di semua link
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
+    allLinks.forEach(link => link.classList.remove('active'));
 
-    allLinks.forEach(link => {
-        // Hapus semua class active terlebih dahulu
-        link.classList.remove('active');
-        
-        // Cek apakah onclick-nya mengandung activeId yang dikirim
-        const onClickAttr = link.getAttribute('onclick') || "";
-        if (onClickAttr.includes(`'${activeId}'`)) {
-            link.classList.add('active');
-        }
-    });
-
-    // Khusus untuk Dashboard agar warnanya pindah dari link-dashboard
+    // 2. Jika yang dipanggil adalah dashboard, langsung tembak ID-nya
     if (activeId === 'dashboard') {
-        document.getElementById('link-dashboard')?.classList.add('active');
+        const dashLink = document.getElementById('link-dashboard');
+        if (dashLink) dashLink.classList.add('active');
+    } 
+    // 3. Jika selain dashboard, baru cari berdasarkan atribut onclick
+    else {
+        allLinks.forEach(link => {
+            const onClickAttr = link.getAttribute('onclick') || "";
+            // Kita pastikan id-nya benar-benar pas (match)
+            if (onClickAttr.includes(`'${activeId}'`)) {
+                link.classList.add('active');
+            }
+        });
     }
 }
 </script>
