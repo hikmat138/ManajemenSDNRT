@@ -520,24 +520,7 @@
                     <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">Memuat....</h4>
                 </div>
             </div>
-<div id="section-kohort" class="hidden p-6 animate__animated animate__fadeIn">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <table class="w-full text-left">
-            <thead class="bg-gray-100 border-b">
-                <tr class="text-[10px] uppercase font-bold text-gray-500">
-                    <th class="p-3 border-r text-center">Tahun Masuk</th>
-                    <th class="p-3 border-r text-center">Total Input</th>
-                    <th class="p-3 border-r text-center">Masih Aktif</th>
-                    <th class="p-3 border-r text-center">Lulus</th>
-                    <th class="p-3 border-r text-center">Keluar</th>
-                    <th class="p-3 text-center">Survival Rate</th>
-                </tr>
-            </thead>
-            <tbody id="tabel-kohort-body">
-                </tbody>
-        </table>
-    </div>
-</div>
+
             <!-- Baris Grafik -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="bg-white p-4 rounded-xl border shadow-sm">
@@ -982,6 +965,13 @@ window.onload = loadData();
     const filterTapel = document.getElementById('filter-tapel');
     const filterKelas = document.getElementById('filter-kelas');
 
+    const sections = ['section-dashboard', 'section-tabel-container', 'section-kohort'];
+        sections.forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.classList.add('hidden');
+        });
+
+        
     // 3. Logika Pemindahan Menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
@@ -1672,61 +1662,53 @@ async function eksekusiImporLulus() {
     reader.readAsArrayBuffer(file);
 }
     function renderKohortAnalysis() {
-    const tbody = document.getElementById('tabel-kohort-body');
-    if (!tbody) return;
+        const tbody = document.getElementById('tabel-kohort-body');
+        if (!tbody) return;
 
-    // 1. Ambil daftar tahun ajaran unik dari semua sumber data
-    const semuaTahun = [
-        ...masterData.map(s => s.tahun_ajaran || s.tapel),
-        ...masterDataLulus.map(s => s.tahun_ajaran || s.thn_ajaran_lulus),
-        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
-    ].filter(t => t && t !== '-');
+        // Ambil tahun ajaran dari semua data
+        const tahunSemua = [
+            ...masterData.map(s => s.tahun_ajaran || s.tapel),
+            ...masterDataLulus.map(s => s.thn_ajaran_lulus),
+            ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
+        ].filter(t => t && t !== '-');
 
-    const daftarTapel = [...new Set(semuaTahun)].sort().reverse();
+        const daftarTapel = [...new Set(tahunSemua)].sort().reverse();
 
-    if (daftarTapel.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data Tahun Ajaran Tidak Ditemukan</td></tr>`;
-        return;
-    }
-
-    // 2. Hitung statistik per tahun ajaran
-    let html = '';
-    daftarTapel.forEach(tapel => {
-        const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel) && s.nama).length;
-        const lulus = masterDataLulus.filter(s => (s.tahun_ajaran === tapel || s.thn_ajaran_lulus === tapel) && s.nama).length;
-        const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel && s.nama).length;
-        
-        const total = aktif + lulus + keluar;
-        const survivalRate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
-
-        html += `
-            <tr class="border-b hover:bg-gray-50 transition text-xs">
-                <td class="p-3 text-center font-bold text-gray-700 border-r">${tapel}</td>
-                <td class="p-3 text-center border-r">${total}</td>
-                <td class="p-3 text-center text-blue-600 font-bold border-r">${aktif}</td>
-                <td class="p-3 text-center text-green-600 font-bold border-r">${lulus}</td>
-                <td class="p-3 text-center text-red-500 border-r">${keluar}</td>
-                <td class="p-3 text-center font-black ${survivalRate >= 90 ? 'text-green-600' : 'text-orange-600'}">
-                    ${survivalRate}%
-                </td>
-            </tr>
-        `;
-    });
-
-    tbody.innerHTML = html;
-}
-    function updateSidebarUI(activeId) {
-    // Cari semua link di sidebar
-    const links = document.querySelectorAll('aside a, aside button');
-    links.forEach(link => {
-        // Jika ID link mengandung activeId, beri warna biru, jika tidak hapus warnanya
-        if (link.getAttribute('onclick')?.includes(`'${activeId}'`)) {
-            link.classList.add('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
-        } else {
-            link.classList.remove('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+        if (daftarTapel.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data belum termuat...</td></tr>`;
+            return;
         }
-    });
-}
+
+        let html = '';
+        daftarTapel.forEach(tapel => {
+            const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel) && s.nama).length;
+            const lulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel && s.nama).length;
+            const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel && s.nama).length;
+            const total = aktif + lulus + keluar;
+            const rate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
+
+            html += `
+                <tr class="border-b hover:bg-gray-50 transition text-xs text-center">
+                    <td class="p-3 font-bold border-r">${tapel}</td>
+                    <td class="p-3 border-r">${total}</td>
+                    <td class="p-3 text-blue-600 font-bold border-r">${aktif}</td>
+                    <td class="p-3 text-green-600 font-bold border-r">${lulus}</td>
+                    <td class="p-3 text-red-500 border-r">${keluar}</td>
+                    <td class="p-3 font-black ${rate >= 90 ? 'text-green-600' : 'text-orange-600'}">${rate}%</td>
+                </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+    function updateSidebarUI(activeId) {
+        const links = document.querySelectorAll('aside a, aside button');
+        links.forEach(link => {
+            if (link.getAttribute('onclick')?.includes(`'${activeId}'`)) {
+                link.classList.add('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+            } else {
+                link.classList.remove('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+            }
+        });
+    }
 </script>
 </body>
 </html>
