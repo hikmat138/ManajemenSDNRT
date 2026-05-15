@@ -1290,24 +1290,19 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
     
-    // Hancurkan chart lama jika ada
     if (charts[canvasId]) charts[canvasId].destroy();
 
-    // 1. CEK DATA KOSONG
-    // Hitung total nilai dalam array data
     const total = data.reduce((a, b) => a + b, 0);
     
-    // Ambil elemen pembungkus (Card/Container grafik)
-    // Asumsi: canvas berada di dalam div (relative), dan div tersebut di dalam card (bg-white)
-    const cardContainer = ctx.closest('.bg-white'); 
+    // CARI CARD PEMBUNGKUS (yang ada class bg-white)
+    const card = ctx.closest('.bg-white');
 
+    // JIKA DATA KOSONG, SEMBUNYIKAN CARDNYA
     if (total === 0) {
-        // Jika tidak ada data, sembunyikan card-nya agar tidak makan tempat
-        if (cardContainer) cardContainer.classList.add('hidden');
+        if (card) card.style.display = 'none'; // Sembunyikan total
         return; 
     } else {
-        // Jika ada data, pastikan card muncul
-        if (cardContainer) cardContainer.classList.remove('hidden');
+        if (card) card.style.display = 'block'; // Munculkan kembali jika ada data
     }
 
     const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
