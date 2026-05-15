@@ -668,6 +668,42 @@
         </div>
 
     </div>
+        <div id="section-kohort" class="hidden space-y-4">
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+        <div class="p-5 border-b bg-gray-50/50 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">ANALISIS KOHORT MURID</h3>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">SD NEGERI RANCA TALES</p>
+            </div>
+            <button onclick="renderKohortAnalysis()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2">
+                <i class="fas fa-sync-alt"></i> Refresh Angka
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-center border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold border-b">
+                        <th class="p-4 border-r">Tahun Ajaran</th>
+                        <th class="p-4 border-r">Total Input</th>
+                        <th class="p-4 border-r text-blue-600">Aktif (Murid)</th>
+                        <th class="p-4 border-r text-green-600">Lulus (Alumni)</th>
+                        <th class="p-4 border-r text-red-600">Keluar (Mutasi)</th>
+                        <th class="p-4 bg-blue-50 text-blue-700">Efektivitas</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-kohort-body" class="text-sm divide-y">
+                    </tbody>
+            </table>
+        </div>
+        
+        <div class="p-4 bg-blue-50/50 border-t">
+            <p class="text-[11px] text-blue-800 italic font-medium">
+                * Efektivitas dihitung berdasarkan persentase murid yang bertahan (Aktif + Lulus) dibandingkan dengan total data yang pernah masuk di tahun ajaran tersebut.
+            </p>
+        </div>
+    </div>
+</div>
 </main>
 </div>
 
