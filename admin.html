@@ -174,18 +174,6 @@
     align-items: center;
     border-top: 1px solid #f3f4f6;
 }
-       .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 1.5rem;
-        /* Ini kuncinya: agar elemen yang lebih pendek tetap di atas */
-        align-items: start; 
-    }
-       .chart-container {
-        position: relative;
-        height: 250px;
-        width: 100%;
-    }
 </style>
     
 </head>
@@ -517,7 +505,7 @@
         <!-- 1. SECTION DASHBOARD (Muncul Pertama Kali) -->
         <div id="section-dashboard" class="space-y-6">
             <!-- Baris Statistik -->
-            <div class="dashboard-grid">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
                     <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
                     <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
@@ -539,9 +527,9 @@
                     <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">Memuat....</h4>
                 </div>
             </div>
-        </div>
+
             <!-- Baris Grafik -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="bg-white p-4 rounded-xl border shadow-sm">
         <div class="h-[250px]"><canvas id="chartUmur"></canvas></div>
     </div>
@@ -584,10 +572,6 @@
     <div class="bg-white p-4 rounded-xl  border shadow-sm">
         <div class="h-[250px]"><canvas id="chartPerKelas"></canvas></div>
     </div>
-     <div class="bg-white p-4 rounded-xl  border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartGender"></canvas></div>
-    </div>
-</div>
 </div>
         </div>
 
@@ -696,7 +680,6 @@
     let masterDataMutasiKeluar = [];
     let masterDataGuru = [];
     let masterDataTendik = [];
-    let masterDataKohort = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -781,7 +764,6 @@
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
-            masterDataKohort = result.data.kohort || [];
             masterDataGuru = (result.data.guru || []).filter(g => g.nama_guru);
             masterDataTendik = (result.data.tendik || []).filter(t => t.nama_tendik);
             // 2. Update Profil Admin
@@ -855,8 +837,6 @@ window.onload = loadData();
             sourceData = masterDataGuru;
         } else if (currentMenu === 'data-tendik') {
             sourceData = masterDataTendik;
-        } else if (currentMenu === 'section-kohort') {
-            sourceData = masterDataKohort;
         } else {
             sourceData = masterData;
         }
@@ -926,7 +906,7 @@ window.onload = loadData();
     }else if (currentMenu === 'data-tendik') {
             cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
     } else if (currentMenu === 'section-kohort') {
-        cols = ['tahun_ajaran', 'total_input', 'aktif', 'lulus', 'keluar', 'survival_rate'];
+        cols = ['tahun_ajaran','thn_ajaran_lulus'];
     } else {
             cols = ['nama'];
         }
@@ -984,6 +964,9 @@ window.onload = loadData();
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
     
+    // Pastikan ID section-kohort sudah ada di HTML Bapak
+  
+
     // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
     const containerAksi = document.getElementById('container-aksi-masal');
@@ -991,51 +974,56 @@ window.onload = loadData();
     const filterTapel = document.getElementById('filter-tapel');
     const filterKelas = document.getElementById('filter-kelas');
 
+        
     // 3. Logika Pemindahan Menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
         if (containerAksi) containerAksi.classList.add('hidden');
+        
+        // Sembunyikan semua filter karena Kohort menghitung semua tahun
         if (filterBulan) filterBulan.classList.add('hidden');
         if (filterTapel) filterTapel.classList.add('hidden');
         if (filterKelas) filterKelas.classList.add('hidden');
+        if (containerAksi) containerAksi.classList.add('hidden');
+        
+        // Jalankan fungsi hitung data kohort
 
     } else {
-        // SEMUA menu selain dashboard (termasuk Kohort) lari ke sini
+        // Menu Tabel Biasa (Siswa, Guru, Mutasi, dll)
         document.getElementById('section-tabel-container').classList.remove('hidden');
-        currentMenu = id;
-
-        // Logika Aksi Masal (Hanya muncul di Registrasi)
+        
+        // Logika Aksi Masal
         if (id === 'siswa-registrasi') {
             if (containerAksi) containerAksi.classList.remove('hidden');
         } else {
             if (containerAksi) containerAksi.classList.add('hidden');
         }
 
-        // Logika Filter Mutasi, Lulus, dan KOHORT
-        // (Kohort biasanya difilter per Tapel, jadi kita munculkan filter Tapelnya)
-        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus' || id === 'section-kohort') {
+        // Logika Filter Mutasi/Lulus
+        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
+            if (filterBulan) filterBulan.classList.remove('hidden');
             if (filterTapel) filterTapel.classList.remove('hidden');
-            // Bulan hanya untuk mutasi/lulus, Kohort biasanya tidak perlu filter bulan
-            if (id !== 'section-kohort' && filterBulan) filterBulan.classList.remove('hidden');
-            else if (filterBulan) filterBulan.classList.add('hidden');
         } else {
             if (filterBulan) filterBulan.classList.add('hidden');
             if (filterTapel) filterTapel.classList.add('hidden');
         }
 
-        // Logika Filter Kelas (Sembunyikan jika Guru, Tendik, atau Kohort)
-        if (id === 'data-guru' || id === 'data-tendik' || id === 'section-kohort') {
+        // Logika Filter Kelas (Sembunyikan jika Guru/Tendik)
+        if (id === 'data-guru' || id === 'data-tendik') {
             if (filterKelas) filterKelas.classList.add('hidden');
         } else {
             if (filterKelas) filterKelas.classList.remove('hidden');
         }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
-        headerTitle.innerText = (id === 'section-kohort') ? "ANALISIS KOHORT MURID" : formattedTitle;
+        headerTitle.innerText = formattedTitle;
 
-        // JALANKAN RENDER
-        resetAndFilter(); 
+        currentMenu = id;
+        if (typeof renderKohortAnalysis === "function") {
+    renderKohortAnalysis();
+}
+        resetAndFilter();
     }
 
     // 4. Update UI Sidebar
@@ -1203,17 +1191,6 @@ if (infoEl) {
     let charts = {}; 
 function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
-    const jmlL = dataAktif.filter(s => String(s.jk).toUpperCase() === 'L').length;
-    const jmlP = dataAktif.filter(s => String(s.jk).toUpperCase() === 'P').length;
-    renderChart(
-        'chartGender', 
-        'doughnut', // Bapak bisa pakai 'pie' atau 'doughnut' agar lebih variatif
-        'Jenis Kelamin Murid', 
-        ['Laki-laki', 'Perempuan'], 
-        [jmlL, jmlP], 
-        ['#2563eb', '#f472b6'] // Biru untuk L, Pink untuk P
-    );
-
     if (!masterData || masterData.length === 0) return;
     // --- 1. PROSES DATA UMUR ---
     let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
@@ -1305,16 +1282,6 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
     if (charts[canvasId]) charts[canvasId].destroy();
 
     const total = data.reduce((a, b) => a + b, 0);
-    
-    // Ini bagian penting supaya kartu yang kosong tidak bikin grafik lain turun ke bawah
-    const card = ctx.closest('.bg-white');
-    if (total === 0) {
-        if (card) card.style.display = 'none'; 
-        return; 
-    } else {
-        if (card) card.style.display = 'block'; 
-    }
-
     const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
 
     charts[canvasId] = new Chart(ctx, {
@@ -1338,7 +1305,6 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
                     text: label.toUpperCase(),
                     font: { size: 14, weight: 'bold' }
                 },
-                // KODE DATALABELS YANG BAPAK KEMBALIKAN
                 datalabels: {
                     display: (type === 'pie' || type === 'doughnut'),
                     color: '#fff',
@@ -1356,9 +1322,9 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
                 y: {
                     beginAtZero: true,
                     min: 0,
-                    max: maxVal,
+                    max: maxVal, // Mengikuti input (100 atau 450)
                     ticks: { 
-                        stepSize: step,
+                        stepSize: step, // Mengikuti input (10 atau 50)
                         precision: 0,
                         font: { size: 10 }
                     },
