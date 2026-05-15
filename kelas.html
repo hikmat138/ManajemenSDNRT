@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - SDN Ranca Tales</title>
+    <title>Panel Guru - SDN Ranca Tales</title>
      <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -180,232 +180,6 @@
    
 <body class="bg-gray-50 text-gray-800">
 
-<div id="modal-tambah-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__fadeInDown">
-        <div class="bg-indigo-700 p-4 text-white flex justify-between items-center">
-            <h3 class="font-bold uppercase"><i class="fas fa-user-plus mr-2"></i> Tambah Murid</h3>
-            <button onclick="tutupModal('modal-tambah-siswa')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="flex border-b">
-            <button onclick="setTipeInput('BARU')" id="tab-baru" class="flex-1 py-3 font-bold text-xs uppercase border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50">Murid Baru (Kelas 1)</button>
-            <button onclick="setTipeInput('PINDAHAN')" id="tab-pindahan" class="flex-1 py-3 font-bold text-xs uppercase text-gray-400 hover:bg-gray-50">Murid Pindahan</button>
-        </div>
-
-        <form id="form-tambah-siswa" onsubmit="simpanMuridBaru(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
-                    <input type="text" id="in-nama" required class="w-full border p-2 rounded-lg outline-none focus:border-indigo-500 text-sm" placeholder="Nama Lengkap Murid">
-                </div>
-
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIS (Nomor Induk Siswa)</label>
-                    <input type="number" id="in-nis" class="w-full border p-2 rounded-lg text-sm" placeholder="NIS Lokal">
-                </div>
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK</label>
-                    <input type="number" id="in-nik" class="w-full border p-2 rounded-lg text-sm" placeholder="16 Digit NIK">
-                </div>
-
-                <div id="box-nisn" class="col-span-2 hidden">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NISN</label>
-                    <input type="number" id="in-nisn" class="w-full border p-2 rounded-lg text-sm" placeholder="Nomor Induk Siswa Nasional">
-                </div>
-
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tempat Lahir</label>
-                    <input type="text" id="in-tmpt" class="w-full border p-2 rounded-lg text-sm" placeholder="Kota Lahir">
-                </div>
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lahir</label>
-                    <input type="date" id="in-tgl" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jenis Kelamin</label>
-                    <select id="in-jk" class="w-full border p-2 rounded-lg text-sm bg-white">
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
-                    </select>
-                </div>
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Agama</label>
-                    <select id="in-agama" class="w-full border p-2 rounded-lg text-sm bg-white">
-                        <option value="Islam">Islam</option>
-                        <option value="Kristen">Kristen</option>
-                        <option value="Katolik">Katolik</option>
-                        <option value="Hindu">Hindu</option>
-                        <option value="Budha">Budha</option>
-                        <option value="Khonghucu">Khonghucu</option>
-                    </select>
-                </div>
-
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas</label>
-                    <select id="in-kelas" required class="w-full border p-2 rounded-lg text-sm bg-white"></select>
-                </div>
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Masuk</label>
-                    <input type="date" id="in-tgl-masuk" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Ajaran</label>
-                    <input type="text" id="in-tapel" placeholder="2025/2026" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-                <div id="box-asal-input" class="col-span-1 hidden">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal</label>
-                    <input type="text" id="in-asal" placeholder="Nama SD Asal" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-
-                <div id="box-alasan" class="col-span-2 hidden">
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alasan Mutasi</label>
-                    <input type="text" id="in-alasan" placeholder="Ikut Orang Tua / Pindah Domisili" class="w-full border p-2 rounded-lg text-sm">
-                </div>
-            </div>
-
-            <div class="flex gap-2 pt-4">
-                <button type="button" onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
-                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg">Simpan Data</button>
-            </div>
-        </form>
-    </div>
-</div>
-<div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn animate__faster">
-        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center shadow-md"></div>
-        <div class="p-6 space-y-4">
-            
-            <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                <div>
-                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Nama Murid</label>
-                    <p id="m-nama" class="font-bold text-gray-700 truncate">-</p>
-                </div>
-                <div>
-                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Kelas Saat Ini</label>
-                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
-                </div>
-            </div>
-            
-            <div id="form-mutasi" class="hidden space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Sekolah Tujuan</label>
-                    <input type="text" id="m-tujuan" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500" placeholder="Contoh: SDN 1 Serang">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Mutasi</label>
-                    <input type="date" id="m-tgl-keluar" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Alasan Mutasi</label>
-                    <textarea id="m-alasan" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-orange-500" placeholder="Contoh: Ikut orang tua pindah rumah"></textarea>
-                </div>
-            </div>
-
-            <div id="form-lulus" class="hidden space-y-3">
-                <div class="grid grid-cols-2 gap-4 text-xs bg-blue-50/50 p-2 rounded-lg border border-blue-100">
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
-                        <p id="m-nis" class="font-bold text-gray-700">-</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
-                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-gray-400 font-bold uppercase">Tempat, Tanggal Lahir</label>
-                        <p id="m-ttl" class="font-bold text-gray-700">-</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun Ajaran</label>
-                        <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="2025/2026">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
-                        <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">No. SK Kelulusan</label>
-                    <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="421/001/SD-RT/2026">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
-                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="DN-28 DI 000xxxx">
-                </div>
-            </div>
-
-            <div id="form-naik-kelas" class="hidden space-y-4 py-4 text-center">
-                <div class="flex justify-center">
-                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center animate-bounce">
-                        <i class="fas fa-arrow-up text-2xl text-blue-600"></i>
-                    </div>
-                </div>
-                <p class="text-sm text-gray-600 px-4">Murid ini akan diproses untuk <b>Naik Kelas</b> secara otomatis ke tingkat selanjutnya.</p>
-                <div class="bg-blue-600 p-3 rounded-xl shadow-lg mx-8">
-                    <p class="text-[10px] text-blue-200 font-bold uppercase">Kelas Tujuan</p>
-                    <p id="m-target-kelas" class="text-xl font-black text-white italic">MEMPROSES...</p>
-                </div>
-            </div>
-
-            <div class="flex space-x-3 pt-4">
-                <button onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-[10px] hover:bg-gray-200 transition">
-                    Batal
-                </button>
-                <button id="btnKonfirmasi" onclick="konfirmasiProses()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg transition active:scale-95">
-                    Konfirmasi
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-<div id="modal-lulus-masal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__fadeInUp animate__faster">
-        <div class="bg-green-700 p-4 text-white flex justify-between items-center shadow-lg">
-            <h3 class="font-bold uppercase text-sm"><i class="fas fa-file-import mr-2"></i> Impor Kelulusan Masal</h3>
-            <button onclick="tutupModal('modal-lulus-masal')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="flex items-center justify-between bg-blue-50 p-3 rounded-xl border border-blue-100">
-                <div class="flex items-center">
-                    <i class="fas fa-file-excel text-blue-600 text-xl mr-3"></i>
-                    <div>
-                        <p class="text-[10px] font-bold text-blue-600 uppercase">Format Impor</p>
-                        <p class="text-[9px] text-blue-400">Gunakan format resmi sistem</p>
-                    </div>
-                </div>
-                <button onclick="downloadFormatLulus()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold hover:bg-blue-700 transition">
-                    DOWNLOAD
-                </button>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Ajaran</label>
-                    <input type="text" id="masal-tapel" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-600" placeholder="2025/2026">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tanggal Lulus</label>
-                    <input type="date" id="masal-tgl" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-600">
-                </div>
-            </div>
-
-            <div>
-    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pilih File Excel (.xlsx)</label>
-    <input type="file" id="masal-file" accept=".xlsx, .xls" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer border rounded-lg p-1">
-</div>
-
-            <div class="flex gap-2 pt-2">
-                <button onclick="tutupModal('modal-lulus-masal')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-[10px] uppercase text-gray-600">Batal</button>
-                <button id="btnEksekusiImpor" onclick="eksekusiImporLulus()" class="flex-1 bg-green-700 text-white py-2.5 rounded-xl font-bold text-[10px] uppercase shadow-lg">Mulai Impor</button>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="flex h-screen">
     <!-- Sidebar -->
    <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
@@ -444,20 +218,6 @@
                     <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
                 </div>
             </div>
-            
-            <div>
-    <button onclick="toggleSubmenu('submenu-tendik')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-        <span class="flex items-center">
-            <i class="fas fa-chalkboard-teacher mr-3 w-5"></i> Tenaga Pendidikan
-        </span>
-        <i class="fas fa-chevron-down text-[10px]"></i>
-    </button>
-    
-    <div id="submenu-tendik" class="hidden space-y-1 mt-1">
-        <div onclick="showSection('data-guru')" class="submenu-link">Data Guru</div>
-        <div onclick="showSection('data-tendik')" class="submenu-link">Tenaga Kependidikan</div>
-    </div>
-</div>
         </nav>
     </aside>
 
@@ -474,8 +234,9 @@
     
     <div class="flex items-center space-x-3">
         <div class="text-right">
-            <p id="admin-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
-            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Operator Sekolah</p>
+            <p id="guru-name" class="text-sm font-bold uppercase italic">Nama Operator</p>
+            <p id="label-kelas-sidebar" class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">KELAS --</p>
+        </div>
         </div>
         <div class="relative">
             <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition" id="userMenuBtn">H</button>
@@ -498,21 +259,13 @@
                     <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid</p>
                     <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-green-600 shadow-sm">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Guru</p>
-                    <h4 id="stat-guru" class="text-2xl font-bold text-green-600 mt-2">Memuat....</h4>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Laki-Laki</p>
+                    <h4 id="stat-L" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-orange-600 shadow-sm">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Tendik</p>
-                    <h4 id="stat-tendik" class="text-2xl font-bold text-orange-600 mt-2">Memuat...</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Masuk</p>
-                    <h4 id="stat-masuk" class="text-2xl font-bold text-indigo-600 mt-2">Memuat...</h4>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase">Mutasi Keluar</p>
-                    <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">Memuat....</h4>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Perempuan</p>
+                    <h4 id="stat-P" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
                 </div>
             </div>
 
@@ -572,12 +325,6 @@
         <button onclick="prosesMasal('NAIK_SEMUA')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
             <i class="fas fa-users"></i> Naik Semua (1-5)
         </button>
-        <button onclick="openModalLulusMasal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
-            <i class="fas fa-graduation-cap"></i> Luluskan Semua (Kelas 6)
-        </button>
-        <button onclick="bukaModalTambahSiswa()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-2">
-            <i class="fas fa-user-plus"></i> Tambah Murid
-        </button>
     </div>
             
             <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
@@ -588,15 +335,6 @@
                             <option value="10">10 Baris</option>
                             <option value="50">50 Baris</option>
                             <option value="100">100 Baris</option>
-                        </select>
-                        <select id="filter-kelas" onchange="resetAndFilter()" class="border p-2 rounded-lg text-sm">
-                            <option value="">Semua Kelas</option>
-                            <option value="1A">1A</option><option value="1B">1B</option>
-                            <option value="2A">2A</option><option value="2B">2B</option>
-                            <option value="3A">3A</option><option value="3B">3B</option>
-                            <option value="4A">4A</option><option value="4B">4B</option>
-                            <option value="5A">5A</option><option value="5B">5B</option>
-                            <option value="6A">6A</option><option value="6B">6B</option>
                         </select>
                         <select id="filter-bulan" onchange="resetAndFilter()" class="p-2 border rounded-lg text-xs">
     <option value="">Semua Bulan</option>
@@ -660,7 +398,9 @@
 </div>
 
 <script>
+    const session = JSON.parse(localStorage.getItem('session_sdnrt'));
     const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+    
     let masterData = [];
     let masterDataLulus = [];
     let filteredData = [];
@@ -669,8 +409,6 @@
     let currentMenu = 'siswa-pribadi';
     let masterDataMutasiMasuk = [];
     let masterDataMutasiKeluar = [];
-    let masterDataGuru = [];
-    let masterDataTendik = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -683,52 +421,7 @@
         'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
         'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
         'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran','nama_guru': 'Nama Guru',
-        'tmpt_lahir_guru': 'Tempat Lahir Guru',
-        'tgl_lahir_guru': 'Tanggal Lahir Guru',
-        'nik_guru': 'NIK Guru',
-        'kk_guru':'KK Guru',
-        'nip': 'NIP',
-        'nuptk': 'NUPTK',
-        'nrg': 'NRG',
-        'jk_guru': 'Jenis Kelamin',
-        'status_kawin': 'Status Kawin',
-        'agama_guru': 'AGAMA',
-        'ijazah_pns': 'Ijazah Awal PNS',
-        'ijazah_terakhir': 'Ijazah Terakhir',
-        'jurusan': 'Jurusan',
-        'jabatan': 'Jabatan',
-        'gol': 'Golongan',
-        'pangkat': 'Pangkat',
-        'tmt_pns': 'TMT PNS',
-        'tmt_sekolah': 'TMT Sekolah',
-        'mengajar_kelas': 'Mengajar Kelas',
-        'status_pegawai': 'Status Pegawai',
-        'jenis_pegawai': 'Jenis Pegawai',
-        'tahun_pensiun': 'Tahun Pensiun',
-        'masa_pns': 'Masa PNS',
-        'masa_sekolah': 'Masa Sekolah','nama_tendik': 'Nama Tendik',
-        'tmpt_lahir_tendik': 'Tempat Lahir Tendik',
-        'tgl_lahir_tendik': 'Tanggal Lahir Tendik',
-        'nik_tendik': 'NIK Tendik',
-        'nip_tendik': 'NIP Tendik',
-        'nuptk_tendik': 'NUPTK Tendik',
-        'jk_tendik': 'Jenis Kelamin',
-        'status_kawin_tendik': 'Status Kawin',
-        'agama_tendik': 'AGAMA',
-        'ijazah_pns_tendik': 'Ijazah Awal PNS',
-        'ijazah_terakhir_tendik': 'Ijazah Terakhir',
-        'jurusan_tendik': 'Jurusan',
-        'jabatan_tendik': 'Jabatan',
-        'gol_tendik': 'Golongan',
-        'pangkat_tendik': 'Pangkat',
-        'tmt_pns_tendik': 'TMT PNS',
-        'tmt_sekolah_tendik': 'TMT Sekolah',
-        'status_pegawai_tendik': 'Status Pegawai',
-        'jenis_pegawai_tendik': 'Jenis Pegawai',
-        'tahun_pensiun_tendik': 'Tahun Pensiun',
-        'masa_pns_tendik': 'Masa PNS',
-        'masa_sekolah_tendik': 'Masa Sekolah'
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
     };   
 
     function formatTanggalIndo(dateStr) {
@@ -744,31 +437,25 @@
         const statMuridEl = document.getElementById('stat-murid');
         if (statMuridEl) statMuridEl.innerText = "Memuat...";
 
-        const res = await fetch(`${API_URL}?action=getAllData`);
+        // Tambahkan parameter ?u= agar GAS bisa mengenali siapa yang login
+        const res = await fetch(`${API_URL}?action=getAllData&u=${session.username}`);
         const result = await res.json();
         
         if (result.status === "success") {
-            // 1. Ambil data dari database (sesuai sheet masing-masing)
             masterData = result.data.siswa || [];
             masterDataLulus = result.data.siswa_lulus || [];
-            
-            // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
-            masterDataGuru = (result.data.guru || []).filter(g => g.nama_guru);
-            masterDataTendik = (result.data.tendik || []).filter(t => t.nama_tendik);
 
-           
-            // 2. Update Profil Admin
-            const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
-            if (userData && userData.nama) {
-                const nameEl = document.getElementById('admin-name');
-                const btnEl = document.getElementById('userMenuBtn');
-                if (nameEl) nameEl.innerText = userData.nama;
-                if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
-            }
-            // 3. Jalankan fungsi pendukung
-            updateStats(); 
+            // Update Profil Guru (Mengambil dari adminName yang dikirim GAS)
+            const nameEl = document.getElementById('admin-name');
+            const btnEl = document.getElementById('userMenuBtn');
+            const guruName = result.adminName || session.nama;
+            
+            if (nameEl) nameEl.innerText = guruName;
+            if (btnEl) btnEl.innerText = guruName.charAt(0).toUpperCase();
+
+            // Jalankan filter otomatis sesuai kelas session
             filterData();  
             
             setTimeout(() => {
@@ -784,61 +471,66 @@
         console.error("Detail Error:", e);
         const statMuridEl = document.getElementById('stat-murid');
         if (statMuridEl) statMuridEl.innerText = "Koneksi Gagal";
-        alert("Koneksi ke server SDN Ranca Tales gagal.");
     }
 }
-
-// Inisialisasi saat halaman selesai dimuat
-window.onload = loadData();
-
     function updateStats() {
-    // Hanya hitung yang ada namanya (biar baris kosong di Excel nggak ikut)
-    const aktif = masterData.filter(s => s.nama && String(s.status_aktif).toLowerCase() === 'aktif').length;
-    
-    // Untuk Guru & Tendik, pastikan kolom nama_guru / nama_tendik tidak kosong
-    const jmlGuru = masterDataGuru.filter(g => g.nama_guru).length; 
-    const jmlTendik = masterDataTendik.filter(t => t.nama_tendik).length;
-    
-    // ... sisa kode pengisian innerText ...
-    if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
-    if(document.getElementById('stat-guru')) document.getElementById('stat-guru').innerText = jmlGuru;
-    if(document.getElementById('stat-tendik')) document.getElementById('stat-tendik').innerText = jmlTendik;
+    // Ambil kelas dari session login
+    const kelasBapak = String(session.kelas_akses).toUpperCase();
 
-    // Filter masuk (tambahkan cek nama agar akurat)
-    const masuk = masterData.filter(s => s.nama && s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'aktif').length;
+    // Hanya hitung murid AKTIF yang kelasnya sesuai dengan kelas Bapak
+    const aktif = masterData.filter(s => 
+        s.nama && 
+        String(s.status_aktif).toLowerCase() === 'aktif' &&
+        String(s.kelas).toUpperCase() === kelasBapak
+    ).length;
+    
+    if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
+
+    // Filter masuk (hanya kelas Bapak)
+    const masuk = masterData.filter(s => 
+        s.nama && 
+        s.tgl_masuk && 
+        s.tgl_masuk !== '-' && 
+        String(s.status_aktif).toLowerCase() === 'aktif' &&
+        String(s.kelas).toUpperCase() === kelasBapak
+    ).length;
     if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
 
-    // Keluar (filter juga baris kosongnya)
-    const jmlKeluar = masterDataMutasiKeluar.filter(m => m.nama).length;
+    // Keluar (hanya kelas Bapak)
+    const jmlKeluar = masterDataMutasiKeluar.filter(m => 
+        m.nama && 
+        String(m.kelas).toUpperCase() === kelasBapak
+    ).length;
     if(document.getElementById('stat-keluar')) document.getElementById('stat-keluar').innerText = jmlKeluar;
 }
-    function filterData() {
+   function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
-    const kls = document.getElementById('filter-kelas').value;
-    const tapel = document.getElementById('filter-tapel').value;
+    // KUNCI KELAS: Langsung ambil dari session, bukan dari dropdown UI
+    const kls = String(session.kelas_akses).toUpperCase(); 
+    const tapel = document.getElementById('filter-tapel') ? document.getElementById('filter-tapel').value : "";
     const bln = document.getElementById('filter-bulan') ? document.getElementById('filter-bulan').value : "";
-    // Tentukan sumber data
+
     let sourceData = [];
-        if (currentMenu === 'siswa-lulus') {
-            sourceData = masterDataLulus;
-        } else if (currentMenu === 'mutasi-masuk') {
-            sourceData = masterDataMutasiMasuk;
-        } else if (currentMenu === 'mutasi-keluar') {
-            sourceData = masterDataMutasiKeluar;
-        } else if (currentMenu === 'data-guru') {
-            sourceData = masterDataGuru;
-        } else if (currentMenu === 'data-tendik') {
-            sourceData = masterDataTendik;
-        } else {
-            sourceData = masterData;
-        }
+    if (currentMenu === 'siswa-lulus') {
+        sourceData = masterDataLulus;
+    } else if (currentMenu === 'mutasi-masuk') {
+        sourceData = masterDataMutasiMasuk;
+    } else if (currentMenu === 'mutasi-keluar') {
+        sourceData = masterDataMutasiKeluar;
+    } else {
+        sourceData = masterData;
+    }
+
     filteredData = sourceData.filter(s => {
-        const namaField = s.nama || s.nama_guru || "";
-            const matchNama = namaField.toLowerCase().includes(keyword);
-            const matchKelas = kls === "" || String(s.kelas) === kls;
-            const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
-            const matchTapel = tapel === "" || valTapel === tapel;
+        const namaField = s.nama || "";
+        const matchNama = namaField.toLowerCase().includes(keyword);
         
+        // PENGUNCIAN: Harus cocok dengan kelas Bapak
+        const matchKelas = String(s.kelas).toUpperCase() === kls;
+        
+        const valTapel = s.tapel || s.tahun_ajaran || s.thn_ajaran_lulus || "";
+        const matchTapel = tapel === "" || valTapel === tapel;
+
         let matchBulan = true;
         if (bln !== "") {
             let tglCek = s.tgl_masuk || s.tgl_keluar || s.tgl_lulus || "";
@@ -850,19 +542,18 @@ window.onload = loadData();
                 matchBulan = false;
             }
         }
-        
-        // Sesuaikan return-nya
+
+        // Logic return untuk murid (Aktif/Lulus/Mutasi)
         if (currentMenu === 'mutasi-masuk' || currentMenu === 'siswa-lulus' || currentMenu === 'mutasi-keluar') {
-                return matchNama && matchKelas && matchTapel && matchBulan;
-            }
-            if (currentMenu === 'data-guru' || currentMenu === 'data-tendik') {
-                return matchNama;
-            }
-        
+            return matchNama && matchKelas && matchTapel && matchBulan;
+        }
+
+        // Dashboard & Identitas Murid
         const isAktif = (String(s.status_aktif) || "").toLowerCase() === 'aktif';
         return matchNama && matchKelas && isAktif;
     });
-    currentPage = 1; // Reset ke hal 1 setiap filter berubah
+
+    currentPage = 1;
     updatePagination();
 }
 
@@ -893,10 +584,6 @@ window.onload = loadData();
         cols = ['nama', 'jk','nis','nisn', 'tmpt_lahir', 'tgl_lahir', 'kelas', 'tgl_keluar', 'alasan_mutasi', 'tahun_ajaran'];
     } else if (currentMenu === 'mutasi-masuk') {
         cols = ['nama','jk','nisn','tgl_masuk', 'kelas','tahun_ajaran','sekolah_asal', 'alasan_masuk', 'status_masuk'];
-    } else if (currentMenu === 'data-guru') {
-            cols = ['nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'];
-    }else if (currentMenu === 'data-tendik') {
-            cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
     } else {
             cols = ['nama'];
         }
@@ -932,16 +619,21 @@ window.onload = loadData();
                         </div>
                     </td>`;
             } else {
-                let val = s[c] || '-';
-                
-                // Format Tanggal Otomatis jika nama kolom mengandung 'tgl' atau 'tmt'
-                if (c.includes('tgl') || c.includes('tmt')) {
-                    val = formatTanggalIndo(val);
-                }
-                
-                const textStyle = (val === 'Aktif') ? 'text-green-600 font-bold' : '';
-                rowHtml += `<td class="p-3 border-r whitespace-nowrap text-xs ${textStyle}">${val}</td>`;
-            }
+    let val = s[c] || '-';
+    
+    // Format Tanggal Otomatis
+    if ((c.includes('tgl') || c.includes('tmt')) && val !== '-') {
+        val = formatTanggalIndo(val);
+    }
+    
+    // Memberi warna pada status agar mudah dipantau
+    let textStyle = 'text-gray-700';
+    if (val === 'Aktif') textStyle = 'bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold text-[10px]';
+    if (val === 'Mutasi' || val === 'Keluar') textStyle = 'bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold text-[10px]';
+    if (val === 'Lulus') textStyle = 'bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold text-[10px]';
+
+    rowHtml += `<td class="p-3 border-r whitespace-nowrap text-xs"><span class="${textStyle}">${val}</span></td>`;
+}
         });
 
         rowHtml += `</tr>`;
@@ -961,7 +653,6 @@ window.onload = loadData();
     const containerAksi = document.getElementById('container-aksi-masal');
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
-    const filterKelas = document.getElementById('filter-kelas');
 
         
     // 3. Logika Pemindahan Menu
@@ -974,7 +665,6 @@ window.onload = loadData();
         // Sembunyikan semua filter karena Kohort menghitung semua tahun
         if (filterBulan) filterBulan.classList.add('hidden');
         if (filterTapel) filterTapel.classList.add('hidden');
-        if (filterKelas) filterKelas.classList.add('hidden');
         if (containerAksi) containerAksi.classList.add('hidden');
         
         // Jalankan fungsi hitung data kohort
@@ -1000,11 +690,6 @@ window.onload = loadData();
         }
 
         // Logika Filter Kelas (Sembunyikan jika Guru/Tendik)
-        if (id === 'data-guru' || id === 'data-tendik') {
-            if (filterKelas) filterKelas.classList.add('hidden');
-        } else {
-            if (filterKelas) filterKelas.classList.remove('hidden');
-        }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
         headerTitle.innerText = formattedTitle;
@@ -1061,7 +746,6 @@ if (infoEl) {
     const header = document.getElementById('modalHeader');
     const formLulus = document.getElementById('form-lulus');
     const formNaikKelas = document.getElementById('form-naik-kelas');
-    const formMutasi = document.getElementById('form-mutasi');
     const btnKonfirmasi = document.getElementById('btnKonfirmasi');
 
     // 1. Reset Input (Gunakan ID yang ada di HTML terbaru Bapak)
@@ -1072,12 +756,8 @@ if (infoEl) {
     });
 
     // 2. Isi Identitas Dasar
-    document.getElementById('m-nama').innerText = s.nama;
-    document.getElementById('m-kelas').innerText = s.kelas;
-    document.getElementById('modalAction').classList.remove('hidden');
 
     // Sembunyikan semua form dulu
-    [formLulus, formNaikKelas, formMutasi].forEach(f => f.classList.add('hidden'));
 
     // 3. Logika Tampilan Berdasarkan Tipe
     if (tipe === 'lulus') {
@@ -1351,23 +1031,9 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
     }, 300); // 300ms sesuai durasi transition-all sidebar
 }
     // --- FUNGSI KONTROL MODAL ---
-function bukaModalTambahSiswa() {
-    document.getElementById('modal-tambah-siswa').classList.remove('hidden');
-    // PANGGIL INI supaya kelas 1A & 1B langsung muncul otomatis
-    setTipeInput('BARU');
-}
 
-function tutupModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) {
-        modal.classList.add('hidden');
-        // Jika yang ditutup modal tambah, reset formnya agar bersih
-        if (id === 'modal-tambah-siswa') {
-            const form = document.getElementById('form-tambah-siswa');
-            if (form) form.reset();
-        }
-    }
-}
+
+
 
 // --- FUNGSI SIMPAN SISWA BARU ---
 let tipeMuridAktif = "BARU"; // Default
@@ -1504,153 +1170,10 @@ async function prosesMasal(tipe, extra = {}) {
 
 // Fitur Lulus Masal via Prompt (Cepat)
 // Membuka Modal Lulus Masal
-function openModalLulusMasal() {
-    // Set tanggal hari ini secara otomatis agar tidak repot input
-    document.getElementById('masal-tgl').value = new Date().toISOString().split('T')[0];
-    document.getElementById('modal-lulus-masal').classList.remove('hidden');
-}
+
 
 // Eksekusi pengiriman data ke GAS
-async function eksekusiLulusMasal(event) {
-    const tapel = document.getElementById('masal-tapel').value;
-    const tgl = document.getElementById('masal-tgl').value;
 
-    if (!tapel || !tgl) {
-        alert("Mohon isi Tahun Ajaran dan Tanggal Lulus, Pak.");
-        return;
-    }
-
-    if (!confirm("Apakah Bapak benar-benar yakin ingin meluluskan SELURUH siswa kelas 6?")) return;
-
-    // Sesuai code.gs Bapak: Aksi IMPOR_LULUS dengan dataImpor kosong
-    const payload = {
-        action: 'IMPOR_LULUS',
-        tapel: tapel,
-        tglLulus: tgl,
-        dataImpor: [] 
-    };
-
-    const btn = event?.target || document.querySelector('#modal-lulus-masal button.bg-green-700');
-    const originalText = btn.innerText;
-    
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-        
-        alert("Selesai! " + result.message);
-        tutupModal('modal-lulus-masal');
-        loadData(); // Refresh tabel murid
-    } catch (err) {
-        alert("Gagal memproses kelulusan masal.");
-    } finally {
-        btn.disabled = false;
-        btn.innerText = originalText;
-    }
-}
-    // 1. Fungsi Download Format CSV Sederhana
-function downloadFormatLulus() {
-    if (typeof XLSX === 'undefined') return alert("Library Excel belum siap!");
-
-    const tapel = document.getElementById('masal-tapel').value || "2025/2026";
-    const tglLulus = document.getElementById('masal-tgl').value || "";
-
-    // Saring murid kelas 6 (6A & 6B)
-    const muridKelas6 = masterData.filter(m => String(m.kelas).startsWith('6'));
-
-    // Urutkan Kelas 6A -> 6B
-    muridKelas6.sort((a, b) => {
-        if (a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
-        return a.nama.localeCompare(b.nama);
-    });
-
-    // Susun sesuai urutan kolom database siswa_lulus
-    const dataExcel = muridKelas6.map(m => ({
-        "nama": m.nama,
-        "jk": m.jk,
-        "tmpt_lahir": m.tmpt_lahir || "",
-        "tgl_lahir": m.tgl_lahir || "",
-        "kelas": m.kelas,
-        "nis": m.nis,
-        "nisn": m.nisn,
-        "thn_ajaran_lulus": tapel,
-        "tgl_lulus": tglLulus,
-        "sk_kelulusan": "", // Kosongkan untuk diisi Bapak
-        "no_ijazah": "",    // Kosongkan untuk diisi Bapak
-        "status_aktif": "LULUS"
-    }));
-
-    if (dataExcel.length === 0) return alert("Murid kelas 6 tidak ditemukan!");
-
-    const ws = XLSX.utils.json_to_sheet(dataExcel);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Format Lulus");
-
-    // Atur lebar kolom agar enak dipandang
-    ws['!cols'] = [
-        {wch:25}, {wch:5}, {wch:15}, {wch:12}, {wch:8}, {wch:10}, 
-        {wch:12}, {wch:15}, {wch:12}, {wch:25}, {wch:25}, {wch:12}
-    ];
-
-    XLSX.writeFile(wb, `Format_Impor_Lulus_SDNRT.xlsx`);
-}
-// 2. Fungsi Eksekusi Impor
-async function eksekusiImporLulus() {
-    const fileInput = document.getElementById('masal-file');
-    if (fileInput.files.length === 0) return alert("Pilih file Excel dulu, Pak.");
-
-    const btn = document.getElementById('btnEksekusiImpor');
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
-
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    reader.onload = async function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet);
-
-            // Mapping data sesuai header Excel Bapak
-            const dataImpor = rows.map(r => ({
-                nama: r.nama,
-                nis: String(r.nis || ""),
-                thn_ajaran_lulus: r.thn_ajaran_lulus,
-                tgl_lulus: r.tgl_lulus,
-                sk_kelulusan: r.sk_kelulusan,
-                no_ijazah: r.no_ijazah
-            }));
-
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'IMPOR_LULUS',
-                    dataImpor: dataImpor
-                })
-            });
-
-            const result = await response.json();
-            alert(result.message);
-            if (result.status === "success") {
-                tutupModal('modal-lulus-masal');
-                loadData(); 
-            }
-        } catch (err) {
-            alert("Gagal membaca file.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Mulai Impor";
-        }
-    };
-    reader.readAsArrayBuffer(file);
-}
     
     function updateSidebarUI(activeId) {
     // 1. Bersihkan semua status active di semua link
