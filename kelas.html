@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru Kelas - SDN Ranca Tales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <div class="p-6 bg-white border-b shadow-sm flex justify-between items-center">
+        <div>
+            <h2 id="title-kelas" class="text-2xl font-bold text-gray-800 uppercase">DASHBOARD KELAS --</h2>
+            <p id="nama-guru" class="text-xs text-indigo-600 font-bold uppercase tracking-widest"></p>
+        </div>
+        <button onclick="logout()" class="text-red-500 font-bold text-sm hover:text-red-700 transition">
+            <i class="fas fa-sign-out-alt"></i> KELUAR
+        </button>
+    </div>
+
+    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border shadow-sm">
+            <p class="text-xs font-bold text-gray-400 uppercase">Total Murid</p>
+            <h3 id="stat-total" class="text-3xl font-black text-gray-800">0</h3>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-4 border-l-blue-500">
+            <p class="text-xs font-bold text-gray-400 uppercase">Laki-Laki</p>
+            <h3 id="stat-l" class="text-3xl font-black text-blue-600">0</h3>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-4 border-l-pink-500">
+            <p class="text-xs font-bold text-gray-400 uppercase">Perempuan</p>
+            <h3 id="stat-p" class="text-3xl font-black text-pink-600">0</h3>
+        </div>
+    </div>
+
+    <div class="px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+            <h4 class="text-center font-bold text-gray-700 mb-4 uppercase text-xs">Grafik Jenis Kelamin</h4>
+            <canvas id="chartJK" height="200"></canvas>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border shadow-sm">
+            <h4 class="text-center font-bold text-gray-700 mb-4 uppercase text-xs">Grafik Umur Murid</h4>
+            <canvas id="chartUmur" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="p-6">
+        <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <h4 class="font-bold text-gray-700">DATA MURID KELAS</h4>
+                <input type="text" id="searchKelas" onkeyup="cariMurid()" placeholder="Cari nama murid..." class="border p-2 rounded-xl text-sm outline-none w-64">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold">
+                            <th class="p-4 border-b">NISN</th>
+                            <th class="p-4 border-b">Nama Murid</th>
+                            <th class="p-4 border-b text-center">JK</th>
+                            <th class="p-4 border-b">Tempat Lahir</th>
+                            <th class="p-4 border-b">Tanggal Lahir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-kelas-murid" class="divide-y">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Ambil Session Login
+        const session = JSON.parse(localStorage.getItem('session_sdnrt'));
+        
+        if (!session) {
+            window.location.href = 'index.html';
+        }
+
+        // Tampilkan Identitas
+        document.getElementById('title-kelas').innerText = `DASHBOARD KELAS ${session.kelas_akses}`;
+        document.getElementById('nama-guru').innerText = `GURU: ${session.nama}`;
+
+        // 2. Load Data & Filter
+        function initKelasData() {
+            // Panggil fungsi GAS untuk ambil master data murid
+            google.script.run.withSuccessHandler(function(allData) {
+                // FILTER HANYA UNTUK KELAS GURU INI
+                const dataKelas = allData.filter(s => s.kelas === session.kelas_akses);
+                
+                renderStats(dataKelas);
+                renderTable(dataKelas);
+                renderCharts(dataKelas);
+            }).getAllMasterDataSiswa(); 
+        }
+
+        function renderStats(data) {
+            const l = data.filter(s => s.jk === 'L').length;
+            const p = data.filter(s => s.jk === 'P').length;
+            document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('stat-l').innerText = l;
+            document.getElementById('stat-p').innerText = p;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tbody-kelas-murid');
+            tbody.innerHTML = data.map(s => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 text-gray-500">${s.nisn}</td>
+                    <td class="p-4 font-bold text-gray-700">${s.nama}</td>
+                    <td class="p-4 text-center">${s.jk}</td>
+                    <td class="p-4 uppercase">${s.tempat_lahir}</td>
+                    <td class="p-4">${s.tgl_lahir}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Logic Chart Umur & JK sama dengan admin tapi datanya 'dataKelas'
+        // ... (Fungsi renderCharts) ...
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        window.onload = initKelasData;
+    </script>
+</body>
+</html>
