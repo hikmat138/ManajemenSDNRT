@@ -1294,15 +1294,13 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
 
     const total = data.reduce((a, b) => a + b, 0);
     
-    // CARI CARD PEMBUNGKUS (yang ada class bg-white)
+    // Ini bagian penting supaya kartu yang kosong tidak bikin grafik lain turun ke bawah
     const card = ctx.closest('.bg-white');
-
-    // JIKA DATA KOSONG, SEMBUNYIKAN CARDNYA
     if (total === 0) {
-        if (card) card.style.display = 'none'; // Sembunyikan total
+        if (card) card.style.display = 'none'; 
         return; 
     } else {
-        if (card) card.style.display = 'block'; // Munculkan kembali jika ada data
+        if (card) card.style.display = 'block'; 
     }
 
     const isPluginAvailable = typeof ChartDataLabels !== 'undefined';
@@ -1328,6 +1326,7 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
                     text: label.toUpperCase(),
                     font: { size: 14, weight: 'bold' }
                 },
+                // KODE DATALABELS YANG BAPAK KEMBALIKAN
                 datalabels: {
                     display: (type === 'pie' || type === 'doughnut'),
                     color: '#fff',
