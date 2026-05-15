@@ -520,7 +520,24 @@
                     <h4 id="stat-keluar" class="text-2xl font-bold text-red-600 mt-2">Memuat....</h4>
                 </div>
             </div>
-
+<div id="section-kohort" class="hidden p-6 animate__animated animate__fadeIn">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <table class="w-full text-left">
+            <thead class="bg-gray-100 border-b">
+                <tr class="text-[10px] uppercase font-bold text-gray-500">
+                    <th class="p-3 border-r text-center">Tahun Masuk</th>
+                    <th class="p-3 border-r text-center">Total Input</th>
+                    <th class="p-3 border-r text-center">Masih Aktif</th>
+                    <th class="p-3 border-r text-center">Lulus</th>
+                    <th class="p-3 border-r text-center">Keluar</th>
+                    <th class="p-3 text-center">Survival Rate</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-kohort-body">
+                </tbody>
+        </table>
+    </div>
+</div>
             <!-- Baris Grafik -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <div class="bg-white p-4 rounded-xl border shadow-sm">
@@ -1128,6 +1145,7 @@ if (infoEl) {
         btnKonfirmasi.className = "flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg hover:bg-orange-600 transition";
     }
 }
+    
     async function konfirmasiProses() {
     if (!selectedMuridId) return;
 
@@ -1652,6 +1670,66 @@ async function eksekusiImporLulus() {
         }
     };
     reader.readAsArrayBuffer(file);
+}
+    function renderKohortAnalysis() {
+    const tbody = document.getElementById('tabel-kohort-body');
+    if (!tbody) return;
+
+    // 1. Objek untuk menampung hitungan
+    const kohort = {};
+
+    // 2. Hitung dari Master Data (Siswa Aktif)
+    masterData.forEach(s => {
+        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
+        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
+        kohort[thn].masuk++;
+        kohort[thn].aktif++;
+    });
+
+    // 3. Hitung dari Data Lulus
+    masterDataLulus.forEach(s => {
+        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
+        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
+        kohort[thn].masuk++;
+        kohort[thn].lulus++;
+    });
+
+    // 4. Hitung dari Mutasi Keluar
+    masterDataMutasiKeluar.forEach(s => {
+        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
+        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
+        kohort[thn].masuk++;
+        kohort[thn].keluar++;
+    });
+
+    // 5. Render ke Tabel dengan style yang mirip renderTable Bapak
+    tbody.innerHTML = '';
+    const daftarTahun = Object.keys(kohort).sort().reverse();
+
+    if (daftarTahun.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data Kohort Belum Tersedia</td></tr>`;
+        return;
+    }
+
+    daftarTahun.forEach(thn => {
+        const d = kohort[thn];
+        const survivalRate = d.masuk > 0 ? ((d.aktif + d.lulus) / d.masuk * 100).toFixed(1) : 0;
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-blue-50 border-b text-xs text-gray-700">
+                <td class="p-3 border-r font-bold text-center">${thn}</td>
+                <td class="p-3 border-r text-center font-bold text-blue-600">${d.masuk}</td>
+                <td class="p-3 border-r text-center">${d.aktif}</td>
+                <td class="p-3 border-r text-center text-green-600">${d.lulus}</td>
+                <td class="p-3 border-r text-center text-red-500">${d.keluar}</td>
+                <td class="p-3 text-center">
+                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-bold">
+                        ${survivalRate}%
+                    </span>
+                </td>
+            </tr>
+        `;
+    });
 }
 </script>
 </body>
