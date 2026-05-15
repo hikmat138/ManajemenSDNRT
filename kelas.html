@@ -75,7 +75,9 @@
                     <p id="label-kelas-sidebar" class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">KELAS --</p>
                 </div>
                 <div class="relative">
-                    <button onclick="toggleUserMenu()" id="userMenuBtn" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition">H</button>
+                    <button onclick="toggleUserMenu()" id="userMenuBtn" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase hover:bg-blue-700 transition">
+    <span id="userInitial">-</span>
+</button>
                     <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
                         <a href="index.html" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold"><i class="fas fa-sign-out-alt mr-3"></i> Keluar</a>
                     </div>
