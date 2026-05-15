@@ -680,6 +680,7 @@
     let masterDataMutasiKeluar = [];
     let masterDataGuru = [];
     let masterDataTendik = [];
+    let masterDataKohort = [];
 
     const colMap = {
         'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
@@ -764,6 +765,7 @@
             // POIN PENTING: Mengambil data khusus mutasi masuk dari JSON server
             masterDataMutasiMasuk = result.data.mutasi_masuk || []; 
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
+            masterDataKohort = result.data.kohort || [];
             masterDataGuru = (result.data.guru || []).filter(g => g.nama_guru);
             masterDataTendik = (result.data.tendik || []).filter(t => t.nama_tendik);
             // 2. Update Profil Admin
@@ -837,6 +839,8 @@ window.onload = loadData();
             sourceData = masterDataGuru;
         } else if (currentMenu === 'data-tendik') {
             sourceData = masterDataTendik;
+        } else if (currentMenu === 'section-kohort') {
+            sourceData = masterDataKohort;
         } else {
             sourceData = masterData;
         }
@@ -906,7 +910,7 @@ window.onload = loadData();
     }else if (currentMenu === 'data-tendik') {
             cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
     } else if (currentMenu === 'section-kohort') {
-        cols = ['tahun_ajaran','thn_ajaran_lulus'];
+        cols = ['tahun_ajaran', 'total_input', 'aktif', 'lulus', 'keluar', 'survival_rate'];
     } else {
             cols = ['nama'];
         }
@@ -964,9 +968,6 @@ window.onload = loadData();
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
     
-    // Pastikan ID section-kohort sudah ada di HTML Bapak
-  
-
     // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
     const containerAksi = document.getElementById('container-aksi-masal');
@@ -974,56 +975,51 @@ window.onload = loadData();
     const filterTapel = document.getElementById('filter-tapel');
     const filterKelas = document.getElementById('filter-kelas');
 
-        
     // 3. Logika Pemindahan Menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
         if (containerAksi) containerAksi.classList.add('hidden');
-        
-        // Sembunyikan semua filter karena Kohort menghitung semua tahun
         if (filterBulan) filterBulan.classList.add('hidden');
         if (filterTapel) filterTapel.classList.add('hidden');
         if (filterKelas) filterKelas.classList.add('hidden');
-        if (containerAksi) containerAksi.classList.add('hidden');
-        
-        // Jalankan fungsi hitung data kohort
 
     } else {
-        // Menu Tabel Biasa (Siswa, Guru, Mutasi, dll)
+        // SEMUA menu selain dashboard (termasuk Kohort) lari ke sini
         document.getElementById('section-tabel-container').classList.remove('hidden');
-        
-        // Logika Aksi Masal
+        currentMenu = id;
+
+        // Logika Aksi Masal (Hanya muncul di Registrasi)
         if (id === 'siswa-registrasi') {
             if (containerAksi) containerAksi.classList.remove('hidden');
         } else {
             if (containerAksi) containerAksi.classList.add('hidden');
         }
 
-        // Logika Filter Mutasi/Lulus
-        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
-            if (filterBulan) filterBulan.classList.remove('hidden');
+        // Logika Filter Mutasi, Lulus, dan KOHORT
+        // (Kohort biasanya difilter per Tapel, jadi kita munculkan filter Tapelnya)
+        if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus' || id === 'section-kohort') {
             if (filterTapel) filterTapel.classList.remove('hidden');
+            // Bulan hanya untuk mutasi/lulus, Kohort biasanya tidak perlu filter bulan
+            if (id !== 'section-kohort' && filterBulan) filterBulan.classList.remove('hidden');
+            else if (filterBulan) filterBulan.classList.add('hidden');
         } else {
             if (filterBulan) filterBulan.classList.add('hidden');
             if (filterTapel) filterTapel.classList.add('hidden');
         }
 
-        // Logika Filter Kelas (Sembunyikan jika Guru/Tendik)
-        if (id === 'data-guru' || id === 'data-tendik') {
+        // Logika Filter Kelas (Sembunyikan jika Guru, Tendik, atau Kohort)
+        if (id === 'data-guru' || id === 'data-tendik' || id === 'section-kohort') {
             if (filterKelas) filterKelas.classList.add('hidden');
         } else {
             if (filterKelas) filterKelas.classList.remove('hidden');
         }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
-        headerTitle.innerText = formattedTitle;
+        headerTitle.innerText = (id === 'section-kohort') ? "ANALISIS KOHORT MURID" : formattedTitle;
 
-        currentMenu = id;
-        if (typeof renderKohortAnalysis === "function") {
-    renderKohortAnalysis();
-}
-        resetAndFilter();
+        // JALANKAN RENDER
+        resetAndFilter(); 
     }
 
     // 4. Update UI Sidebar
