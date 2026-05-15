@@ -139,22 +139,35 @@
     };
 
     async function loadData() {
-        try {
-            document.getElementById('guru-name').innerText = session.nama;
-            document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
-            
-            const res = await fetch(`${API_URL}?action=getAllData&u=${session.username}`);
-            const result = await res.json();
-            
-            if (result.status === "success") {
-                masterData = result.data.siswa || [];
-                updateStats();
-                initCharts();
-            }
-        } catch (e) {
-            console.error("Load Error:", e);
+    try {
+        // Ambil nama dari session atau default
+        const guruName = session.nama || "User";
+        const initial = guruName.charAt(0).toUpperCase();
+
+        // Tampilkan nama di teks profil
+        if (document.getElementById('guru-name')) {
+            document.getElementById('guru-name').innerText = guruName;
         }
+
+        // UPDATE DISINI: Tampilkan inisial di dalam lingkaran tombol
+        if (document.getElementById('userInitial')) {
+            document.getElementById('userInitial').innerText = initial;
+        }
+
+        document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
+        
+        const res = await fetch(`${API_URL}?action=getAllData&u=${session.username}`);
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            masterData = result.data.siswa || [];
+            updateStats();
+            initCharts();
+        }
+    } catch (e) {
+        console.error("Load Error:", e);
     }
+}
 
     function updateStats() {
         const kelas = session.kelas_akses.toUpperCase();
