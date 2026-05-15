@@ -572,6 +572,9 @@
     <div class="bg-white p-4 rounded-xl  border shadow-sm">
         <div class="h-[250px]"><canvas id="chartPerKelas"></canvas></div>
     </div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <div class="chart-container"><canvas id="chartGender"></canvas></div>
+    </div>
 </div>
         </div>
 
@@ -1209,7 +1212,13 @@ function initCharts() {
     const warnaUmur = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#475569'];
     // Panggil renderChart dengan data yang sudah dihitung
     renderChart('chartUmur', 'pie', 'Grafik Umur Murid', Object.keys(katUmur), Object.values(katUmur), warnaUmur);
-
+    let dataJK = { "Laki-laki": 0, "Perempuan": 0 };
+    dataAktif.forEach(s => {
+        let jk = String(s.jk || "").toUpperCase();
+        if (jk === 'L') dataJK["Laki-laki"]++;
+        else if (jk === 'P') dataJK["Perempuan"]++;
+    });
+    renderChart('chartGender', 'doughnut', 'Jenis Kelamin Murid', Object.keys(dataJK), Object.values(dataJK), ['#3b82f6', '#f472b6']);
     // --- 2. PROSES DATA AGAMA ---
     const listAgama = ["Islam", "Kristen", "Katolik", "Hindu", "Budha", "Konghucu"];
     let dataAgama = listAgama.map(a => dataAktif.filter(s => (s.agama || "").toLowerCase() === a.toLowerCase()).length);
