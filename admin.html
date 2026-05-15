@@ -668,28 +668,30 @@
         </div>
 
     </div>
-     <div id="section-kohort" class="hidden mt-0"> 
+     <div id="section-kohort" class="hidden !mt-[-10px]"> 
     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
         <div class="p-3 border-b bg-gray-50/50 flex justify-between items-center">
-            <h3 class="text-sm font-bold text-gray-800 uppercase">Laporan Kohort & Mutasi Murid</h3>
-            <span class="text-[9px] bg-blue-100 text-blue-700 px-2 py-1 rounded-md font-bold">SDN RANCA TALES</span>
+            <h3 class="text-xs font-black text-gray-800 uppercase tracking-tight">Laporan Kohort & Mutasi Murid - SDN RANCA TALES</h3>
+            <button onclick="renderKohortAnalysis()" class="text-[10px] bg-blue-600 text-white px-3 py-1 rounded-lg font-bold">
+                <i class="fas fa-sync-alt mr-1"></i> REFRESH
+            </button>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-center border-collapse text-[10px]">
                 <thead>
-                    <tr class="bg-gray-100 text-gray-600 border-b">
-                        <th rowspan="2" class="p-2 border-r whitespace-nowrap">Tahun Ajaran</th>
-                        <th rowspan="2" class="p-2 border-r bg-blue-50">Total Input</th>
+                    <tr class="bg-gray-100 text-gray-700 border-b font-bold uppercase">
+                        <th rowspan="2" class="p-2 border-r">Tahun Ajaran</th>
+                        <th rowspan="2" class="p-2 border-r bg-blue-50">Total</th>
                         <th colspan="2" class="p-2 border-r">Kelas 1</th>
                         <th colspan="2" class="p-2 border-r">Kelas 2</th>
                         <th colspan="2" class="p-2 border-r">Kelas 3</th>
                         <th colspan="2" class="p-2 border-r">Kelas 4</th>
                         <th colspan="2" class="p-2 border-r">Kelas 5</th>
                         <th colspan="2" class="p-2 border-r">Kelas 6</th>
-                        <th colspan="2" class="p-2 border-r bg-green-50">Mutasi Masuk</th>
-                        <th colspan="2" class="p-2 bg-red-50">Mutasi Keluar</th>
+                        <th colspan="2" class="p-2 border-r bg-green-50">Masuk</th>
+                        <th colspan="2" class="p-2 bg-red-50">Keluar</th>
                     </tr>
-                    <tr class="bg-gray-50 text-gray-500 border-b">
+                    <tr class="bg-gray-50 text-gray-500 border-b text-[9px]">
                         <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
                         <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
                         <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
@@ -700,12 +702,12 @@
                         <th class="p-1 border-r bg-red-50">L</th><th class="p-1 bg-red-50">P</th>
                     </tr>
                 </thead>
-                <tbody id="tabel-kohort-body" class="divide-y font-medium">
+                <tbody id="tabel-kohort-body" class="divide-y font-bold text-gray-700">
                     </tbody>
             </table>
         </div>
     </div>
-</div>   
+</div>
 </main>
 </div>
 
