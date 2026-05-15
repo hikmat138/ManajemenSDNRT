@@ -184,7 +184,7 @@
     <!-- Sidebar -->
    <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
         <div class="p-6">
-            <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL ADMIN</h1>
+            <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL GURU</h1>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
         </div>
         
@@ -448,7 +448,7 @@
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
 
             // Update Profil Guru (Mengambil dari adminName yang dikirim GAS)
-            const nameEl = document.getElementById('admin-name');
+            const nameEl = document.getElementById('guru-name');
             const btnEl = document.getElementById('userMenuBtn');
             const guruName = result.adminName || session.nama;
             
@@ -474,34 +474,42 @@
     }
 }
     function updateStats() {
-    // Ambil kelas dari session login
+    // 1. Ambil kunci akses kelas
     const kelasBapak = String(session.kelas_akses).toUpperCase();
 
-    // Hanya hitung murid AKTIF yang kelasnya sesuai dengan kelas Bapak
-    const aktif = masterData.filter(s => 
+    // 2. Filter data kelas bapak sekali saja untuk performa lebih cepat
+    const dataKelasAktif = masterData.filter(s => 
         s.nama && 
         String(s.status_aktif).toLowerCase() === 'aktif' &&
         String(s.kelas).toUpperCase() === kelasBapak
-    ).length;
-    
-    if(document.getElementById('stat-murid')) document.getElementById('stat-murid').innerText = aktif;
+    );
 
-    // Filter masuk (hanya kelas Bapak)
-    const masuk = masterData.filter(s => 
-        s.nama && 
-        s.tgl_masuk && 
-        s.tgl_masuk !== '-' && 
-        String(s.status_aktif).toLowerCase() === 'aktif' &&
-        String(s.kelas).toUpperCase() === kelasBapak
-    ).length;
-    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
+    // 3. Hitung Statistik Dasar
+    const totalAktif = dataKelasAktif.length;
+    const jmlL = dataKelasAktif.filter(s => String(s.jk).toUpperCase() === 'L').length;
+    const jmlP = dataKelasAktif.filter(s => String(s.jk).toUpperCase() === 'P').length;
 
-    // Keluar (hanya kelas Bapak)
+    // 4. Hitung Mutasi Masuk (Dari masterData sesuai filter tgl_masuk)
+    const jmlMasuk = dataKelasAktif.filter(s => 
+        s.tgl_masuk && s.tgl_masuk !== '-'
+    ).length;
+
+    // 5. Hitung Mutasi Keluar (Dari array khusus mutasi keluar)
     const jmlKeluar = masterDataMutasiKeluar.filter(m => 
-        m.nama && 
-        String(m.kelas).toUpperCase() === kelasBapak
+        m.nama && String(m.kelas).toUpperCase() === kelasBapak
     ).length;
-    if(document.getElementById('stat-keluar')) document.getElementById('stat-keluar').innerText = jmlKeluar;
+
+    // 6. Update ke UI (Pastikan ID sesuai dengan di HTML)
+    const updateUI = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    };
+
+    updateUI('stat-murid', totalAktif);
+    updateUI('stat-L', jmlL);
+    updateUI('stat-P', jmlP);
+    updateUI('stat-masuk', jmlMasuk);
+    updateUI('stat-keluar', jmlKeluar);
 }
    function filterData() {
     const keyword = document.getElementById('search-data').value.toLowerCase();
