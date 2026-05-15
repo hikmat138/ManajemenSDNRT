@@ -956,8 +956,7 @@ window.onload = loadData();
     document.getElementById('section-tabel-container').classList.add('hidden');
     
     // Pastikan ID section-kohort sudah ada di HTML Bapak
-    const sectionKohort = document.getElementById('section-kohort');
-    if (sectionKohort) sectionKohort.classList.add('hidden');
+  
 
     // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
@@ -966,22 +965,12 @@ window.onload = loadData();
     const filterTapel = document.getElementById('filter-tapel');
     const filterKelas = document.getElementById('filter-kelas');
 
-    const sections = ['section-dashboard', 'section-tabel-container', 'section-kohort'];
-        sections.forEach(s => {
-            const el = document.getElementById(s);
-            if (el) el.classList.add('hidden');
-        });
-
         
     // 3. Logika Pemindahan Menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
         if (containerAksi) containerAksi.classList.add('hidden');
-        
-    } else if (id === 'section-kohort') { // <--- LOGIKA KHUSUS KOHORT
-        if (sectionKohort) sectionKohort.classList.remove('hidden');
-        headerTitle.innerText = "LAPORAN ANALISIS KOHORT";
         
         // Sembunyikan semua filter karena Kohort menghitung semua tahun
         if (filterBulan) filterBulan.classList.add('hidden');
@@ -990,9 +979,6 @@ window.onload = loadData();
         if (containerAksi) containerAksi.classList.add('hidden');
         
         // Jalankan fungsi hitung data kohort
-        if (typeof renderKohortAnalysis === "function") {
-            renderKohortAnalysis();
-        }
 
     } else {
         // Menu Tabel Biasa (Siswa, Guru, Mutasi, dll)
