@@ -908,8 +908,6 @@ window.onload = loadData();
             cols = ['nama_guru', 'tmpt_lahir_guru', 'tgl_lahir_guru', 'nik_guru', 'kk_guru', 'nip', 'nuptk', 'nrg', 'jk_guru', 'status_kawin', 'agama_guru', 'ijazah_pns', 'ijazah_terakhir', 'jurusan', 'jabatan', 'gol', 'pangkat', 'tmt_pns', 'tmt_sekolah', 'mengajar_kelas', 'status_pegawai', 'jenis_pegawai', 'tahun_pensiun', 'masa_sekolah', 'masa_pns'];
     }else if (currentMenu === 'data-tendik') {
             cols = ['nama_tendik', 'tmpt_lahir_tendik', 'tgl_lahir_tendik', 'nik_tendik', 'kk_tendik', 'nip_tendik', 'nuptk_tendik', 'jk_tendik', 'status_kawin_tendik', 'agama_tendik', 'ijazah_pns_tendik', 'ijazah_terakhir_tendik', 'jurusan_tendik', 'jabatan_tendik', 'gol_tendik', 'pangkat_tendik', 'tmt_pns_tendik', 'tmt_sekolah_tendik', 'status_pegawai_tendik', 'jenis_pegawai_tendik', 'tahun_pensiun_tendik', 'masa_sekolah_tendik', 'masa_pns_tendik'];   
-    } else if (currentMenu === 'section-kohort') {
-        cols = ['tahun_ajaran','thn_ajaran_lulus'];
     } else {
             cols = ['nama'];
         }
@@ -968,7 +966,8 @@ window.onload = loadData();
     document.getElementById('section-tabel-container').classList.add('hidden');
     
     // Pastikan ID section-kohort sudah ada di HTML Bapak
-  
+    const secKohort = document.getElementById('section-kohort');
+    if (secKohort) secKohort.classList.add('hidden');
 
     // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
@@ -982,6 +981,10 @@ window.onload = loadData();
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
+    }else if (id === 'section-kohort') {
+        // KHUSUS MENU KOHORT
+        if (secKohort) secKohort.classList.remove('hidden');
+        headerTitle.innerText = "LAPORAN ANALISIS KOHORT";
         if (containerAksi) containerAksi.classList.add('hidden');
         
         // Sembunyikan semua filter karena Kohort menghitung semua tahun
@@ -1667,43 +1670,41 @@ async function eksekusiImporLulus() {
     reader.readAsArrayBuffer(file);
 }
     function renderKohortAnalysis() {
-        const tbody = document.getElementById('tabel-kohort-body');
-        if (!tbody) return;
+    const tbody = document.getElementById('tabel-kohort-body');
+    if (!tbody) return;
 
-        // Ambil tahun ajaran dari semua data
-        const tahunSemua = [
-            ...masterData.map(s => s.tahun_ajaran || s.tapel),
-            ...masterDataLulus.map(s => s.thn_ajaran_lulus),
-            ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
-        ].filter(t => t && t !== '-');
+    // Ambil semua tahun ajaran unik dari data aktif, lulus, dan mutasi
+    const tahunSemua = [
+        ...masterData.map(s => s.tahun_ajaran || s.tapel),
+        ...masterDataLulus.map(s => s.thn_ajaran_lulus),
+        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
+    ].filter(t => t && t !== '-' && t !== '');
 
-        const daftarTapel = [...new Set(tahunSemua)].sort().reverse();
+    const daftarTapel = [...new Set(tahunSemua)].sort().reverse();
 
-        if (daftarTapel.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data belum termuat...</td></tr>`;
-            return;
-        }
+    let html = '';
+    daftarTapel.forEach(tapel => {
+        // Hitung masing-masing kategori per tahun ajaran
+        const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel)).length;
+        const lulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel).length;
+        const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel).length;
+        
+        const total = aktif + lulus + keluar;
+        const rate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
 
-        let html = '';
-        daftarTapel.forEach(tapel => {
-            const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel) && s.nama).length;
-            const lulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel && s.nama).length;
-            const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel && s.nama).length;
-            const total = aktif + lulus + keluar;
-            const rate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
-
-            html += `
-                <tr class="border-b hover:bg-gray-50 transition text-xs text-center">
-                    <td class="p-3 font-bold border-r">${tapel}</td>
-                    <td class="p-3 border-r">${total}</td>
-                    <td class="p-3 text-blue-600 font-bold border-r">${aktif}</td>
-                    <td class="p-3 text-green-600 font-bold border-r">${lulus}</td>
-                    <td class="p-3 text-red-500 border-r">${keluar}</td>
-                    <td class="p-3 font-black ${rate >= 90 ? 'text-green-600' : 'text-orange-600'}">${rate}%</td>
-                </tr>`;
-        });
-        tbody.innerHTML = html;
-    }
+        html += `
+            <tr class="border-b hover:bg-gray-50 transition text-xs text-center">
+                <td class="p-3 font-bold border-r bg-gray-100">${tapel}</td>
+                <td class="p-3 border-r">${total}</td>
+                <td class="p-3 text-blue-600 font-bold border-r">${aktif}</td>
+                <td class="p-3 text-green-600 font-bold border-r">${lulus}</td>
+                <td class="p-3 text-red-500 border-r">${keluar}</td>
+                <td class="p-3 font-black text-blue-700">${rate}%</td>
+            </tr>`;
+    });
+    
+    tbody.innerHTML = html || `<tr><td colspan="6" class="p-5 text-center">Tidak ada data kohort</td></tr>`;
+}
     function updateSidebarUI(activeId) {
     // 1. Bersihkan semua status active di semua link
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
