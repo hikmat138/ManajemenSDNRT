@@ -194,24 +194,24 @@
                 const resp = await fetch(`${API_URL}?action=login&u=${encodeURIComponent(u)}&p=${encodeURIComponent(p)}&ts=${Date.now()}`);
                 const res = await resp.json();
 
-                if (res.success) {
-                    // Perbaikan: Ambil nama dari 'res.user' atau 'res.nama' atau fallback ke username
-                    const namaTampil = res.user || res.nama || u; 
-                    
-                    localStorage.setItem('session_sdnrt', JSON.stringify(res));
+                // Di dalam success login (sesuai kode Bapak sebelumnya)
+if (res.success) {
+    const namaTampil = res.nama || u; 
+    
+    // Simpan seluruh hasil response (termasuk kelas_akses) ke localStorage
+    localStorage.setItem('session_sdnrt', JSON.stringify(res));
 
-                    Swal.fire({ 
-                        icon: 'success', 
-                        title: 'Berhasil Masuk', 
-                        text: 'Selamat datang, ' + namaTampil.toUpperCase(), 
-                        timer: 2000, 
-                        showConfirmButton: false,
-                        position: 'center'
-                    }).then(() => {
-                        // Redirect berdasarkan role
-                        window.location.href = res.role === 'admin' ? 'admin.html' : 'kelas.html';
-                    });
-                } else {
+    Swal.fire({ 
+        icon: 'success', 
+        title: 'Berhasil Masuk', 
+        text: 'Selamat datang, ' + namaTampil.toUpperCase(), 
+        timer: 1500, 
+        showConfirmButton: false
+    }).then(() => {
+        // Redirect: Admin ke admin.html, Guru ke kelas.html
+        window.location.href = res.role.toLowerCase() === 'admin' ? 'admin.html' : 'kelas.html';
+    });
+} else {
                     Swal.fire({ 
                         icon: 'error', 
                         title: 'Akses Ditolak', 
@@ -239,6 +239,17 @@
                 prosesLogin();
             }
         });
+        function filterDataSiswa(dataSemuaSiswa) {
+    const session = JSON.parse(localStorage.getItem('session_sdnrt'));
+    
+    // Jika bukan admin, filter data berdasarkan kelas_akses
+    if (session.role.toLowerCase() !== 'admin') {
+        const akses = session.kelas_akses; // Misal isinya "1A"
+        return dataSemuaSiswa.filter(siswa => siswa.kelas === akses);
+    }
+    
+    return dataSemuaSiswa; // Admin bisa lihat semua
+}
     </script>
 </body>
 </html>
