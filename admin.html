@@ -769,6 +769,8 @@
             masterDataMutasiKeluar = result.data.mutasi_keluar || []; 
             masterDataGuru = (result.data.guru || []).filter(g => g.nama_guru);
             masterDataTendik = (result.data.tendik || []).filter(t => t.nama_tendik);
+
+           
             // 2. Update Profil Admin
             const userData = (result.data.users && result.data.users.length > 0) ? result.data.users[0] : null;
             if (userData && userData.nama) {
@@ -777,7 +779,8 @@
                 if (nameEl) nameEl.innerText = userData.nama;
                 if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
             }
-
+            renderTable(masterData);
+            renderKohortAnalysis();
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
