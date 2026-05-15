@@ -1034,9 +1034,9 @@ window.onload = loadData();
         headerTitle.innerText = formattedTitle;
 
         currentMenu = id;
-        if (typeof generateTapelOptions === "function") {
-            generateTapelOptions();
-        }
+        if (typeof renderKohortAnalysis === "function") {
+    renderKohortAnalysis();
+}
         resetAndFilter();
     }
 
@@ -1675,61 +1675,45 @@ async function eksekusiImporLulus() {
     const tbody = document.getElementById('tabel-kohort-body');
     if (!tbody) return;
 
-    // 1. Objek untuk menampung hitungan
-    const kohort = {};
+    // 1. Ambil daftar tahun ajaran unik dari semua sumber data
+    const semuaTahun = [
+        ...masterData.map(s => s.tahun_ajaran || s.tapel),
+        ...masterDataLulus.map(s => s.tahun_ajaran || s.thn_ajaran_lulus),
+        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
+    ].filter(t => t && t !== '-');
 
-    // 2. Hitung dari Master Data (Siswa Aktif)
-    masterData.forEach(s => {
-        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
-        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
-        kohort[thn].masuk++;
-        kohort[thn].aktif++;
-    });
+    const daftarTapel = [...new Set(semuaTahun)].sort().reverse();
 
-    // 3. Hitung dari Data Lulus
-    masterDataLulus.forEach(s => {
-        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
-        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
-        kohort[thn].masuk++;
-        kohort[thn].lulus++;
-    });
-
-    // 4. Hitung dari Mutasi Keluar
-    masterDataMutasiKeluar.forEach(s => {
-        const thn = s.tgl_masuk ? new Date(s.tgl_masuk).getFullYear() : "Tidak Terdata";
-        if (!kohort[thn]) kohort[thn] = { masuk: 0, aktif: 0, lulus: 0, keluar: 0 };
-        kohort[thn].masuk++;
-        kohort[thn].keluar++;
-    });
-
-    // 5. Render ke Tabel dengan style yang mirip renderTable Bapak
-    tbody.innerHTML = '';
-    const daftarTahun = Object.keys(kohort).sort().reverse();
-
-    if (daftarTahun.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data Kohort Belum Tersedia</td></tr>`;
+    if (daftarTapel.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-gray-400">Data Tahun Ajaran Tidak Ditemukan</td></tr>`;
         return;
     }
 
-    daftarTahun.forEach(thn => {
-        const d = kohort[thn];
-        const survivalRate = d.masuk > 0 ? ((d.aktif + d.lulus) / d.masuk * 100).toFixed(1) : 0;
+    // 2. Hitung statistik per tahun ajaran
+    let html = '';
+    daftarTapel.forEach(tapel => {
+        const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel) && s.nama).length;
+        const lulus = masterDataLulus.filter(s => (s.tahun_ajaran === tapel || s.thn_ajaran_lulus === tapel) && s.nama).length;
+        const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel && s.nama).length;
+        
+        const total = aktif + lulus + keluar;
+        const survivalRate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
 
-        tbody.innerHTML += `
-            <tr class="hover:bg-blue-50 border-b text-xs text-gray-700">
-                <td class="p-3 border-r font-bold text-center">${thn}</td>
-                <td class="p-3 border-r text-center font-bold text-blue-600">${d.masuk}</td>
-                <td class="p-3 border-r text-center">${d.aktif}</td>
-                <td class="p-3 border-r text-center text-green-600">${d.lulus}</td>
-                <td class="p-3 border-r text-center text-red-500">${d.keluar}</td>
-                <td class="p-3 text-center">
-                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-bold">
-                        ${survivalRate}%
-                    </span>
+        html += `
+            <tr class="border-b hover:bg-gray-50 transition text-xs">
+                <td class="p-3 text-center font-bold text-gray-700 border-r">${tapel}</td>
+                <td class="p-3 text-center border-r">${total}</td>
+                <td class="p-3 text-center text-blue-600 font-bold border-r">${aktif}</td>
+                <td class="p-3 text-center text-green-600 font-bold border-r">${lulus}</td>
+                <td class="p-3 text-center text-red-500 border-r">${keluar}</td>
+                <td class="p-3 text-center font-black ${survivalRate >= 90 ? 'text-green-600' : 'text-orange-600'}">
+                    ${survivalRate}%
                 </td>
             </tr>
         `;
     });
+
+    tbody.innerHTML = html;
 }
     function updateSidebarUI(activeId) {
     // Cari semua link di sidebar
