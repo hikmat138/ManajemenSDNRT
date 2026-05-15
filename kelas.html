@@ -307,63 +307,147 @@
         </div>
     </main>
 </div>
-</body>
 
     <script>
-        // 1. Ambil Session Login
-        const session = JSON.parse(localStorage.getItem('session_sdnrt'));
+    // --- KONFIGURASI & SESSION ---
+    const session = JSON.parse(localStorage.getItem('session_sdnrt'));
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; // Ganti dengan URL deployment Bapak
+    
+    if (!session) { window.location.href = 'index.html'; }
+
+    let masterData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let charts = {};
+
+    // --- INITIAL LOAD ---
+    async function loadData() {
+        const titleTitle = document.getElementById('section-title');
+        titleTitle.innerHTML = `<i class="fas fa-sync fa-spin mr-2"></i> Mengambil Data...`;
+
+        try {
+            // Gunakan google.script.run jika di dalam lingkungan GAS
+            // Atau fetch jika dari luar
+            const response = await fetch(API_URL + "?action=GET_ALL_SISWA");
+            const res = await response.json();
+            masterData = res;
+
+            // UPDATE UI IDENTITAS GURU
+            document.querySelectorAll('.badge-kelas').forEach(el => el.innerText = session.kelas_akses);
+            document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
+            document.getElementById('guru-name-sidebar').innerText = session.nama;
+            document.getElementById('user-initial').innerText = session.nama.charAt(0);
+
+            resetAndFilter();
+        } catch (err) {
+            console.error(err);
+            Swal.fire("Gagal", "Gagal memuat data dari server", "error");
+        } finally {
+            titleTitle.innerText = "Dashboard Utama";
+        }
+    }
+
+    // --- LOGIKA FILTER KELAS (Pembeda Utama dengan Admin) ---
+    function resetAndFilter() {
+        currentPage = 1;
+        const keyword = document.getElementById('search-data').value.toLowerCase();
         
-        if (!session) {
-            window.location.href = 'index.html';
+        // PENGUNCI: Hanya ambil yang AKTIF dan sesuai KELAS Guru
+        filteredData = masterData.filter(s => {
+            const matchKelas = String(s.kelas).toUpperCase() === String(session.kelas_akses).toUpperCase();
+            const isAktif = String(s.status_aktif).toLowerCase() === 'aktif';
+            const matchSearch = s.nama.toLowerCase().includes(keyword) || (s.nisn && s.nisn.includes(keyword));
+            
+            return matchKelas && isAktif && matchSearch;
+        });
+
+        updateStats();
+        renderTable();
+        initCharts(); // Update grafik hanya berdasarkan murid kelas ini
+    }
+
+    // --- UPDATE DASHBOARD KECIL ---
+    function updateStats() {
+        const l = filteredData.filter(s => s.jk === 'L').length;
+        const p = filteredData.filter(s => s.jk === 'P').length;
+        
+        document.getElementById('stat-murid').innerText = filteredData.length;
+        document.getElementById('stat-l').innerText = l;
+        document.getElementById('stat-p').innerText = p;
+
+        // Logika Tombol Lulus/Naik Masal
+        const isKelas6 = String(session.kelas_akses).startsWith('6');
+        if(isKelas6) {
+            document.getElementById('btn-lulus-masal').classList.remove('hidden');
+            document.getElementById('btn-naik-masal').classList.add('hidden');
+        } else {
+            document.getElementById('btn-lulus-masal').classList.add('hidden');
+            document.getElementById('btn-naik-masal').classList.remove('hidden');
         }
+    }
 
-        // Tampilkan Identitas
-        document.getElementById('title-kelas').innerText = `DASHBOARD KELAS ${session.kelas_akses}`;
-        document.getElementById('nama-guru').innerText = `GURU: ${session.nama}`;
+    // --- RENDER TABEL ---
+    function renderTable() {
+        const tbody = document.getElementById('tbody-data');
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedItems = filteredData.slice(start, end);
 
-        // 2. Load Data & Filter
-        function initKelasData() {
-            // Panggil fungsi GAS untuk ambil master data murid
-            google.script.run.withSuccessHandler(function(allData) {
-                // FILTER HANYA UNTUK KELAS GURU INI
-                const dataKelas = allData.filter(s => s.kelas === session.kelas_akses);
-                
-                renderStats(dataKelas);
-                renderTable(dataKelas);
-                renderCharts(dataKelas);
-            }).getAllMasterDataSiswa(); 
+        tbody.innerHTML = paginatedItems.map((s, index) => `
+            <tr>
+                <td class="text-center font-bold text-gray-400">${start + index + 1}</td>
+                <td>
+                    <div class="font-bold text-indigo-900">${s.nama}</div>
+                    <div class="text-[10px] text-gray-400">NISN: ${s.nisn || '-'} | NIS: ${s.nis || '-'}</div>
+                </td>
+                <td class="text-center">${s.jk}</td>
+                <td>${s.tmpt_lahir}, ${s.tgl_lahir}</td>
+                <td class="text-center">
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">AKTIF</span>
+                </td>
+                <td>
+                    <div class="flex gap-2">
+                        <button onclick="bukaModalEdit('${s.id}')" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="openModalAction('${s.id}', '${s.nama}', '${s.kelas}')" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100">
+                            <i class="fas fa-graduation-cap"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        updatePaginationUI();
+    }
+
+    // --- FUNGSI UI LAINNYA ---
+    function toggleSubmenu(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+
+    function showSection(sectionId) {
+        // Logika pindah section dashboard / tabel
+        const dash = document.getElementById('section-dashboard');
+        const tabContainer = document.getElementById('section-tabel-container');
+        const title = document.getElementById('section-title');
+
+        if (sectionId === 'dashboard') {
+            dash.classList.remove('hidden');
+            tabContainer.classList.add('hidden');
+            title.innerText = "Dashboard Utama";
+        } else {
+            dash.classList.add('hidden');
+            tabContainer.classList.remove('hidden');
+            title.innerText = sectionId.replace('siswa-', 'DATA ').toUpperCase();
+            renderTableHeader(sectionId);
         }
+        updateSidebarUI(sectionId);
+    }
 
-        function renderStats(data) {
-            const l = data.filter(s => s.jk === 'L').length;
-            const p = data.filter(s => s.jk === 'P').length;
-            document.getElementById('stat-total').innerText = data.length;
-            document.getElementById('stat-l').innerText = l;
-            document.getElementById('stat-p').innerText = p;
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('tbody-kelas-murid');
-            tbody.innerHTML = data.map(s => `
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 text-gray-500">${s.nisn}</td>
-                    <td class="p-4 font-bold text-gray-700">${s.nama}</td>
-                    <td class="p-4 text-center">${s.jk}</td>
-                    <td class="p-4 uppercase">${s.tempat_lahir}</td>
-                    <td class="p-4">${s.tgl_lahir}</td>
-                </tr>
-            `).join('');
-        }
-
-        // Logic Chart Umur & JK sama dengan admin tapi datanya 'dataKelas'
-        // ... (Fungsi renderCharts) ...
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
-
-        window.onload = initKelasData;
-    </script>
+    // Jalankan saat load
+    window.onload = loadData;
+</script>
 </body>
 </html>
