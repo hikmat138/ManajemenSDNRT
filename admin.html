@@ -41,7 +41,16 @@
         border-right: 4px solid var(--primary); 
         font-weight: 600;
     }
+/* Warna untuk item di dalam dropdown saat aktif */
+.submenu-link.active {
+    color: var(--primary);
+    background-color: #eff6ff;
+    font-weight: bold;
+    border-left: 3px solid var(--primary);
+    padding-left: 12px; /* Memberi kesan menjorok */
+}
 
+/* Style dasar submenu agar lebih rapi */
     .submenu-link { 
         padding: 0.5rem 1rem 0.5rem 2.5rem; 
         font-size: 0.875rem; 
@@ -412,7 +421,7 @@
 
             <!-- Menu Siswa -->
             <div>
-                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link active flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link  flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
                     <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
@@ -426,7 +435,7 @@
 
             <!-- Menu Mutasi -->
             <div>
-                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link active flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link  flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
                     <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
@@ -437,7 +446,7 @@
             </div>
             
             <div>
-    <button onclick="toggleSubmenu('submenu-tendik')" class="w-full sidebar-link active flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+    <button onclick="toggleSubmenu('submenu-tendik')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
         <span class="flex items-center">
             <i class="fas fa-chalkboard-teacher mr-3 w-5"></i> Tenaga Pendidikan
         </span>
@@ -1687,23 +1696,24 @@ async function eksekusiImporLulus() {
         tbody.innerHTML = html;
     }
     function updateSidebarUI(activeId) {
-    // 1. Ambil semua elemen yang bisa diklik di sidebar (a dan button)
-    const sidebarLinks = document.querySelectorAll('aside a, aside button');
+    // 1. Ambil semua elemen yang bisa diklik (Link Utama & Submenu)
+    const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
 
-    sidebarLinks.forEach(link => {
-        const onClickAttr = link.getAttribute('onclick') || "";
+    allLinks.forEach(link => {
+        // Hapus semua class active terlebih dahulu
+        link.classList.remove('active');
         
-        // 2. Bersihkan dulu semua warna biru yang ada
-        link.classList.remove('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
-        link.classList.add('text-gray-600'); // Kembalikan ke warna standar
-
-        // 3. Jika atribut onclick mengandung ID yang sedang aktif
-        // Kita gunakan includes agar lebih fleksibel (misal: 'section-kohort' atau 'dashboard')
+        // Cek apakah onclick-nya mengandung activeId yang dikirim
+        const onClickAttr = link.getAttribute('onclick') || "";
         if (onClickAttr.includes(`'${activeId}'`)) {
-            link.classList.remove('text-gray-600');
-            link.classList.add('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+            link.classList.add('active');
         }
     });
+
+    // Khusus untuk Dashboard agar warnanya pindah dari link-dashboard
+    if (activeId === 'dashboard') {
+        document.getElementById('link-dashboard')?.classList.add('active');
+    }
 }
 </script>
 </body>
