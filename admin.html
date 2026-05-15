@@ -670,37 +670,40 @@
     </div>
         <div id="section-kohort" class="hidden space-y-4">
     <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div class="p-5 border-b bg-gray-50/50 flex justify-between items-center">
-            <div>
-                <h3 class="text-lg font-bold text-gray-800">ANALISIS KOHORT MURID</h3>
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">SD NEGERI RANCA TALES</p>
-            </div>
-            <button onclick="renderKohortAnalysis()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2">
-                <i class="fas fa-sync-alt"></i> Refresh Angka
-            </button>
+        <div class="p-5 border-b bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-800 uppercase">Laporan Kohort & Mutasi Murid Per Kelas</h3>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">SD NEGERI RANCA TALES</p>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-center border-collapse">
+            <table class="w-full text-center border-collapse text-[10px]">
                 <thead>
-                    <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold border-b">
-                        <th class="p-4 border-r">Tahun Ajaran</th>
-                        <th class="p-4 border-r">Total Input</th>
-                        <th class="p-4 border-r text-blue-600">Aktif (Murid)</th>
-                        <th class="p-4 border-r text-green-600">Lulus (Alumni)</th>
-                        <th class="p-4 border-r text-red-600">Keluar (Mutasi)</th>
-                        <th class="p-4 bg-blue-50 text-blue-700">Efektivitas</th>
+                    <tr class="bg-gray-100 text-gray-600 border-b">
+                        <th rowspan="2" class="p-2 border-r whitespace-nowrap">Tahun Ajaran</th>
+                        <th rowspan="2" class="p-2 border-r bg-blue-50">Total Input</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 1</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 2</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 3</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 4</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 5</th>
+                        <th colspan="2" class="p-2 border-r">Kelas 6</th>
+                        <th colspan="2" class="p-2 border-r bg-green-50">Mutasi Masuk</th>
+                        <th colspan="2" class="p-2 bg-red-50">Mutasi Keluar</th>
+                    </tr>
+                    <tr class="bg-gray-50 text-gray-500 border-b">
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
+                        <th class="p-1 border-r bg-green-50">L</th><th class="p-1 border-r bg-green-50">P</th>
+                        <th class="p-1 border-r bg-red-50">L</th><th class="p-1 bg-red-50">P</th>
                     </tr>
                 </thead>
-                <tbody id="tabel-kohort-body" class="text-sm divide-y">
+                <tbody id="tabel-kohort-body" class="divide-y font-medium">
                     </tbody>
             </table>
-        </div>
-        
-        <div class="p-4 bg-blue-50/50 border-t">
-            <p class="text-[11px] text-blue-800 italic font-medium">
-                * Efektivitas dihitung berdasarkan persentase murid yang bertahan (Aktif + Lulus) dibandingkan dengan total data yang pernah masuk di tahun ajaran tersebut.
-            </p>
         </div>
     </div>
 </div>
@@ -1712,37 +1715,60 @@ async function eksekusiImporLulus() {
     const tbody = document.getElementById('tabel-kohort-body');
     if (!tbody) return;
 
-    // Ambil semua tahun ajaran unik dari data aktif, lulus, dan mutasi
+    // Ambil semua daftar Tahun Ajaran unik
     const tahunSemua = [
         ...masterData.map(s => s.tahun_ajaran || s.tapel),
         ...masterDataLulus.map(s => s.thn_ajaran_lulus),
-        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran)
+        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran),
+        ...masterDataMutasiMasuk.map(s => s.tahun_ajaran)
     ].filter(t => t && t !== '-' && t !== '');
 
     const daftarTapel = [...new Set(tahunSemua)].sort().reverse();
 
     let html = '';
     daftarTapel.forEach(tapel => {
-        // Hitung masing-masing kategori per tahun ajaran
-        const aktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel)).length;
-        const lulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel).length;
-        const keluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel).length;
-        
-        const total = aktif + lulus + keluar;
-        const rate = total > 0 ? ((aktif + lulus) / total * 100).toFixed(1) : 0;
+        // Filter data berdasarkan tahun ini
+        const dAktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel));
+        const dKeluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel);
+        const dMasuk = masterDataMutasiMasuk.filter(s => s.tahun_ajaran === tapel);
+        const dLulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel);
+
+        const totalInput = dAktif.length + dKeluar.length + dLulus.length;
+
+        // Fungsi pembantu hitung L/P per tingkat kelas
+        const hitung = (data, tingkat, jk) => {
+            return data.filter(s => {
+                const kls = String(s.kelas || "");
+                return kls.startsWith(tingkat) && s.jk === jk;
+            }).length;
+        };
+
+        // Hitung Mutasi Global L/P
+        const mMasukL = dMasuk.filter(s => s.jk === 'L').length;
+        const mMasukP = dMasuk.filter(s => s.jk === 'P').length;
+        const mKeluarL = dKeluar.filter(s => s.jk === 'L').length;
+        const mKeluarP = dKeluar.filter(s => s.jk === 'P').length;
 
         html += `
-            <tr class="border-b hover:bg-gray-50 transition text-xs text-center">
-                <td class="p-3 font-bold border-r bg-gray-100">${tapel}</td>
-                <td class="p-3 border-r">${total}</td>
-                <td class="p-3 text-blue-600 font-bold border-r">${aktif}</td>
-                <td class="p-3 text-green-600 font-bold border-r">${lulus}</td>
-                <td class="p-3 text-red-500 border-r">${keluar}</td>
-                <td class="p-3 font-black text-blue-700">${rate}%</td>
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="p-2 border-r font-bold bg-gray-50">${tapel}</td>
+                <td class="p-2 border-r font-bold bg-blue-50/50">${totalInput}</td>
+                
+                <td class="p-2 border-r">${hitung(dAktif, '1', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '1', 'P')}</td>
+                <td class="p-2 border-r">${hitung(dAktif, '2', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '2', 'P')}</td>
+                <td class="p-2 border-r">${hitung(dAktif, '3', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '3', 'P')}</td>
+                <td class="p-2 border-r">${hitung(dAktif, '4', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '4', 'P')}</td>
+                <td class="p-2 border-r">${hitung(dAktif, '5', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '5', 'P')}</td>
+                <td class="p-2 border-r">${hitung(dAktif, '6', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '6', 'P')}</td>
+                
+                <td class="p-2 border-r bg-green-50 text-green-700">${mMasukL}</td>
+                <td class="p-2 border-r bg-green-50 text-green-700">${mMasukP}</td>
+                <td class="p-2 border-r bg-red-50 text-red-700">${mKeluarL}</td>
+                <td class="p-2 bg-red-50 text-red-700">${mKeluarP}</td>
             </tr>`;
     });
-    
-    tbody.innerHTML = html || `<tr><td colspan="6" class="p-5 text-center">Tidak ada data kohort</td></tr>`;
+
+    tbody.innerHTML = html || `<tr><td colspan="18" class="p-5 text-center">Data tidak ditemukan</td></tr>`;
 }
     function updateSidebarUI(activeId) {
     // 1. Bersihkan semua status active di semua link
