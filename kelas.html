@@ -311,7 +311,8 @@
     <script>
     // --- KONFIGURASI & SESSION ---
     const session = JSON.parse(localStorage.getItem('session_sdnrt'));
-    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; // Ganti dengan URL deployment Bapak
+    // Gunakan URL Web App GAS Bapak
+    const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; 
     
     if (!session) { window.location.href = 'index.html'; }
 
@@ -319,7 +320,6 @@
     let filteredData = [];
     let currentPage = 1;
     const rowsPerPage = 10;
-    let charts = {};
 
     // --- INITIAL LOAD ---
     async function loadData() {
@@ -327,91 +327,92 @@
         titleTitle.innerHTML = `<i class="fas fa-sync fa-spin mr-2"></i> Mengambil Data...`;
 
         try {
-            // Gunakan google.script.run jika di dalam lingkungan GAS
-            // Atau fetch jika dari luar
-            const response = await fetch(API_URL + "?action=GET_ALL_SISWA");
+            // 1. SINKRONISASI ACTION: Di GAS Bapak pakai 'getAllData'
+            // 2. SINKRONISASI PARAMETER: Di GAS Bapak minta parameter 'u' (username)
+            const response = await fetch(`${API_URL}?action=getAllData&u=${session.username}`);
             const res = await response.json();
-            masterData = res;
 
-            // UPDATE UI IDENTITAS GURU
-            document.querySelectorAll('.badge-kelas').forEach(el => el.innerText = session.kelas_akses);
-            document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
-            document.getElementById('guru-name-sidebar').innerText = session.nama;
-            document.getElementById('user-initial').innerText = session.nama.charAt(0);
+            if (res.status === "success") {
+                // 3. SINKRONISASI STRUKTUR: Data siswa ada di dalam res.data.siswa
+                masterData = res.data.siswa;
 
-            resetAndFilter();
+                // UPDATE UI IDENTITAS GURU
+                document.querySelectorAll('.badge-kelas').forEach(el => el.innerText = session.kelas_akses);
+                document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
+                document.getElementById('guru-name-sidebar').innerText = res.adminName || session.nama;
+                document.getElementById('user-initial').innerText = (res.adminName || session.nama).charAt(0);
+
+                resetAndFilter();
+            } else {
+                throw new Error(res.message);
+            }
         } catch (err) {
             console.error(err);
-            Swal.fire("Gagal", "Gagal memuat data dari server", "error");
+            Swal.fire("Gagal", "Gagal memuat data: " + err.message, "error");
         } finally {
             titleTitle.innerText = "Dashboard Utama";
         }
     }
 
-    // --- LOGIKA FILTER KELAS (Pembeda Utama dengan Admin) ---
+    // --- LOGIKA FILTER KELAS ---
     function resetAndFilter() {
         currentPage = 1;
-        const keyword = document.getElementById('search-data').value.toLowerCase();
+        const searchInput = document.getElementById('search-data');
+        const keyword = searchInput ? searchInput.value.toLowerCase() : "";
         
-        // PENGUNCI: Hanya ambil yang AKTIF dan sesuai KELAS Guru
+        if (!masterData) return;
+
         filteredData = masterData.filter(s => {
-            const matchKelas = String(s.kelas).toUpperCase() === String(session.kelas_akses).toUpperCase();
-            const isAktif = String(s.status_aktif).toLowerCase() === 'aktif';
-            const matchSearch = s.nama.toLowerCase().includes(keyword) || (s.nisn && s.nisn.includes(keyword));
+            // Ambil kolom 'kelas' (sesuai header di sheet yang jadi lowercase)
+            const kelasMurid = String(s.kelas || "").toUpperCase().trim();
+            const kelasAkses = String(session.kelas_akses || "").toUpperCase().trim();
+            
+            const matchKelas = kelasMurid === kelasAkses;
+            // Di GAS Bapak, status mungkin tersimpan di kolom 'status_aktif'
+            const isAktif = String(s.status_aktif || "").toLowerCase() === 'aktif';
+            const matchSearch = String(s.nama || "").toLowerCase().includes(keyword) || 
+                               String(s.nisn || "").includes(keyword);
             
             return matchKelas && isAktif && matchSearch;
         });
 
         updateStats();
         renderTable();
-        initCharts(); // Update grafik hanya berdasarkan murid kelas ini
-    }
-
-    // --- UPDATE DASHBOARD KECIL ---
-    function updateStats() {
-        const l = filteredData.filter(s => s.jk === 'L').length;
-        const p = filteredData.filter(s => s.jk === 'P').length;
-        
-        document.getElementById('stat-murid').innerText = filteredData.length;
-        document.getElementById('stat-l').innerText = l;
-        document.getElementById('stat-p').innerText = p;
-
-        // Logika Tombol Lulus/Naik Masal
-        const isKelas6 = String(session.kelas_akses).startsWith('6');
-        if(isKelas6) {
-            document.getElementById('btn-lulus-masal').classList.remove('hidden');
-            document.getElementById('btn-naik-masal').classList.add('hidden');
-        } else {
-            document.getElementById('btn-lulus-masal').classList.add('hidden');
-            document.getElementById('btn-naik-masal').classList.remove('hidden');
-        }
+        if (typeof initCharts === 'function') initCharts(); 
     }
 
     // --- RENDER TABEL ---
     function renderTable() {
         const tbody = document.getElementById('tbody-data');
+        if (!tbody) return;
+
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         const paginatedItems = filteredData.slice(start, end);
 
+        if (paginatedItems.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400 font-bold uppercase text-xs">Tidak ada data murid di kelas ini</td></tr>`;
+            return;
+        }
+
         tbody.innerHTML = paginatedItems.map((s, index) => `
-            <tr>
+            <tr class="hover:bg-indigo-50/30 transition">
                 <td class="text-center font-bold text-gray-400">${start + index + 1}</td>
                 <td>
-                    <div class="font-bold text-indigo-900">${s.nama}</div>
+                    <div class="font-bold text-indigo-900 uppercase">${s.nama}</div>
                     <div class="text-[10px] text-gray-400">NISN: ${s.nisn || '-'} | NIS: ${s.nis || '-'}</div>
                 </td>
-                <td class="text-center">${s.jk}</td>
-                <td>${s.tmpt_lahir}, ${s.tgl_lahir}</td>
+                <td class="text-center font-semibold text-gray-600">${s.jk}</td>
+                <td class="text-xs uppercase text-gray-600">${s.tempat_lahir || ''}, ${s.tanggal_lahir || s.tgl_lahir || ''}</td>
                 <td class="text-center">
-                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">AKTIF</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold italic">AKTIF</span>
                 </td>
                 <td>
                     <div class="flex gap-2">
-                        <button onclick="bukaModalEdit('${s.id}')" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100">
+                        <button onclick="bukaModalEdit('${s.row_index}')" class="p-2 bg-yellow-50 text-yellow-600 rounded-lg hover:bg-yellow-100 transition">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="openModalAction('${s.id}', '${s.nama}', '${s.kelas}')" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100">
+                        <button onclick="openModalAction('${s.row_index}', '${s.nama}', '${s.kelas}')" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
                             <i class="fas fa-graduation-cap"></i>
                         </button>
                     </div>
@@ -419,34 +420,50 @@
             </tr>
         `).join('');
 
-        updatePaginationUI();
+        if (typeof updatePaginationUI === 'function') updatePaginationUI();
     }
 
-    // --- FUNGSI UI LAINNYA ---
-    function toggleSubmenu(id) {
-        document.getElementById(id).classList.toggle('hidden');
-    }
+    // --- UPDATE STATS ---
+    function updateStats() {
+        const l = filteredData.filter(s => String(s.jk).toUpperCase() === 'L').length;
+        const p = filteredData.filter(s => String(s.jk).toUpperCase() === 'P').length;
+        
+        const elMurid = document.getElementById('stat-murid');
+        const elL = document.getElementById('stat-l');
+        const elP = document.getElementById('stat-p');
 
-    function showSection(sectionId) {
-        // Logika pindah section dashboard / tabel
-        const dash = document.getElementById('section-dashboard');
-        const tabContainer = document.getElementById('section-tabel-container');
-        const title = document.getElementById('section-title');
+        if(elMurid) elMurid.innerText = filteredData.length;
+        if(elL) elL.innerText = l;
+        if(elP) elP.innerText = p;
 
-        if (sectionId === 'dashboard') {
-            dash.classList.remove('hidden');
-            tabContainer.classList.add('hidden');
-            title.innerText = "Dashboard Utama";
+        const isKelas6 = String(session.kelas_akses).startsWith('6');
+        const btnLulus = document.getElementById('btn-lulus-masal');
+        const btnNaik = document.getElementById('btn-naik-masal');
+
+        if(isKelas6) {
+            if(btnLulus) btnLulus.classList.remove('hidden');
+            if(btnNaik) btnNaik.classList.add('hidden');
         } else {
-            dash.classList.add('hidden');
-            tabContainer.classList.remove('hidden');
-            title.innerText = sectionId.replace('siswa-', 'DATA ').toUpperCase();
-            renderTableHeader(sectionId);
+            if(btnLulus) btnLulus.classList.add('hidden');
+            if(btnNaik) btnNaik.classList.remove('hidden');
         }
-        updateSidebarUI(sectionId);
     }
 
-    // Jalankan saat load
+    // Fungsi bantu navigasi halaman
+    function nextPage() {
+        if ((currentPage * rowsPerPage) < filteredData.length) {
+            currentPage++;
+            renderTable();
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+        }
+    }
+
     window.onload = loadData;
 </script>
 </body>
