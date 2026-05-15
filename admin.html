@@ -458,18 +458,6 @@
         <div onclick="showSection('data-tendik')" class="submenu-link">Tenaga Kependidikan</div>
     </div>
 </div>
-            <div>
-    <button onclick="toggleSubmenu('sub-laporan')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-        <span class="flex items-center">
-            <i class="fas fa-chart-bar mr-3 w-5"></i> Laporan
-        </span>
-        <i class="fas fa-chevron-down text-[10px]"></i>
-    </button>
-    
-    <div id="sub-laporan" class="hidden space-y-1 mt-1">
-        <div onclick="showSection('section-kohort')" class="submenu-link"> Kohort Siswa </div>
-</div>
-            </div>
         </nav>
     </aside>
 
@@ -668,46 +656,6 @@
         </div>
 
     </div>
-     <div id="section-kohort" class="hidden !mt-[-10px]"> 
-    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div class="p-3 border-b bg-gray-50/50 flex justify-between items-center">
-            <h3 class="text-xs font-black text-gray-800 uppercase tracking-tight">Laporan Kohort & Mutasi Murid - SDN RANCA TALES</h3>
-            <button onclick="renderKohortAnalysis()" class="text-[10px] bg-blue-600 text-white px-3 py-1 rounded-lg font-bold">
-                <i class="fas fa-sync-alt mr-1"></i> REFRESH
-            </button>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-center border-collapse text-[10px]">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700 border-b font-bold uppercase">
-                        <th rowspan="2" class="p-2 border-r">Tahun Ajaran</th>
-                        <th rowspan="2" class="p-2 border-r bg-blue-50">Total</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 1</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 2</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 3</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 4</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 5</th>
-                        <th colspan="2" class="p-2 border-r">Kelas 6</th>
-                        <th colspan="2" class="p-2 border-r bg-green-50">Masuk</th>
-                        <th colspan="2" class="p-2 bg-red-50">Keluar</th>
-                    </tr>
-                    <tr class="bg-gray-50 text-gray-500 border-b text-[9px]">
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r">L</th><th class="p-1 border-r">P</th>
-                        <th class="p-1 border-r bg-green-50">L</th><th class="p-1 border-r bg-green-50">P</th>
-                        <th class="p-1 border-r bg-red-50">L</th><th class="p-1 bg-red-50">P</th>
-                    </tr>
-                </thead>
-                <tbody id="tabel-kohort-body" class="divide-y font-bold text-gray-700">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 </main>
 </div>
 
@@ -819,8 +767,6 @@
                 if (nameEl) nameEl.innerText = userData.nama;
                 if (btnEl) btnEl.innerText = userData.nama.charAt(0).toUpperCase();
             }
-            renderTable(masterData);
-            renderKohortAnalysis();
             // 3. Jalankan fungsi pendukung
             updateStats(); 
             filterData();  
@@ -1009,9 +955,7 @@ window.onload = loadData();
     document.getElementById('section-tabel-container').classList.add('hidden');
     
     // Pastikan ID section-kohort sudah ada di HTML Bapak
-    const secKohort = document.getElementById('section-kohort');
-    if (secKohort) secKohort.classList.add('hidden');
-
+    
     // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
     const containerAksi = document.getElementById('container-aksi-masal');
@@ -1024,11 +968,7 @@ window.onload = loadData();
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
-    }else if (id === 'section-kohort') {
-        // KHUSUS MENU KOHORT
-        if (secKohort) secKohort.classList.remove('hidden');
-        headerTitle.innerText = "LAPORAN ANALISIS KOHORT";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    
         if (containerAksi) containerAksi.classList.add('hidden');
         
         // Sembunyikan semua filter karena Kohort menghitung semua tahun
@@ -1070,9 +1010,7 @@ window.onload = loadData();
         headerTitle.innerText = formattedTitle;
 
         currentMenu = id;
-        if (typeof renderKohortAnalysis === "function") {
-    renderKohortAnalysis();
-}
+        
         resetAndFilter();
     }
 
@@ -1713,65 +1651,7 @@ async function eksekusiImporLulus() {
     };
     reader.readAsArrayBuffer(file);
 }
-    function renderKohortAnalysis() {
-    const tbody = document.getElementById('tabel-kohort-body');
-    if (!tbody) return;
-
-    // Ambil semua daftar Tahun Ajaran unik
-    const tahunSemua = [
-        ...masterData.map(s => s.tahun_ajaran || s.tapel),
-        ...masterDataLulus.map(s => s.thn_ajaran_lulus),
-        ...masterDataMutasiKeluar.map(s => s.tahun_ajaran),
-        ...masterDataMutasiMasuk.map(s => s.tahun_ajaran)
-    ].filter(t => t && t !== '-' && t !== '');
-
-    const daftarTapel = [...new Set(tahunSemua)].sort().reverse();
-
-    let html = '';
-    daftarTapel.forEach(tapel => {
-        // Filter data berdasarkan tahun ini
-        const dAktif = masterData.filter(s => (s.tahun_ajaran === tapel || s.tapel === tapel));
-        const dKeluar = masterDataMutasiKeluar.filter(s => s.tahun_ajaran === tapel);
-        const dMasuk = masterDataMutasiMasuk.filter(s => s.tahun_ajaran === tapel);
-        const dLulus = masterDataLulus.filter(s => s.thn_ajaran_lulus === tapel);
-
-        const totalInput = dAktif.length + dKeluar.length + dLulus.length;
-
-        // Fungsi pembantu hitung L/P per tingkat kelas
-        const hitung = (data, tingkat, jk) => {
-            return data.filter(s => {
-                const kls = String(s.kelas || "");
-                return kls.startsWith(tingkat) && s.jk === jk;
-            }).length;
-        };
-
-        // Hitung Mutasi Global L/P
-        const mMasukL = dMasuk.filter(s => s.jk === 'L').length;
-        const mMasukP = dMasuk.filter(s => s.jk === 'P').length;
-        const mKeluarL = dKeluar.filter(s => s.jk === 'L').length;
-        const mKeluarP = dKeluar.filter(s => s.jk === 'P').length;
-
-        html += `
-            <tr class="hover:bg-gray-50 border-b">
-                <td class="p-2 border-r font-bold bg-gray-50">${tapel}</td>
-                <td class="p-2 border-r font-bold bg-blue-50/50">${totalInput}</td>
-                
-                <td class="p-2 border-r">${hitung(dAktif, '1', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '1', 'P')}</td>
-                <td class="p-2 border-r">${hitung(dAktif, '2', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '2', 'P')}</td>
-                <td class="p-2 border-r">${hitung(dAktif, '3', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '3', 'P')}</td>
-                <td class="p-2 border-r">${hitung(dAktif, '4', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '4', 'P')}</td>
-                <td class="p-2 border-r">${hitung(dAktif, '5', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '5', 'P')}</td>
-                <td class="p-2 border-r">${hitung(dAktif, '6', 'L')}</td><td class="p-2 border-r">${hitung(dAktif, '6', 'P')}</td>
-                
-                <td class="p-2 border-r bg-green-50 text-green-700">${mMasukL}</td>
-                <td class="p-2 border-r bg-green-50 text-green-700">${mMasukP}</td>
-                <td class="p-2 border-r bg-red-50 text-red-700">${mKeluarL}</td>
-                <td class="p-2 bg-red-50 text-red-700">${mKeluarP}</td>
-            </tr>`;
-    });
-
-    tbody.innerHTML = html || `<tr><td colspan="18" class="p-5 text-center">Data tidak ditemukan</td></tr>`;
-}
+    
     function updateSidebarUI(activeId) {
     // 1. Bersihkan semua status active di semua link
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
