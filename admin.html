@@ -950,65 +950,80 @@ window.onload = loadData();
 }
 
     function showSection(id) {
-    // 1. Sembunyikan semua kontainer agar tidak bertumpuk
+    // 1. Sembunyikan SEMUA kontainer utama
     document.getElementById('section-dashboard').classList.add('hidden');
     document.getElementById('section-tabel-container').classList.add('hidden');
+    
+    // Pastikan ID section-kohort sudah ada di HTML Bapak
+    const sectionKohort = document.getElementById('section-kohort');
+    if (sectionKohort) sectionKohort.classList.add('hidden');
 
-    // 2. Ambil elemen judul & tombol aksi
+    // 2. Ambil elemen pendukung
     const headerTitle = document.getElementById('section-title');
     const containerAksi = document.getElementById('container-aksi-masal');
-    
-    // --- TAMBAHAN: Ambil elemen filter khusus mutasi ---
     const filterBulan = document.getElementById('filter-bulan');
     const filterTapel = document.getElementById('filter-tapel');
     const filterKelas = document.getElementById('filter-kelas');
-    // 3. Logika pemindahan menu
+
+    // 3. Logika Pemindahan Menu
     if (id === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         headerTitle.innerText = "DASHBOARD UTAMA";
         if (containerAksi) containerAksi.classList.add('hidden');
         
+    } else if (id === 'section-kohort') { // <--- LOGIKA KHUSUS KOHORT
+        if (sectionKohort) sectionKohort.classList.remove('hidden');
+        headerTitle.innerText = "LAPORAN ANALISIS KOHORT";
+        
+        // Sembunyikan semua filter karena Kohort menghitung semua tahun
+        if (filterBulan) filterBulan.classList.add('hidden');
+        if (filterTapel) filterTapel.classList.add('hidden');
+        if (filterKelas) filterKelas.classList.add('hidden');
+        if (containerAksi) containerAksi.classList.add('hidden');
+        
+        // Jalankan fungsi hitung data kohort
+        if (typeof renderKohortAnalysis === "function") {
+            renderKohortAnalysis();
+        }
+
     } else {
+        // Menu Tabel Biasa (Siswa, Guru, Mutasi, dll)
         document.getElementById('section-tabel-container').classList.remove('hidden');
         
-        // --- LOGIKA TOMBOL AKSI MASAL (Registrasi) ---
+        // Logika Aksi Masal
         if (id === 'siswa-registrasi') {
             if (containerAksi) containerAksi.classList.remove('hidden');
         } else {
             if (containerAksi) containerAksi.classList.add('hidden');
         }
 
-        // --- LOGIKA TAMPIL/SEMBUNYI FILTER MUTASI ---
-        // Kita munculkan filter Bulan & Tapel hanya di menu Mutasi atau Lulus
+        // Logika Filter Mutasi/Lulus
         if (id === 'mutasi-masuk' || id === 'mutasi-keluar' || id === 'siswa-lulus') {
             if (filterBulan) filterBulan.classList.remove('hidden');
             if (filterTapel) filterTapel.classList.remove('hidden');
         } else {
-            // Sembunyikan di menu Profil Siswa / Registrasi agar tidak bingung
             if (filterBulan) filterBulan.classList.add('hidden');
             if (filterTapel) filterTapel.classList.add('hidden');
         }
-        if(id==='data-guru'||id==='data-tendik'){
-            if(filterKelas) filterKelas.classList.add('hidden');
+
+        // Logika Filter Kelas (Sembunyikan jika Guru/Tendik)
+        if (id === 'data-guru' || id === 'data-tendik') {
+            if (filterKelas) filterKelas.classList.add('hidden');
         } else {
-            if(filterKelas) filterKelas.classList.remove('hidden');
+            if (filterKelas) filterKelas.classList.remove('hidden');
         }
         
         const formattedTitle = id.replace(/-/g, ' ').toUpperCase();
         headerTitle.innerText = formattedTitle;
 
-        // SET MENU SEKARANG & REFRESH DATA
         currentMenu = id;
-        
-        // Pastikan dropdown Tahun Ajaran sudah terisi sebelum filter jalan
         if (typeof generateTapelOptions === "function") {
             generateTapelOptions();
         }
-        
         resetAndFilter();
     }
 
-    // 4. Update tampilan aktif di Sidebar
+    // 4. Update UI Sidebar
     updateSidebarUI(id);
 }
     function toggleSubmenu(id) { document.getElementById(id).classList.toggle('hidden'); }
