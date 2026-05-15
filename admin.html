@@ -572,6 +572,10 @@
     <div class="bg-white p-4 rounded-xl  border shadow-sm">
         <div class="h-[250px]"><canvas id="chartPerKelas"></canvas></div>
     </div>
+     <div class="bg-white p-4 rounded-xl  border shadow-sm">
+        <div class="h-[250px]"><canvas id="chartGender"></canvas></div>
+    </div>
+</div>
 </div>
         </div>
 
@@ -1187,6 +1191,17 @@ if (infoEl) {
     let charts = {}; 
 function initCharts() {
     const dataAktif = masterData.filter(s => String(s.status_aktif).toLowerCase() === 'aktif');
+    const jmlL = dataAktif.filter(s => String(s.jk).toUpperCase() === 'L').length;
+    const jmlP = dataAktif.filter(s => String(s.jk).toUpperCase() === 'P').length;
+    renderChart(
+        'chartGender', 
+        'doughnut', // Bapak bisa pakai 'pie' atau 'doughnut' agar lebih variatif
+        'Jenis Kelamin Murid', 
+        ['Laki-laki', 'Perempuan'], 
+        [jmlL, jmlP], 
+        ['#2563eb', '#f472b6'] // Biru untuk L, Pink untuk P
+    );
+
     if (!masterData || masterData.length === 0) return;
     // --- 1. PROSES DATA UMUR ---
     let katUmur = { "< 7": 0, "7-8": 0, "8-9": 0, "9-10": 0, "10-11": 0, "11-12": 0, "> 12": 0 };
@@ -1302,13 +1317,15 @@ function renderChart(canvasId, type, label, labels, data, bgColor, maxVal = 450,
                     font: { size: 14, weight: 'bold' }
                 },
                 datalabels: {
-                    display: (type === 'pie' || type === 'doughnut'),
-                    color: '#fff',
-                    font: { weight: 'bold' },
-                    formatter: (value) => {
-                        return total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
-                    }
-                },
+    display: (type === 'pie' || type === 'doughnut'),
+    color: '#fff',
+    font: { weight: 'bold', size: 12 }, // Tambah ukuran font sedikit
+    anchor: 'center', // Agar angka pas di tengah potongan
+    align: 'center',
+    formatter: (value) => {
+        return total > 0 ? ((value / total) * 100).toFixed(1) + "%" : "0%";
+    }
+},
                 legend: { 
                     display: (type === 'pie' || type === 'doughnut'),
                     position: 'bottom' 
