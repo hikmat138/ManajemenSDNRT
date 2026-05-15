@@ -119,67 +119,195 @@
         .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 text-gray-800">
 
-    <div class="p-6 bg-white border-b shadow-sm flex justify-between items-center">
-        <div>
-            <h2 id="title-kelas" class="text-2xl font-bold text-gray-800 uppercase">DASHBOARD KELAS --</h2>
-            <p id="nama-guru" class="text-xs text-indigo-600 font-bold uppercase tracking-widest"></p>
+<div id="modal-edit-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div class="bg-indigo-700 p-4 text-white flex justify-between items-center">
+            <h3 class="font-bold uppercase"><i class="fas fa-edit mr-2"></i> Lengkapi/Edit Data Murid</h3>
+            <button onclick="tutupModal('modal-edit-siswa')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
         </div>
-        <button onclick="logout()" class="text-red-500 font-bold text-sm hover:text-red-700 transition">
-            <i class="fas fa-sign-out-alt"></i> KELUAR
-        </button>
-    </div>
-
-    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl border shadow-sm">
-            <p class="text-xs font-bold text-gray-400 uppercase">Total Murid</p>
-            <h3 id="stat-total" class="text-3xl font-black text-gray-800">0</h3>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-4 border-l-blue-500">
-            <p class="text-xs font-bold text-gray-400 uppercase">Laki-Laki</p>
-            <h3 id="stat-l" class="text-3xl font-black text-blue-600">0</h3>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border shadow-sm border-l-4 border-l-pink-500">
-            <p class="text-xs font-bold text-gray-400 uppercase">Perempuan</p>
-            <h3 id="stat-p" class="text-3xl font-black text-pink-600">0</h3>
-        </div>
-    </div>
-
-    <div class="px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-4 rounded-2xl border shadow-sm">
-            <h4 class="text-center font-bold text-gray-700 mb-4 uppercase text-xs">Grafik Jenis Kelamin</h4>
-            <canvas id="chartJK" height="200"></canvas>
-        </div>
-        <div class="bg-white p-4 rounded-2xl border shadow-sm">
-            <h4 class="text-center font-bold text-gray-700 mb-4 uppercase text-xs">Grafik Umur Murid</h4>
-            <canvas id="chartUmur" height="200"></canvas>
-        </div>
-    </div>
-
-    <div class="p-6">
-        <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
-            <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
-                <h4 class="font-bold text-gray-700">DATA MURID KELAS</h4>
-                <input type="text" id="searchKelas" onkeyup="cariMurid()" placeholder="Cari nama murid..." class="border p-2 rounded-xl text-sm outline-none w-64">
+        <form id="form-edit-siswa" onsubmit="updateDataMurid(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <input type="hidden" id="ed-id">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
+                    <input type="text" id="ed-nama" required class="w-full border p-2 rounded-lg text-sm focus:border-indigo-500 outline-none">
+                </div>
+                <div class="col-span-2 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                    <p class="text-[10px] text-yellow-700 font-bold uppercase">Catatan Guru:</p>
+                    <p class="text-[9px] text-yellow-600">Lengkapi data yang masih kosong sesuai dokumen resmi murid.</p>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-[10px] font-bold">
-                            <th class="p-4 border-b">NISN</th>
-                            <th class="p-4 border-b">Nama Murid</th>
-                            <th class="p-4 border-b text-center">JK</th>
-                            <th class="p-4 border-b">Tempat Lahir</th>
-                            <th class="p-4 border-b">Tanggal Lahir</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-kelas-murid" class="divide-y">
-                        </tbody>
-                </table>
+            <div class="flex gap-2 pt-4">
+                <button type="button" onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
+                <button type="submit" class="flex-1 bg-indigo-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg">Update Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn animate__faster">
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center shadow-md"></div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <div>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Nama Murid</label>
+                    <p id="m-nama" class="font-bold text-gray-700 truncate">-</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Kelas</label>
+                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
+                </div>
+            </div>
+            
+            <div id="form-lulus" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun Ajaran</label>
+                        <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm" placeholder="2025/2026">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
+                        <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                </div>
+                <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm" placeholder="No. SK Kelulusan">
+                <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm" placeholder="Nomor Ijazah">
+            </div>
+
+            <div id="form-naik-kelas" class="hidden space-y-4 py-4 text-center">
+                <div class="bg-blue-600 p-3 rounded-xl shadow-lg mx-8">
+                    <p class="text-[10px] text-blue-200 font-bold uppercase">Naik Ke Kelas</p>
+                    <p id="m-target-kelas" class="text-xl font-black text-white italic">...</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-[10px]">Batal</button>
+                <button id="btnKonfirmasi" onclick="konfirmasiProses()" class="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg">Konfirmasi</button>
             </div>
         </div>
     </div>
+</div>
+
+<div class="flex h-screen overflow-hidden">
+    <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col transition-all duration-300">
+        <div class="p-6">
+            <h1 class="text-xl font-bold text-indigo-600 uppercase">PANEL GURU</h1>
+            <p id="label-kelas-sidebar" class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">KELAS --</p>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-chart-line mr-3 w-5"></i> Dashboard Kelas
+            </a>
+
+            <div>
+                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
+                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Data Murid</span>
+                    <i class="fas fa-chevron-down text-[10px]"></i>
+                </button>
+                <div id="sub-murid" class="hidden space-y-1 mt-1">
+                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Identitas Murid</div>
+                    <div onclick="showSection('siswa-periodik')" class="submenu-link">Data Periodik</div>
+                    <div onclick="showSection('siswa-registrasi')" class="submenu-link">Status Kenaikan/Lulus</div>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="p-4 border-t bg-gray-50">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold" id="user-initial">H</div>
+                <div class="overflow-hidden">
+                    <p id="guru-name-sidebar" class="text-[10px] font-bold text-gray-700 truncate">Nama Guru</p>
+                    <p class="text-[8px] text-gray-400 font-bold uppercase">Guru Kelas</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600"><i class="fas fa-bars"></i></button>
+                <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
+            </div>
+            <button onclick="logout()" class="text-[10px] font-bold text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition uppercase">
+                <i class="fas fa-sign-out-alt mr-1"></i> Keluar
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6">
+            <div id="section-dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border-l-4 border-l-indigo-600 shadow-sm">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase italic">Total Murid Kelas <span class="badge-kelas">--</span></p>
+                        <h4 id="stat-murid" class="text-2xl font-black text-gray-800 mt-2">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border-l-4 border-l-blue-500 shadow-sm">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Laki-Laki</p>
+                        <h4 id="stat-l" class="text-2xl font-bold text-blue-600 mt-1">0</h4>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border-l-4 border-l-pink-500 shadow-sm">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Perempuan</p>
+                        <h4 id="stat-p" class="text-2xl font-bold text-pink-600 mt-1">0</h4>
+                    </div>
+                    <div id="card-lulus" class="hidden bg-white p-4 rounded-xl border-l-4 border-l-green-600 shadow-sm">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Sudah Lulus</p>
+                        <h4 id="stat-lulus" class="text-2xl font-bold text-green-600 mt-1">0</h4>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-4 rounded-xl border shadow-sm h-[280px]"><canvas id="chartGender"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm h-[280px]"><canvas id="chartUmur"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl border shadow-sm h-[280px]"><canvas id="chartAgama"></canvas></div>
+                </div>
+            </div>
+
+            <div id="section-tabel-container" class="hidden space-y-4">
+                <div id="container-aksi-masal" class="flex flex-wrap gap-2">
+                    <button id="btn-naik-masal" onclick="prosesMasal('NAIK_SEMUA')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition">
+                        <i class="fas fa-arrow-up mr-2"></i> Naikkan Semua Murid
+                    </button>
+                    <button id="btn-lulus-masal" onclick="openModalLulusMasal()" class="hidden bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition">
+                        <i class="fas fa-graduation-cap mr-2"></i> Luluskan Semua Murid
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b bg-gray-50/50">
+                        <div class="flex gap-2">
+                            <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari nama murid..." class="border p-2 rounded-lg text-sm w-64 outline-none focus:ring-2 ring-indigo-100">
+                        </div>
+                        <p class="text-[10px] font-bold text-indigo-600 uppercase italic">Data Murid Kelas <span class="badge-kelas">--</span></p>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <div class="table-scroll-area">
+                            <table class="w-full text-left">
+                                <thead id="thead-data" class="sticky-header uppercase text-[10px] font-bold">
+                                    </thead>
+                                <tbody id="tbody-data" class="text-sm divide-y"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-t flex justify-between items-center bg-gray-50">
+                        <div id="pagination-info" class="text-[10px] text-gray-500 font-bold uppercase">Memuat data...</div>
+                        <div class="flex gap-2">
+                            <button onclick="prevPage()" class="px-3 py-1 text-xs font-bold border rounded-lg hover:bg-white transition">Prev</button>
+                            <button onclick="nextPage()" class="px-3 py-1 text-xs font-bold border rounded-lg hover:bg-white transition">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
 
     <script>
         // 1. Ambil Session Login
