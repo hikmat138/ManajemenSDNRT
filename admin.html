@@ -1731,6 +1731,18 @@ async function eksekusiImporLulus() {
         `;
     });
 }
+    function updateSidebarUI(activeId) {
+    // Cari semua link di sidebar
+    const links = document.querySelectorAll('aside a, aside button');
+    links.forEach(link => {
+        // Jika ID link mengandung activeId, beri warna biru, jika tidak hapus warnanya
+        if (link.getAttribute('onclick')?.includes(`'${activeId}'`)) {
+            link.classList.add('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+        } else {
+            link.classList.remove('bg-blue-50', 'text-blue-600', 'border-r-4', 'border-blue-600');
+        }
+    });
+}
 </script>
 </body>
 </html>
