@@ -353,21 +353,27 @@
         let instansiChartUmur = null;
         let instansiChartAgama = null;
         let instansiChartBulan = null;
+        const colMap = {
+        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
+        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
+        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
+        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'layak_pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
+        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
+        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
+        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
+        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
+        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
+        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
+    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
+    };   
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!session) {
-                alert("Sesi habis, silakan login kembali.");
-                window.location.href = "index.html";
-                return;
-            }
-            
-            if(String(session.kelas_akses) === '6') {
-                document.getElementById('menu-lulus').classList.remove('hidden');
-            }
-
-            loadDataKelas();
-            document.getElementById('formEditSiswa').addEventListener('submit', simpanIdentitas);
-        });
+    function formatTanggalIndo(dateStr) {
+        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
+        let date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
+    }
 
         function setMenuFilter(menuKey) {
             currentMenu = menuKey;
