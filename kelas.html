@@ -83,33 +83,31 @@
                 </div>
             </nav>
         </div>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-950/40">
+            <button onclick="toggleUserMenu()" class="w-full flex items-center gap-3 p-2 hover:bg-slate-800 rounded-xl transition text-left group">
+                <div id="userInitial" class="w-9 h-9 rounded-lg bg-slate-700 text-white flex items-center justify-center font-bold text-sm group-hover:bg-teal-500 transition">
+                    G
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id="guru-name" class="text-white font-semibold text-xs truncate">Memuat Guru...</p>
+                    <p class="text-[10px] text-slate-500 truncate">Klik untuk Keluar</p>
+                </div>
+                <i class="fas fa-right-from-bracket text-slate-500 text-xs group-hover:text-red-400 transition"></i>
+            </button>
+        </div>
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 min-h-screen">
-        <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-            <div class="flex items-center gap-4">
-                <div>
-                    <h2 id="txt-title-dashboard" class="text-xl font-bold text-slate-900">Dashboard Grafik</h2>
-                    <p id="txt-desc-dashboard" class="text-xs text-slate-500">Analisis visual data statistik murid berdasarkan database Dapodik kelas</p>
-                </div>
-                
-                <div id="searchWrapper" class="w-64 relative hidden ml-2">
-                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="searchBox" onkeyup="renderTable()" placeholder="Cari Nama / NIS..." class="w-full pl-10 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition">
-                </div>
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+            <div>
+                <h2 id="txt-title-dashboard" class="text-xl font-bold text-slate-900">Dashboard Grafik</h2>
+                <p id="txt-desc-dashboard" class="text-xs text-slate-500">Analisis visual data statistik murid berdasarkan database Dapodik kelas</p>
             </div>
             
-            <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
-                <button onclick="toggleUserMenu()" class="flex items-center gap-3 p-1.5 hover:bg-slate-100 rounded-xl transition text-left group">
-                    <div id="userInitial" class="w-9 h-9 rounded-lg bg-slate-800 text-white flex items-center justify-center font-bold text-sm group-hover:bg-teal-600 transition">
-                        G
-                    </div>
-                    <div class="hidden sm:block">
-                        <p id="guru-name" class="text-slate-900 font-bold text-xs truncate max-w-[140px]">Memuat Guru...</p>
-                        <p class="text-[10px] font-semibold text-slate-400">Guru Kelas</p>
-                    </div>
-                    <i class="fas fa-right-from-bracket text-slate-400 text-xs ml-1 group-hover:text-red-500 transition"></i>
-                </button>
+            <div id="searchWrapper" class="w-72 relative hidden">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchBox" onkeyup="renderTable()" placeholder="Cari Nama / NIS / NISN..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition">
             </div>
         </header>
 
@@ -178,7 +176,8 @@
                 
                 <div class="overflow-x-auto custom-scrollbar">
                     <table class="w-full text-left border-collapse">
-                        <thead id="table-head-view"></thead>
+                        <thead id="table-head-view">
+                            </thead>
                         <tbody id="tbodySiswa" class="divide-y divide-slate-100 text-sm">
                             <tr>
                                 <td colspan="6" class="py-12 text-center text-slate-400">
@@ -348,32 +347,26 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; 
         
         let masterDataSiswa = [];
-        let currentMenu = 'dashboard';
+        let currentMenu = 'dashboard'; // Halaman beranda pertama kali load adalah Dashboard Grafik
 
         let instansiChartUmur = null;
         let instansiChartAgama = null;
         let instansiChartBulan = null;
-        const colMap = {
-        'nama': 'Nama Murid', 'kelas': 'Kelas', 'status_aktif': 'Status', 'nis': 'NIS', 'nisn': 'NISN', 'nik': 'NIK', 'jk': 'L/P',
-        'tmpt_lahir': 'Tempat Lahir', 'tgl_lahir': 'Tanggal Lahir', 'agama': 'Agama', 'akte': 'No Akte', 'disabilitas': 'Keb. Khusus',
-        'kk': 'No KK', 'anak_ke': 'Anak Ke', 'saudara': 'Jml Saudara', 'jns_tinggal': 'Jenis Tinggal',
-        'transportasi': 'Transportasi', 'jarak': 'Jarak (Km)', 'kip': 'KIP', 'kps': 'KPS', 'layak_pip': 'Layak PIP', 'no_kip': 'No KIP', 'nama_kip': 'Nama KIP', 'kks': 'KKS', 'alasan_pip': 'Alasan PIP',
-        'ayah_nama': 'Nama Ayah', 'ayah_nik': 'NIK Ayah', 'ayah_thn_lahir': 'Thn Lahir Ayah', 'ayah_pekerjaan': 'Pekerjaan Ayah', 'ayah_pendidikan': 'Pendidikan Ayah', 'ayah_penghasilan': 'Penghasilan Ayah', 'ayah_disabilitas': 'Disabilitas Ayah',
-        'ibu_nama': 'Nama Ibu', 'ibu_nik': 'NIK Ibu', 'ibu_thn_lahir': 'Thn Lahir Ibu', 'ibu_pekerjaan': 'Pekerjaan Ibu', 'ibu_pendidikan': 'Pendidikan Ibu', 'ibu_penghasilan': 'Penghasilan Ibu', 'ibu_disabilitas': 'Disabilitas Ibu',
-        'wali_nama': 'Nama Wali', 'alamat': 'Alamat', 'rt': 'RT', 'rw': 'RW', 'kelurahan': 'Kelurahan', 'kecamatan': 'Kecamatan', 'kodepos': 'Kode Pos', 'lintang': 'Lintang', 'bujur': 'Bujur',
-        'bb': 'BB (Kg)', 'tb': 'TB (Cm)', 'lingkar_kepala': 'Lingkar Kepala', 'hobi': 'Hobi', 'cita_cita': 'Cita-cita', 'sekolah_asal': 'Sekolah Asal',
-        'hp': 'No HP', 'telp': 'No Telp', 'email': 'Email', 'tgl_masuk': 'Tgl Masuk', 'tgl_keluar': 'Tgl Keluar', 'alasan_masuk': 'Alasan Masuk','alasan_mutasi':'Alasan Keluar',
-        'thn_ajaran_lulus': 'Tahun Lulus', 'aksi': 'Aksi','umur': 'Umur', 'tgl_lulus':'Tanggal Lulus','sk_kelulusan':'SK Kelulusan','no_ijazah':'Nomor Ijazah',
-    'keterangan_siswa': 'Keterangan','status_masuk':'Status','tahun_ajaran':'Tahun Ajaran'
-    };   
 
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr || dateStr === '-' || dateStr === 'undefined') return '-';
-        let date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        const bln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-        return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
-    }
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!session) {
+                alert("Sesi habis, silakan login kembali.");
+                window.location.href = "index.html";
+                return;
+            }
+            
+            if(String(session.kelas_akses) === '6') {
+                document.getElementById('menu-lulus').classList.remove('hidden');
+            }
+
+            loadDataKelas();
+            document.getElementById('formEditSiswa').addEventListener('submit', simpanIdentitas);
+        });
 
         function setMenuFilter(menuKey) {
             currentMenu = menuKey;
@@ -393,6 +386,7 @@
                 activeEl.classList.remove('hover:bg-slate-800', 'text-slate-400', 'hover:text-white');
             }
 
+            // Atur Tampilan Kontainer (Sembunyikan/Munculkan Grafik vs Tabel)
             const grafikSection = document.getElementById('section-grafik-container');
             const tabelSection = document.getElementById('section-tabel-container');
             const searchWrapper = document.getElementById('searchWrapper');
@@ -473,14 +467,16 @@
 
             let dataSiswaAktif = filterDataByMenu(masterDataSiswa);
             
+            // Perbarui data Grafik (Selalu menggunakan data murid aktif)
             if (currentMenu === 'dashboard') {
                 renderCharts(dataSiswaAktif);
                 document.getElementById('stat-murid').innerText = dataSiswaAktif.length;
                 document.getElementById('stat-L').innerText = dataSiswaAktif.filter(s => String(s.jk).toUpperCase() === 'L').length;
                 document.getElementById('stat-P').innerText = dataSiswaAktif.filter(s => String(s.jk).toUpperCase() === 'P').length;
-                return;
+                return; // Berhenti di sini jika cuma menampilkan dashboard grafik
             }
 
+            // Pembentukan struktur kolom tabel dinamis
             if (currentMenu === 'identitas') {
                 thead.innerHTML = `
                     <tr class="bg-slate-100 text-slate-600 text-[11px] font-bold tracking-wider uppercase border-b border-slate-200">
@@ -600,11 +596,15 @@
             });
         }
 
+        // ==========================================
+        // ENGINE GRAPH (CHART.JS)
+        // ==========================================
         function renderCharts(dataSiswa) {
             if (instansiChartUmur) instansiChartUmur.destroy();
             if (instansiChartAgama) instansiChartAgama.destroy();
             if (instansiChartBulan) instansiChartBulan.destroy();
 
+            // 1. Kalkulasi Umur
             let mapUmur = {};
             dataSiswa.forEach(s => {
                 if (s.tgl_lahir && s.tgl_lahir !== '-') {
@@ -618,6 +618,7 @@
             let labelsUmur = Object.keys(mapUmur).sort((a,b) => a-b);
             let valuesUmur = labelsUmur.map(l => mapUmur[l]);
 
+            // 2. Kalkulasi Agama
             let mapAgama = {};
             dataSiswa.forEach(s => {
                 let agm = (s.agama || 'Islam').trim();
@@ -626,6 +627,7 @@
             let labelsAgama = Object.keys(mapAgama);
             let valuesAgama = labelsAgama.map(l => mapAgama[l]);
 
+            // 3. Kalkulasi Bulan Lahir
             let namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             let hitungBulan = Array(12).fill(0);
             dataSiswa.forEach(s => {
@@ -638,6 +640,7 @@
                 }
             });
 
+            // Pembuatan Grafik
             const ctxUmur = document.getElementById('chartUmur').getContext('2d');
             instansiChartUmur = new Chart(ctxUmur, {
                 type: 'bar',
@@ -669,6 +672,9 @@
             });
         }
 
+        // ==========================================
+        // WINDOW MODAL MUTATION & FORM SUBMIT
+        // ==========================================
         function openEditModal(nis) {
             const siswa = masterDataSiswa.find(s => String(s.nis) === String(nis));
             if (!siswa) return;
