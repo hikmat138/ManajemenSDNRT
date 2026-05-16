@@ -6,6 +6,7 @@
     <title>Dashboard Guru Kelas - SDN Ranca Tales</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -52,7 +53,7 @@
                     <div class="space-y-1">
                         <button onclick="setMenuFilter('lulus')" id="menu-lulus" class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition text-left text-sm hidden">
                             <i class="fas fa-user-graduate text-base w-5 text-center text-amber-400"></i>
-                            <span>Siswa Lulus (Klsw 6)</span>
+                            <span>Siswa Lulus (Kls 6)</span>
                         </button>
                         <button onclick="setMenuFilter('mutasi_masuk')" id="menu-mutasi_masuk" class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition text-left text-sm">
                             <i class="fas fa-door-open text-base w-5 text-center text-emerald-400"></i>
@@ -125,6 +126,38 @@
                         <h3 id="stat-P" class="text-3xl font-extrabold text-pink-600 mt-1">0</h3>
                     </div>
                     <div class="w-12 h-12 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center text-lg"><i class="fas fa-venus"></i></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between h-80">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500"><i class="fas fa-cake-candles text-amber-500 mr-1"></i> Grafik Umur Murid</h4>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md">Tahun</span>
+                    </div>
+                    <div class="flex-1 relative min-h-0 w-full flex items-center justify-center">
+                        <canvas id="chartUmur"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between h-80">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500"><i class="fas fa-mosque text-emerald-500 mr-1"></i> Grafik Agama</h4>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md">Sebaran</span>
+                    </div>
+                    <div class="flex-1 relative min-h-0 w-full flex items-center justify-center">
+                        <canvas id="chartAgama"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between h-80">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500"><i class="fas fa-calendar-check text-blue-500 mr-1"></i> Grafik Bulan Lahir</h4>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-md">Jan - Des</span>
+                    </div>
+                    <div class="flex-1 relative min-h-0 w-full flex items-center justify-center">
+                        <canvas id="chartBulan"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -245,46 +278,16 @@
                             <label class="block text-xs font-bold text-slate-500 mb-1">Alamat Jalan</label>
                             <input type="text" id="form_alamat" name="alamat" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">RT</label>
-                            <input type="text" id="form_rt" name="rt" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">RW</label>
-                            <input type="text" id="form_rw" name="rw" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Kelurahan</label>
-                            <input type="text" id="form_kelurahan" name="kelurahan" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Kecamatan</label>
-                            <input type="text" id="form_kecamatan" name="kecamatan" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Kode Pos</label>
-                            <input type="text" id="form_kodepos" name="kodepos" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Jns Tinggal</label>
-                            <input type="text" id="form_jns_tinggal" name="jns_tinggal" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Lintang</label>
-                            <input type="text" id="form_lintang" name="lintang" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Bujur</label>
-                            <input type="text" id="form_bujur" name="bujur" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Jarak (Km)</label>
-                            <input type="text" id="form_jarak" name="jarak" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Transportasi</label>
-                            <input type="text" id="form_transportasi" name="transportasi" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm">
-                        </div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">RT</label><input type="text" id="form_rt" name="rt" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">RW</label><input type="text" id="form_rw" name="rw" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Kelurahan</label><input type="text" id="form_kelurahan" name="kelurahan" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Kecamatan</label><input type="text" id="form_kecamatan" name="kecamatan" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Kode Pos</label><input type="text" id="form_kodepos" name="kodepos" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Jns Tinggal</label><input type="text" id="form_jns_tinggal" name="jns_tinggal" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Lintang</label><input type="text" id="form_lintang" name="lintang" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Bujur</label><input type="text" id="form_bujur" name="bujur" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Jarak (Km)</label><input type="text" id="form_jarak" name="jarak" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Transportasi</label><input type="text" id="form_transportasi" name="transportasi" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm"></div>
                     </div>
 
                     <div id="tab-orangtua" class="tab-content space-y-4 hidden">
@@ -306,12 +309,6 @@
                             <div><input type="text" id="form_ibu_pekerjaan" name="ibu_pekerjaan" placeholder="Pekerjaan" class="w-full p-2 border rounded-xl text-sm"></div>
                             <div class="md:col-span-2"><input type="text" id="form_ibu_penghasilan" name="ibu_penghasilan" placeholder="Penghasilan" class="w-full p-2 border rounded-xl text-sm"></div>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-3">
-                            <h5 class="md:col-span-4 text-xs font-extrabold text-slate-600 uppercase">Wali</h5>
-                            <div class="md:col-span-2"><input type="text" id="form_wali_nama" name="wali_nama" placeholder="Nama Wali" class="w-full p-2 border rounded-xl text-sm"></div>
-                            <div><input type="text" id="form_wali_nik" name="wali_nik" placeholder="NIK Wali" class="w-full p-2 border rounded-xl text-sm"></div>
-                            <div><input type="number" id="form_wali_thn_lahir" name="wali_thn_lahir" placeholder="Tahun Lahir" class="w-full p-2 border rounded-xl text-sm"></div>
-                        </div>
                     </div>
 
                     <div id="tab-fisik" class="tab-content grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
@@ -322,9 +319,7 @@
                         <div><label class="block text-xs font-bold text-slate-500 mb-1">Cita-Cita</label><input type="text" id="form_cita_cita" name="cita_cita" class="w-full p-2.5 border rounded-xl text-sm"></div>
                         <div><label class="block text-xs font-bold text-slate-500 mb-1">Disabilitas</label><input type="text" id="form_disabilitas" name="disabilitas" class="w-full p-2.5 border rounded-xl text-sm"></div>
                         <div><label class="block text-xs font-bold text-slate-500 mb-1">No HP</label><input type="text" id="form_hp" name="hp" class="w-full p-2.5 border rounded-xl text-sm"></div>
-                        <div><label class="block text-xs font-bold text-slate-500 mb-1">Telp Rumah</label><input type="text" id="form_telp" name="telp" class="w-full p-2.5 border rounded-xl text-sm"></div>
                         <div><label class="block text-xs font-bold text-slate-500 mb-1">Email</label><input type="email" id="form_email" name="email" class="w-full p-2.5 border rounded-xl text-sm"></div>
-                        <div class="md:col-span-3"><label class="block text-xs font-bold text-slate-500 mb-1">Asal Sekolah TK</label><input type="text" id="form_sekolah_asal" name="sekolah_asal" class="w-full p-2.5 border rounded-xl text-sm"></div>
                         <input type="hidden" id="form_kelas" name="kelas">
                     </div>
                 </div>
@@ -344,7 +339,12 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; 
         
         let masterDataSiswa = [];
-        let currentMenu = 'identitas'; // Default halaman aktif awal
+        let currentMenu = 'identitas'; 
+
+        // Instances Penyimpan Objek Grafik Chart.js
+        let instansiChartUmur = null;
+        let instansiChartAgama = null;
+        let instansiChartBulan = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!session) {
@@ -353,7 +353,6 @@
                 return;
             }
             
-            // Khusus jika yang login kelas 6, aktifkan menu kelulusan otomatis
             if(String(session.kelas_akses) === '6') {
                 document.getElementById('menu-lulus').classList.remove('hidden');
             }
@@ -362,11 +361,9 @@
             document.getElementById('formEditSiswa').addEventListener('submit', simpanIdentitas);
         });
 
-        // Pengendali Klik Menu Sidebar Baru
         function setMenuFilter(menuKey) {
             currentMenu = menuKey;
             
-            // Reset gaya tombol menu sidebar
             const menus = ['identitas', 'periodik', 'registrasi', 'lulus', 'mutasi_masuk', 'mutasi_keluar'];
             menus.forEach(m => {
                 const el = document.getElementById(`menu-${m}`);
@@ -376,14 +373,12 @@
                 }
             });
 
-            // Set tombol aktif saat ini
             const activeEl = document.getElementById(`menu-${menuKey}`);
             if(activeEl) {
                 activeEl.classList.add('bg-teal-600', 'text-white');
                 activeEl.classList.remove('hover:bg-slate-800', 'text-slate-400', 'hover:text-white');
             }
 
-            // Ubah Header Keterangan Judul Halaman
             const titleMap = {
                 'identitas': { title: "Identitas Murid", desc: "Pembaruan instrumen 58 kolom biodata dasar dapodik murid", labelStat: "Total Murid Aktif", lblTab: "Daftar Anggota Kelas Aktif" },
                 'periodik': { title: "Siswa Periodik", desc: "Pemantauan tinggi badan, berat badan, lingkar kepala, dan jarak tempuh berkala", labelStat: "Murid Tercatat", lblTab: "Variabel Atribut Periodik Murid" },
@@ -398,7 +393,6 @@
             document.getElementById('label-stat-total').innerText = titleMap[menuKey].labelStat;
             document.getElementById('label-table-title').innerText = titleMap[menuKey].lblTab;
 
-            // Re-render isi tabel secara real-time
             renderTable();
         }
 
@@ -413,7 +407,6 @@
                 
                 if (result.status === "success") {
                     masterDataSiswa = result.data.siswa || [];
-                    updateDashboardStats();
                     renderTable();
                 } else {
                     alert("Gagal memuat: " + result.message);
@@ -423,21 +416,11 @@
             }
         }
 
-        function updateDashboardStats() {
-            // Filter statistik berdasarkan data yang ada di menu aktif saat ini
-            let dataFiltered = filterDataByMenu(masterDataSiswa);
-            document.getElementById('stat-murid').innerText = dataFiltered.length;
-            document.getElementById('stat-L').innerText = dataFiltered.filter(s => String(s.jk).toUpperCase() === 'L').length;
-            document.getElementById('stat-P').innerText = dataFiltered.filter(s => String(s.jk).toUpperCase() === 'P').length;
-        }
-
-        // Fungsi pemisahan logic filter array objek data berdasarkan menu aktif
         function filterDataByMenu(data) {
             switch(currentMenu) {
                 case 'identitas':
                 case 'periodik':
                 case 'registrasi':
-                    // Hanya menampilkan siswa yang statusnya aktif di kelas (bukan contoh data kosong, mutasi, atau lulus)
                     return data.filter(s => s.status_siswa !== 'MUTASI' && s.status_siswa !== 'LULUS');
                 case 'lulus':
                     return data.filter(s => s.status_siswa === 'LULUS' || (String(session.kelas_akses) === '6' && s.status_siswa !== 'MUTASI'));
@@ -456,7 +439,6 @@
             const searchKeyword = document.getElementById('searchBox').value.toLowerCase().trim();
             tbody.innerHTML = "";
 
-            // 1. Sesuaikan Judul Kolom Tabel Secara Dinamis Berdasarkan Menu yang Dipilih Guru
             if (currentMenu === 'identitas') {
                 thead.innerHTML = `
                     <tr class="bg-slate-100 text-slate-600 text-[11px] font-bold tracking-wider uppercase border-b border-slate-200">
@@ -489,7 +471,6 @@
                         <th class="py-3 px-6 text-center w-32">Aksi</th>
                     </tr>`;
             } else {
-                // Untuk menu Kelulusan / Mutasi
                 thead.innerHTML = `
                     <tr class="bg-slate-100 text-slate-600 text-[11px] font-bold tracking-wider uppercase border-b border-slate-200">
                         <th class="py-3 px-6 text-center w-12">No</th>
@@ -501,7 +482,6 @@
                     </tr>`;
             }
 
-            // 2. Jalankan Filter Menu dan Filter Search Pencarian
             let dataSiswaAktif = filterDataByMenu(masterDataSiswa);
             
             const filteredData = dataSiswaAktif.filter(s => {
@@ -510,13 +490,19 @@
                        (s.nisn || "").toLowerCase().includes(searchKeyword);
             });
 
+            // Trigger Regenerasi Data Grafik Berdasarkan Saringan Data Terbaru
+            renderCharts(filteredData);
+
+            // Update Top Mini Stats
+            document.getElementById('stat-murid').innerText = filteredData.length;
+            document.getElementById('stat-L').innerText = filteredData.filter(s => String(s.jk).toUpperCase() === 'L').length;
+            document.getElementById('stat-P').innerText = filteredData.filter(s => String(s.jk).toUpperCase() === 'P').length;
+
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium"><i class="fas fa-folder-open text-3xl mb-2 block text-slate-300"></i> Tidak ada data murid ditemukan untuk kategori ini.</td></tr>`;
-                updateDashboardStats();
+                tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-medium"><i class="fas fa-folder-open text-3xl mb-2 block text-slate-300"></i> Tidak ada data murid ditemukan.</td></tr>`;
                 return;
             }
 
-            // 3. Render isi baris tabel sesuai pola kolom menunya
             filteredData.forEach((siswa, index) => {
                 if (currentMenu === 'identitas') {
                     tbody.innerHTML += `
@@ -562,7 +548,7 @@
                             </td>
                         </tr>`;
                 } else {
-                    let ketKeterangan = siswa.sekolah_tujuan || siswa.alasan_pip || 'Proses Mutasi Selesai';
+                    let ketKeterangan = siswa.sekolah_tujuan || 'Arsip Valid';
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3.5 px-6 text-center font-mono font-bold text-slate-400 text-xs">${index + 1}</td>
@@ -571,19 +557,110 @@
                             <td class="py-3.5 px-4 text-center">${siswa.jk}</td>
                             <td class="py-3.5 px-6 text-xs text-slate-600">${ketKeterangan}</td>
                             <td class="py-3.5 px-6 text-center">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${currentMenu === 'mutasi_keluar' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}">
-                                    <i class="fas fa-circle-check mr-1"></i> Validated
-                                </span>
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase ${currentMenu === 'mutasi_keluar' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}"><i class="fas fa-circle-check mr-1"></i> Validated</span>
                             </td>
                         </tr>`;
                 }
             });
-
-            updateDashboardStats();
         }
 
         // ==========================================
-        // MANAJEMEN MODAL TAB ENGINE
+        // ENGINE KONTROLLER GRAFIK (CHART.JS LOGIC)
+        // ==========================================
+        function renderCharts(dataSiswa) {
+            // Hancurkan grafik lama jika ada, untuk menghindari visual menumpuk saat ganti menu
+            if (instansiChartUmur) instansiChartUmur.destroy();
+            if (instansiChartAgama) instansiChartAgama.destroy();
+            if (instansiChartBulan) instansiChartBulan.destroy();
+
+            // --- 1. PROSES DATA GRAFIK UMUR ---
+            let mapUmur = {};
+            dataSiswa.forEach(s => {
+                if (s.tgl_lahir && s.tgl_lahir !== '-') {
+                    let tahunLahir = parseInt(s.tgl_lahir.split('-')[0]);
+                    if (!isNaN(tahunLahir)) {
+                        let umur = new Date().getFullYear() - tahunLahir;
+                        mapUmur[umur] = (mapUmur[umur] || 0) + 1;
+                    }
+                }
+            });
+            let labelsUmur = Object.keys(mapUmur).sort((a,b) => a-b);
+            let valuesUmur = labelsUmur.map(l => mapUmur[l]);
+
+            // --- 2. PROSES DATA GRAFIK AGAMA ---
+            let mapAgama = {};
+            dataSiswa.forEach(s => {
+                let agm = (s.agama || 'Islam').trim();
+                mapAgama[agm] = (mapAgama[agm] || 0) + 1;
+            });
+            let labelsAgama = Object.keys(mapAgama);
+            let valuesAgama = labelsAgama.map(l => mapAgama[l]);
+
+            // --- 3. PROSES DATA GRAFIK BULAN LAHIR ---
+            let namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+            let hitungBulan = Array(12).fill(0);
+            dataSiswa.forEach(s => {
+                if (s.tgl_lahir && s.tgl_lahir.includes('-')) {
+                    let parts = s.tgl_lahir.split('-');
+                    if(parts[1]) {
+                        let idxBulan = parseInt(parts[1]) - 1;
+                        if (idxBulan >= 0 && idxBulan < 12) hitungBulan[idxBulan]++;
+                    }
+                }
+            });
+
+            // --- GENERATE GRAFIK 1: UMUR ---
+            const ctxUmur = document.getElementById('chartUmur').getContext('2d');
+            instansiChartUmur = new Chart(ctxUmur, {
+                type: 'bar',
+                data: {
+                    labels: labelsUmur.length ? labelsUmur.map(u => u + ' Thn') : ['0 Thn'],
+                    datasets: [{
+                        label: 'Jumlah Murid',
+                        data: valuesUmur.length ? valuesUmur : [0],
+                        backgroundColor: '#0d9488', // Teal 600
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // --- GENERATE GRAFIK 2: AGAMA ---
+            const ctxAgama = document.getElementById('chartAgama').getContext('2d');
+            instansiChartAgama = new Chart(ctxAgama, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsAgama.length ? labelsAgama : ['Belum Diisi'],
+                    datasets: [{
+                        data: valuesAgama.length ? valuesAgama : [0],
+                        backgroundColor: ['#0f172a', '#06b6d4', '#f59e0b', '#ec4899', '#10b981']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
+
+            // --- GENERATE GRAFIK 3: BULAN LAHIR ---
+            const ctxBulan = document.getElementById('chartBulan').getContext('2d');
+            instansiChartBulan = new Chart(ctxBulan, {
+                type: 'line',
+                data: {
+                    labels: namaBulan,
+                    datasets: [{
+                        label: 'Kelahiran',
+                        data: hitungBulan,
+                        borderColor: '#2563eb', // Blue 600
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        // ==========================================
+        // MANAJEMEN MODAL & TAB CONTROL
         // ==========================================
         function openEditModal(nis) {
             const siswa = masterDataSiswa.find(s => String(s.nis) === String(nis));
@@ -591,9 +668,7 @@
 
             document.getElementById('modalTitle').innerText = `Edit Instrumen Murid: ${siswa.nama}`;
             
-            // Auto switch tab berdasarkan menu aktif biar guru tidak cape klik ulang tab
             if(currentMenu === 'periodik') switchTab('tab-fisik');
-            else if(currentMenu === 'registrasi') switchTab('tab-biodata');
             else switchTab('tab-biodata');
 
             const fields = [
@@ -634,7 +709,7 @@
         }
 
         // ==========================================
-        // Fitur Ajax Submit Data ke Web App GAS Bapak
+        // FITUR AJAX SUBMIT DATA
         // ==========================================
         async function simpanIdentitas(e) {
             e.preventDefault();
