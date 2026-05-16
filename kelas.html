@@ -635,7 +635,7 @@ function updatePagination() {
 }
 
 function renderTabelSiswa(dataList) {
-    // 1. Logika Pendeteksi ID tbody HTML Bapak secara otomatis
+    // 1. Logika Pendeteksi ID tbody HTML
     let targetTbodyId = 'tbody-data'; 
     
     if (currentMenu === "siswa-lulus") {
@@ -648,7 +648,6 @@ function renderTabelSiswa(dataList) {
         targetTbodyId = `tbody-${currentMenu}`;
     }
 
-    // Coba cari ID spesifik sub-menu dulu, jika tidak ketemu, baru pakai fallback 'tbody-data'
     let tbody = document.getElementById(targetTbodyId) || document.getElementById('tbody-data');
     
     if (!tbody) {
@@ -656,7 +655,7 @@ function renderTabelSiswa(dataList) {
         return; 
     }
 
-    tbody.innerHTML = ""; // Bersihkan baris lama sebelum rendering
+    tbody.innerHTML = ""; // Bersihkan baris lama
 
     // 2. Jika Data Kosong
     if (!dataList || dataList.length === 0) {
@@ -672,7 +671,7 @@ function renderTabelSiswa(dataList) {
         return;
     }
 
-    // 3. Looping Pembuatan Baris Baru
+    // 3. Looping Pembuatan Baris Baru (Tanpa Kolom ID, Langsung Nama)
     dataList.forEach((row, index) => {
         let barisNomor = (currentPage - 1) * rowsPerPage + (index + 1);
         let tr = document.createElement('tr');
