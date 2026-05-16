@@ -113,14 +113,14 @@
     <div id="modal-edit-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
             <div class="bg-blue-700 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold uppercase"><i class="fas fa-user-edit mr-2"></i> Formulir Master Data Murid (63 Atribut)</h3>
+                <h3 class="font-bold uppercase"><i class="fas fa-user-edit mr-2"></i> Formulir Pembaruan Data Murid</h3>
                 <button onclick="tutupModal('modal-edit-siswa')" class="hover:text-red-300"><i class="fas fa-times"></i></button>
             </div>
             <form id="form-edit-siswa" onsubmit="simpanEditSiswa(event)" class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                 <input type="hidden" id="edit-id">
                 
                 <div>
-                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">I. Identitas Utama & Dapodik</h4>
+                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">I. Identitas Utama</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Nama Lengkap</label>
@@ -162,17 +162,17 @@
                             <input type="text" id="edit-akte" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">No. Kartu Keluarga (KK)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">No. KK</label>
                             <input type="text" id="edit-kk" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">II. Data Alamat & Spasial</h4>
+                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">II. Data Wilayah Tempat Tinggal</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alamat Jalan</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alamat Rumah</label>
                             <input type="text" id="edit-alamat" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
@@ -200,15 +200,15 @@
                             <input type="text" id="edit-jns_tinggal" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Lintang (Latitude)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Lintang</label>
                             <input type="text" id="edit-lintang" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Bujur (Longitude)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Bujur</label>
                             <input type="text" id="edit-bujur" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jarak Rumah ke Sekolah</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jarak Sekolah (Km)</label>
                             <input type="text" id="edit-jarak" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
@@ -219,14 +219,14 @@
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">III. Kesejahteraan, Keluarga, & Fisik Murid</h4>
+                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">III. Perkembangan Fisik & PIP</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Anak Ke</label>
                             <input type="number" id="edit-anak_ke" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jml Saudara Kandung</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Saudara Kandung</label>
                             <input type="number" id="edit-saudara" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
@@ -238,11 +238,11 @@
                             <input type="text" id="edit-layak_pip" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alasan PIP</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Alasan Layak PIP</label>
                             <input type="text" id="edit-alasan_pip" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kebutuhan Khusus / Disabilitas</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kebutuhan Khusus</label>
                             <input type="text" id="edit-disabilitas" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
@@ -262,88 +262,91 @@
                             <input type="text" id="edit-hobi" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Cita-cita</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Cita-Cita</label>
                             <input type="text" id="edit-cita_cita" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">IV. Data Orang Tua & Wali</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-3 rounded-xl border">
+                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">IV. Data Wali & Orang Tua</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border">
                         <div>
-                            <label class="block text-[10px] font-bold text-blue-700 mb-1 uppercase">Nama Ayah</label>
-                            <input type="text" id="edit-ayah_nama" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK Ayah</label>
-                            <input type="text" id="edit-ayah_nik" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pendidikan Ayah</label>
-                            <input type="text" id="edit-ayah_pendidikan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pekerjaan Ayah</label>
-                            <input type="text" id="edit-ayah_pekerjaan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Penghasilan Ayah</label>
-                            <input type="text" id="edit-ayah_penghasilan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Lahir Ayah</label>
-                            <input type="text" id="edit-ayah_thn_lahir" class="w-full border p-2 rounded-lg text-sm bg-white">
+                            <p class="text-xs font-bold text-blue-700 mb-2 uppercase border-b pb-0.5">Data Ayah Kandung</p>
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Nama Ayah</label>
+                            <input type="text" id="edit-ayah_nama" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">NIK Ayah</label>
+                            <input type="text" id="edit-ayah_nik" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pendidikan</label>
+                            <input type="text" id="edit-ayah_pendidikan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pekerjaan</label>
+                            <input type="text" id="edit-ayah_pekerjaan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Penghasilan</label>
+                            <input type="text" id="edit-ayah_penghasilan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Tahun Lahir</label>
+                            <input type="text" id="edit-ayah_thn_lahir" class="w-full border p-1.5 rounded-lg text-xs bg-white">
                             <input type="hidden" id="edit-ayah_disabilitas">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-pink-700 mb-1 uppercase">Nama Ibu</label>
-                            <input type="text" id="edit-ibu_nama" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK Ibu</label>
-                            <input type="text" id="edit-ibu_nik" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pendidikan Ibu</label>
-                            <input type="text" id="edit-ibu_pendidikan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pekerjaan Ibu</label>
-                            <input type="text" id="edit-ibu_pekerjaan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Penghasilan Ibu</label>
-                            <input type="text" id="edit-ibu_penghasilan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Lahir Ibu</label>
-                            <input type="text" id="edit-ibu_thn_lahir" class="w-full border p-2 rounded-lg text-sm bg-white">
+                            <p class="text-xs font-bold text-pink-700 mb-2 uppercase border-b pb-0.5">Data Ibu Kandung</p>
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Nama Ibu</label>
+                            <input type="text" id="edit-ibu_nama" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">NIK Ibu</label>
+                            <input type="text" id="edit-ibu_nik" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pendidikan</label>
+                            <input type="text" id="edit-ibu_pendidikan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pekerjaan</label>
+                            <input type="text" id="edit-ibu_pekerjaan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Penghasilan</label>
+                            <input type="text" id="edit-ibu_penghasilan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Tahun Lahir</label>
+                            <input type="text" id="edit-ibu_thn_lahir" class="w-full border p-1.5 rounded-lg text-xs bg-white">
                             <input type="hidden" id="edit-ibu_disablilitas">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-amber-700 mb-1 uppercase">Nama Wali</label>
-                            <input type="text" id="edit-wali_nama" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">NIK Wali</label>
-                            <input type="text" id="edit-wali_nik" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pendidikan Wali</label>
-                            <input type="text" id="edit-wali_pendidikan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Pekerjaan Wali</label>
-                            <input type="text" id="edit-wali_pekerjaan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Penghasilan Wali</label>
-                            <input type="text" id="edit-wali_penghasilan" class="w-full border p-2 rounded-lg text-sm bg-white mb-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Tahun Lahir Wali</label>
-                            <input type="text" id="edit-wali_thn_lahir" class="w-full border p-2 rounded-lg text-sm bg-white">
+                            <p class="text-xs font-bold text-amber-700 mb-2 uppercase border-b pb-0.5">Data Wali Siswa</p>
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Nama Wali</label>
+                            <input type="text" id="edit-wali_nama" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">NIK Wali</label>
+                            <input type="text" id="edit-wali_nik" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pendidikan</label>
+                            <input type="text" id="edit-wali_pendidikan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Pekerjaan</label>
+                            <input type="text" id="edit-wali_pekerjaan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Penghasilan</label>
+                            <input type="text" id="edit-wali_penghasilan" class="w-full border p-1.5 rounded-lg text-xs bg-white mb-2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-0.5">Tahun Lahir</label>
+                            <input type="text" id="edit-wali_thn_lahir" class="w-full border p-1.5 rounded-lg text-xs bg-white">
                             <input type="hidden" id="edit-wali_disabilitas">
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">V. Status Registrasi & Kontak</h4>
+                    <h4 class="text-xs font-bold text-blue-600 uppercase border-b pb-1 mb-3">V. Status Administrasi Registrasi</h4>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kelas Aktif</label>
-                            <input type="text" id="edit-kelas" class="w-full border p-2 rounded-lg text-sm">
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Rombel Kelas</label>
+                            <input type="text" id="edit-kelas" class="w-full border p-2 rounded-lg text-sm font-bold text-blue-700">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Sekolah Asal</label>
                             <input type="text" id="edit-sekolah_asal" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">No. HP</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">No HP Kontak</label>
                             <input type="text" id="edit-hp" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">No. Telp Rumah</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Telepon Rumah</label>
                             <input type="text" id="edit-telp" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Email</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Email Aktif</label>
                             <input type="email" id="edit-email" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Status Aktif</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Status Keaktifan</label>
                             <input type="text" id="edit-status_aktif" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
@@ -351,19 +354,19 @@
                             <input type="date" id="edit-tgl_masuk" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Umur Saat Ini</label>
-                            <input type="text" id="edit-umur" class="w-full border p-2 rounded-lg text-sm bg-gray-50" readonly>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Kalkulasi Umur</label>
+                            <input type="text" id="edit-umur" class="w-full border p-2 rounded-lg text-sm bg-gray-50 font-medium" readonly>
                         </div>
                         <div class="md:col-span-3">
-                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Keterangan Tambahan / Catatan Siswa</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Catatan Keterangan Murid</label>
                             <input type="text" id="edit-keterangan_siswa" class="w-full border p-2 rounded-lg text-sm">
                         </div>
                     </div>
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t">
-                    <button type="button" onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600 tracking-wider">Batal</button>
-                    <button type="submit" class="flex-1 bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg hover:bg-blue-800">Simpan Seluruh Data</button>
+                    <button type="button" onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-xs uppercase text-gray-600">Batal</button>
+                    <button type="submit" class="flex-1 bg-blue-700 text-white py-2.5 rounded-xl font-bold text-xs uppercase shadow-lg hover:bg-blue-800">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -405,7 +408,7 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="text-right">
-                        <p class="text-sm font-bold text-gray-700" id="user-display">HIKMATULLAH</p>
+                        <p class="text-sm font-bold text-gray-700" id="user-display">Wali Kelas</p>
                         <p class="text-[10px] font-semibold text-blue-600 uppercase bg-blue-50 px-2 py-0.5 rounded-md inline-block border border-blue-200" id="role-display">MEMUAT...</p>
                     </div>
                 </div>
@@ -447,12 +450,12 @@
                         </div>
                         <div class="bg-gradient-to-br from-blue-700 to-indigo-900 p-6 rounded-2xl text-white flex flex-col justify-between shadow-xl">
                             <div>
-                                <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Database Terintegrasi</span>
-                                <h3 class="text-lg font-bold mt-4 leading-snug">63 Atribut Kolom Siswa Berhasil Diaktifkan</h3>
-                                <p class="text-xs text-blue-200 mt-2">Seluruh kolom dari data dasar hingga Dapodik telah sinkron sempurna dengan Sheet Utama.</p>
+                                <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Sistem Sinkronisasi</span>
+                                <h3 class="text-lg font-bold mt-4 leading-snug">63 Atribut Kolom Murid Aktif</h3>
+                                <p class="text-xs text-blue-200 mt-2">Menampilkan data real-time per kelas berdasarkan integrasi Session Akun Web App Anda.</p>
                             </div>
                             <div class="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-blue-100 font-semibold">
-                                <span>Status Server</span>
+                                <span>Status Sinkronisasi</span>
                                 <span class="flex items-center text-green-400"><span class="w-2 h-2 rounded-full bg-green-400 animate-pulse mr-2"></span> Terhubung</span>
                             </div>
                         </div>
@@ -462,7 +465,7 @@
                 <section id="sec-siswa-pribadi" class="hidden space-y-4">
                     <div class="flex justify-between items-center">
                         <input type="text" oninput="cariTabel('pribadi', this.value)" placeholder="Cari nama atau nomor induk..." class="border px-3 py-1.5 rounded-lg text-xs w-64 outline-none focus:border-blue-500">
-                        <span class="text-xs bg-slate-100 border text-slate-600 px-3 py-1 rounded-md font-medium"><i class="fas fa-info-circle mr-1"></i> Geser tabel ke kanan untuk melihat total 63 kolom</span>
+                        <span class="text-xs bg-blue-50 border border-blue-200 text-blue-700 px-3 py-1 rounded-md font-medium"><i class="fas fa-info-circle mr-1"></i> Geser horizontal untuk meninjau data Dapodik lengkap</span>
                     </div>
                     
                     <div class="table-wrapper">
@@ -598,13 +601,10 @@
     </div>
 
     <script>
-        // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT BAPAK DI SINI
+        // TARGET URL API WEB APP APPS SCRIPT BAPAK
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
         
-        // Parameter Autentikasi Admin Pak Hikmatullah (Bisa memilah kelas apa pun lewat variabel ini)
-        const USERNAME_LOGIN = "sdnrancatales"; 
-        const KELAS_AKSES = "1A"; // Target penapisan kelas riil di database siswa
-
+        let session = null;
         let DATA_SISWA_AKTIF = [];
         let DATA_ALUMNI = [];
         let DATA_MUTASI_KELUAR = [];
@@ -617,12 +617,22 @@
         };
 
         window.onload = function() {
+            // Mengambil Session Riil Login dari LocalStorage seperti pada file user.docx milik Bapak
+            const sessionRaw = localStorage.getItem('session_sdnrt');
+            if (sessionRaw) {
+                session = JSON.parse(sessionRaw);
+            } else {
+                // Fallback otomatis jika dipanggil mandiri tanpa halaman login index
+                session = { username: "sdnrancatales", role: "admin", kelas_akses: "1A", nama: "HIKMATULLAH" };
+            }
+            
             ambilDataSistem();
         };
 
         async function ambilDataSistem() {
             try {
-                const urlTarget = `${API_URL}?action=getDataKelas&u=${encodeURIComponent(USERNAME_LOGIN)}&k=${encodeURIComponent(KELAS_AKSES)}`;
+                // Menyesuaikan action 'getDataKelas' dengan parsing parameter u dan k di doGet code.gs bapak
+                const urlTarget = `${API_URL}?action=getDataKelas&u=${encodeURIComponent(session.username)}&k=${encodeURIComponent(session.kelas_akses)}`;
                 const response = await fetch(urlTarget, { method: 'GET' });
                 const res = await response.json();
                 
@@ -631,17 +641,17 @@
                     DATA_ALUMNI = res.data.siswa_lulus || [];
                     DATA_MUTASI_KELUAR = res.data.mutasi_keluar || [];
                     
-                    document.getElementById('role-display').innerText = "ADMIN - KELAS: " + KELAS_AKSES;
-                    document.getElementById('user-display').innerText = res.adminName || "HIKMATULLAH";
+                    document.getElementById('role-display').innerText = `${session.role.toUpperCase()} - KELAS: ${session.kelas_akses}`;
+                    document.getElementById('user-display').innerText = session.nama;
                     
                     kalkulasiDasbor();
                     renderSemuaTabel();
                 } else {
-                    alert("Gagal memuat data kelas: " + (res.message || "Kesalahan internal"));
+                    alert("Respons Gagal: " + (res.message || "Periksa server Google Sheets Anda."));
                 }
             } catch (err) {
                 console.error("Gagal sinkronisasi data: ", err);
-                alert("Koneksi gagal! Silakan periksa kembali tautan Web App Apps Script Anda.");
+                alert("Gagal memuat data dari server Apps Script.");
             }
         }
 
@@ -758,7 +768,7 @@
                     let jkSiswa = String(d.jk || 'L').toUpperCase().startsWith('L') ? 'L' : 'P';
                     tr.innerHTML = `
                         <td class="text-center">
-                            <button onclick="bukaEditSiswa('${d.nis}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm"><i class="fas fa-edit mr-1"></i>Buka</button>
+                            <button onclick="bukaEditSiswa('${d.nis}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm"><i class="fas fa-edit mr-1"></i>Edit</button>
                         </td>
                         <td>${no}</td>
                         <td>${d.id || ''}</td>
@@ -872,7 +882,6 @@
             let s = DATA_SISWA_AKTIF.find(item => item.nis == nis);
             if (!s) return;
 
-            // Pemetaan Seluruh Kolom ke Formulir Dialog
             document.getElementById('edit-id').value = s.id || '';
             document.getElementById('edit-nis').value = s.nis || '';
             document.getElementById('edit-nama').value = s.nama || '';
@@ -948,7 +957,6 @@
             e.preventDefault();
             let nis = document.getElementById('edit-nis').value;
             
-            // Satukan seluruh muatan data (Formulir payload 63 kolom lengkap)
             let payload = {
                 id: document.getElementById('edit-id').value,
                 nama: document.getElementById('edit-nama').value,
@@ -1033,7 +1041,7 @@
                     ambilDataSistem();
                 }
             } catch(err) {
-                alert("Gagal memperbarui data siswa ke spreadsheet.");
+                alert("Gagal memperbarui data murid ke spreadsheet.");
             }
         }
 
