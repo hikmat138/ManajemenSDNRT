@@ -493,10 +493,9 @@ async function loadData() {
         // ========================================================
         // MASUKKAN KODE PEMBERSIHANNYA DI SINI (DI BAWAH RESULT)
         // ========================================================
-        let rawSiswa = result.data.siswa || [];
-        // Kita cek s.nama, jadi walaupun kolom id kosong karena rumus, data 1 murid tetap lolos!
-        masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "nama siswa");
-
+       let rawSiswa = result.data.siswa || [];
+// Kita bersihkan data kosong, tapi tidak memeriksa nama spesifik dulu
+masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "");
         let rawLulus = result.data.siswa_lulus || [];
         masterDataLulus = rawLulus.filter(s => s.nama && String(s.nama).trim() !== "");
 
@@ -603,13 +602,19 @@ function filterData() {
     } else {
         // Filter Murid Aktif
         source = masterData.filter(s => {
-            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return isAktif;
-            } else {
-                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
+    // Karena kolom status_aktif bergeser ke kolom 'tgl_masuk', kita cek dua-duanya agar aman
+    let cekStatus = String(s.status_aktif || '').toLowerCase() === "aktif" || 
+                    String(s.tgl_masuk || '').toLowerCase() === "aktif" ||
+                    String(s.status_aktif || '') === "1A"; // Antisipasi bocor kolom
+
+    if (userRoleAktif === "admin" || userKelasAkses === "-") {
+        return true; // Loloskan dulu semua biar muncul di tabel admin
+    } else {
+        // Karena kolom kelas berisi teks acak, kita cek jika s.status_aktif atau kolom lainnya berisi "1A"
+        return String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase() || 
+               String(s.status_aktif).toUpperCase() === userKelasAkses.toUpperCase();
+    }
+});
     }
 
     // 2. Filter berdasarkan kata kunci pencarian
