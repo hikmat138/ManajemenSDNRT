@@ -26,12 +26,6 @@
             overflow: hidden;
         }
 
-        .main-content-scroll {
-            height: calc(100vh - 64px);
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-
         .sidebar-link.active { 
             background-color: #eff6ff; 
             color: var(--primary); 
@@ -79,7 +73,7 @@
         }
 
         table {
-            min-width: 1000px;
+            min-width: 1100px;
             width: 100%;
             border-collapse: collapse;
         }
@@ -165,18 +159,18 @@
 
             <div>
                 <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i>Siswa</span>
+                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i> Data Murid</span>
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
                 <div id="sub-murid" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Data Siswa Aktif</div>
-                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Siswa Lulus</div>
+                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Murid Aktif Kelas</div>
+                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Alumni / Lulus</div>
                 </div>
             </div>
 
             <div>
                 <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Mutasi</span>
+                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Riwayat Mutasi</span>
                     <i class="fas fa-chevron-down text-[10px]"></i>
                 </button>
                 <div id="sub-mutasi" class="hidden space-y-1 mt-1">
@@ -252,16 +246,8 @@
 
                     <div class="overflow-x-auto" style="max-height: 65vh;">
                         <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
-                                <tr>
-                                    <th class="px-6 py-3 text-center w-16">No</th>
-                                    <th class="px-6 py-3">Nama Lengkap</th>
-                                    <th class="px-6 py-3">Identitas (NISN/NIS)</th>
-                                    <th class="px-6 py-3">JK</th>
-                                    <th class="px-6 py-3">Tempat, Tanggal Lahir</th>
-                                    <th class="px-6 py-3 text-center w-32">Aksi</th>
-                                </tr>
-                            </thead>
+                            <thead id="thead-kolom" class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                                </thead>
                             <tbody id="tbody-data" class="text-sm divide-y bg-white">
                                 </tbody>
                         </table>
@@ -284,7 +270,7 @@
 </div>
 
 <script>
-// Masukkan URL Web App Google Apps Script Bapak di sini
+// URL Web App Google Apps Script
 const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
 let masterData = [];
@@ -296,7 +282,7 @@ let filteredData = [];
 let currentPage = 1;
 let rowsPerPage = 10;
 let currentMenu = "dashboard";
-let userKelasAkses = ""; // Menyimpan otomatis kelas akses guru aktif
+let userKelasAkses = ""; 
 let charts = {};
 
 document.addEventListener("DOMContentLoaded", loadData);
@@ -305,7 +291,6 @@ async function loadData() {
     try {
         document.getElementById('stat-murid').innerText = "Memuat...";
         
-        // Panggil fungsi spesifik berdasar kecocokan kelas di sheet 'users'
         const res = await fetch(`${API_URL}?action=getAllData`);
         const result = await res.json();
         
@@ -316,8 +301,8 @@ async function loadData() {
         masterDataMutasiMasuk = result.data.mutasi_masuk || [];
         masterDataMutasiKeluar = result.data.mutasi_keluar || [];
 
-        // Menyesuaikan Identitas Guru Login berdasarkan data sheet users
-        let userAktif = result.data.users?.[1] || result.data.users?.[0]; // default penyesuaian simulasi user guru
+        // Penyesuaian Identitas Guru Login berdasarkan data sheet users
+        let userAktif = result.data.users?.[1] || result.data.users?.[0]; 
         if (userAktif) {
             userKelasAkses = userAktif.kelas_akses;
             document.getElementById('admin-name').innerText = userAktif.nama;
@@ -336,7 +321,6 @@ async function loadData() {
 }
 
 function updateStats() {
-    // Saring data berdasarkan murid yang sekelas dengan 'kelas_akses' dari user login
     let aktifKelas = masterData.filter(s => 
         String(s.status_aktif).toLowerCase() === "aktif" && 
         String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase()
@@ -354,12 +338,14 @@ function filterData() {
     let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
     let source = [];
 
-    // Pilih sumber data berdasarkan sidebar menu aktif
-    if (currentMenu === "siswa-lulus") source = masterDataLulus;
-    else if (currentMenu === "mutasi-masuk") source = masterDataMutasiMasuk;
-    else if (currentMenu === "mutasi-keluar") source = masterDataMutasiKeluar;
-    else {
-        // Menu utama siswa aktif: Saring otomatis agar HANYA menampilkan kelas guru yang bersangkutan
+    if (currentMenu === "siswa-lulus") {
+        source = masterDataLulus;
+    } else if (currentMenu === "mutasi-masuk") {
+        source = masterDataMutasiMasuk;
+    } else if (currentMenu === "mutasi-keluar") {
+        source = masterDataMutasiKeluar;
+    } else {
+        // Default Murid Aktif Kelas Guru
         source = masterData.filter(s => String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase());
     }
 
@@ -382,42 +368,149 @@ function updatePagination() {
 }
 
 function renderTabelSiswa(dataList) {
+    const thead = document.getElementById('thead-kolom');
     const tbody = document.getElementById('tbody-data');
+    
     tbody.innerHTML = "";
+    thead.innerHTML = "";
 
+    // 1. TENTUKAN STRUKTUR HEADER KOLOM SEUAI MENU SEKARANG
+    if (currentMenu === "siswa-lulus") {
+        thead.innerHTML = `
+            <tr>
+                <th class="px-6 py-3 text-center w-16">No</th>
+                <th class="px-6 py-3">Nama Lengkap</th>
+                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
+                <th class="px-6 py-3">JK</th>
+                <th class="px-6 py-3">Tahun Lulus</th>
+                <th class="px-6 py-3">No. Ijazah</th>
+                <th class="px-6 py-3 text-center w-32">Aksi</th>
+            </tr>`;
+    } else if (currentMenu === "mutasi-masuk") {
+        thead.innerHTML = `
+            <tr>
+                <th class="px-6 py-3 text-center w-16">No</th>
+                <th class="px-6 py-3">Nama Lengkap</th>
+                <th class="px-6 py-3">NISN</th>
+                <th class="px-6 py-3">JK</th>
+                <th class="px-6 py-3">Sekolah Asal</th>
+                <th class="px-6 py-3">Tanggal Masuk</th>
+                <th class="px-6 py-3 text-center w-32">Aksi</th>
+            </tr>`;
+    } else if (currentMenu === "mutasi-keluar") {
+        thead.innerHTML = `
+            <tr>
+                <th class="px-6 py-3 text-center w-16">No</th>
+                <th class="px-6 py-3">Nama Lengkap</th>
+                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
+                <th class="px-6 py-3">Sekolah Tujuan</th>
+                <th class="px-6 py-3">Alasan Keluar</th>
+                <th class="px-6 py-3">Tanggal Keluar</th>
+                <th class="px-6 py-3 text-center w-32">Aksi</th>
+            </tr>`;
+    } else {
+        // Default Murid Aktif Kelas
+        thead.innerHTML = `
+            <tr>
+                <th class="px-6 py-3 text-center w-16">No</th>
+                <th class="px-6 py-3">Nama Lengkap</th>
+                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
+                <th class="px-6 py-3">JK</th>
+                <th class="px-6 py-3">Tempat, Tanggal Lahir</th>
+                <th class="px-6 py-3 text-center w-32">Aksi</th>
+            </tr>`;
+    }
+
+    // 2. JIKA DATA KOSONG
     if (dataList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400"><i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>Tidak ada data murid untuk ditampilkan.</td></tr>`;
+        let totalKolom = thead.querySelectorAll('th').length;
+        tbody.innerHTML = `<tr><td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-400"><i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>Tidak ada data murid untuk ditampilkan.</td></tr>`;
         return;
     }
 
+    // 3. RENDER DATA BARIS
     dataList.forEach((row, index) => {
         let barisNomor = (currentPage - 1) * rowsPerPage + (index + 1);
-        let nama = row.nama || '-';
-        let nis = row.nis || '-';
-        let jk = row.jk || '-';
-        let nisn = row.nisn || '-';
-        let tmpt = row.tmpt_lahir || '';
-        let tgl = row.tgl_lahir || '';
-        let ttl = tmpt + (tgl ? ', ' + tgl : '');
-
         let tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50 transition";
-        tr.innerHTML = `
-            <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
-            <td class="px-6 py-3 font-semibold text-gray-800">${nama}</td>
-            <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${nisn} <br> NIS: ${nis}</td>
-            <td class="px-6 py-3">
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${jk}</span>
-            </td>
-            <td class="px-6 py-3 text-gray-600">${ttl}</td>
-            <td class="px-6 py-3 text-center space-x-1">
-                <button onclick="bukaModalAksi('${nama}', '${row.kelas || userKelasAkses}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition">
-                    <i class="fa-solid fa-gear"></i> Aksi
-                </button>
-            </td>
-        `;
+
+        if (currentMenu === "siswa-lulus") {
+            tr.innerHTML = `
+                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
+                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
+                <td class="px-6 py-3 text-gray-600 font-medium">${row.thn_ajaran_lulus || '-'}</td>
+                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.no_ijazah || '-'}</td>
+                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Lulus')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
+        } else if (currentMenu === "mutasi-masuk") {
+            tr.innerHTML = `
+                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                <td class="px-6 py-3 text-gray-500 font-mono text-xs">${row.nisn || '-'}</td>
+                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
+                <td class="px-6 py-3 text-gray-600">${row.sekolah_asal || '-'}</td>
+                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.tgl_masuk || '-'}</td>
+                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
+        } else if (currentMenu === "mutasi-keluar") {
+            tr.innerHTML = `
+                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
+                <td class="px-6 py-3 text-gray-600 font-medium">${row.sekolah_tujuan || '-'}</td>
+                <td class="px-6 py-3 text-gray-600 italic text-xs">${row.alasan_mutasi || '-'}</td>
+                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.tgl_keluar || '-'}</td>
+                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
+        } else {
+            // Default Murid Aktif Kelas
+            let ttl = (row.tmpt_lahir || '') + (row.tgl_lahir ? ', ' + row.tgl_lahir : '');
+            tr.innerHTML = `
+                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
+                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
+                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
+                <td class="px-6 py-3 text-gray-600">${ttl || '-'}</td>
+                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas || userKelasAkses}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i> Aksi</button></td>`;
+        }
         tbody.appendChild(tr);
     });
+}
+
+function updateSidebarUI(activeId) {
+    const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
+    allLinks.forEach(link => link.classList.remove('active'));
+
+    if (activeId === 'dashboard') {
+        const dashLink = document.getElementById('link-dashboard');
+        if (dashLink) dashLink.classList.add('active');
+    } else {
+        allLinks.forEach(link => {
+            const onClickAttr = link.getAttribute('onclick') || "";
+            if (onClickAttr.includes(`'${activeId}'`)) {
+                link.classList.add('active');
+            }
+        });
+    }
+}
+
+function showSection(id) {
+    document.getElementById('section-dashboard').classList.add('hidden');
+    document.getElementById('section-tabel-container').classList.add('hidden');
+
+    if (id === "dashboard") {
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        currentMenu = "dashboard";
+    } else {
+        document.getElementById('section-tabel-container').classList.remove('hidden');
+        currentMenu = id;
+    }
+
+    updateSidebarUI(id);
+    resetAndFilter();
+
+    let formatTitle = id.replaceAll('-', ' ').toUpperCase();
+    if (id === 'siswa-pribadi') formatTitle = "MURID AKTIF KELAS";
+    document.getElementById('section-title').innerText = formatTitle;
 }
 
 function nextPage() {
@@ -443,26 +536,6 @@ function changeRowsPerPage() {
 function resetAndFilter() {
     currentPage = 1;
     filterData();
-}
-
-function showSection(id) {
-    document.getElementById('section-dashboard').classList.add('hidden');
-    document.getElementById('section-tabel-container').classList.add('hidden');
-
-    // Menghilangkan status active lama di semua sidebar & submenu
-    document.querySelectorAll('.sidebar-link, .submenu-link').forEach(l => l.classList.remove('active'));
-
-    if (id === "dashboard") {
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        document.getElementById('link-dashboard').classList.add('active');
-        currentMenu = "dashboard";
-    } else {
-        document.getElementById('section-tabel-container').classList.remove('hidden');
-        currentMenu = id;
-        resetAndFilter();
-    }
-
-    document.getElementById('section-title').innerText = id.replaceAll('-', ' ').toUpperCase();
 }
 
 function toggleSidebar() {
