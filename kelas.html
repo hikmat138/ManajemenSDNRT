@@ -250,29 +250,34 @@
             })
         });
         const result = await response.json();
+        
+        // PENTING: Untuk debug, silakan cek F12 Console di browser Bapak
+        console.log("Respons Server Apps Script:", result);
 
-        // Perbaikan: Memeriksa properti result.data dan result.data.siswa sesuai format respons dari backend GAS
-        if (result.status === "success" && result.data && result.data.siswa) {
+        if (result.status === "success" && result.data) {
+            // Ambil array siswa dari properti objek bersarang result.data.siswa
+            // Jika undefined atau kosong, default ke array kosong [] agar tidak crash
+            cacheDataMurid = result.data.siswa || []; 
             
-            // Simpan data array siswa aktif ke dalam cache lokal frontend
-            cacheDataMurid = result.data.siswa; 
-            
-            // Opsional: Jika Bapak ingin menyimpan data mutasi atau lulus ke cache frontend agar bisa dipakai nanti
-            cacheMutasiMasuk = result.data.mutasi_masuk || [];
-            cacheMutasiKeluar = result.data.mutasi_keluar || [];
-            cacheSiswaLulus = result.data.siswa_lulus || [];
+            // Opsional: Ambil data mutasi dan kelulusan untuk keperluan analitik dashboard
+            if (typeof cacheMutasiMasuk !== 'undefined') cacheMutasiMasuk = result.data.mutasi_masuk || [];
+            if (typeof cacheMutasiKeluar !== 'undefined') cacheMutasiKeluar = result.data.mutasi_keluar || [];
+            if (typeof cacheSiswaLulus !== 'undefined') cacheSiswaLulus = result.data.siswa_lulus || [];
 
-            // Jalankan fungsi render UI komponen dashboard
+            // Pemicu render komponen UI Dashboard
             renderDashboardAnalitik();
-            if (menuAktif !== 'dashboard') renderTabelAtributDapodik();
+            
+            // Pemicu render tabel atribut data jika menu aktif bukan dashboard
+            if (menuAktif !== 'dashboard') {
+                renderTabelAtributDapodik();
+            }
             
             document.getElementById('main-content-desc').innerText = `Sinkronisasi sukses. Ditemukan ${cacheDataMurid.length} murid aktif di kelas Bapak.`;
         } else {
-            // Menampilkan pesan error spesifik dari server jika gagal
-            alert("Gagal membaca pangkalan data kelas: " + (result.message || "Struktur respons data tidak valid."));
+            alert("Gagal membaca pangkalan data kelas: " + (result.message || "Struktur data tidak dikenal."));
         }
     } catch (err) {
-        console.error(err);
+        console.error("Error Frontend:", err);
         alert("Koneksi gagal terhubung dengan peladen API Google Apps Script.");
     }
 }
