@@ -682,7 +682,6 @@ function renderTabelSiswa(dataList) {
         switch (currentMenu) {
             case "siswa-pribadi":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600 font-medium">${row.kelas || '-'}</td>
                     <td class="p-3 font-mono text-xs text-gray-500">${row.nis || '-'}</td>
@@ -701,7 +700,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-alamat":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -722,7 +720,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-keadaan":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -740,7 +737,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-ortu":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -771,7 +767,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-periodik":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -786,7 +781,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-registrasi":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 font-bold text-blue-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -804,7 +798,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-kontak":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -817,7 +810,6 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-lulus":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -829,7 +821,6 @@ function renderTabelSiswa(dataList) {
 
             case "mutasi-masuk":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-500 font-mono text-xs">${row.nisn || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
@@ -841,7 +832,6 @@ function renderTabelSiswa(dataList) {
 
             case "mutasi-keluar":
                 tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
                     <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
                     <td class="p-3 text-gray-600 font-medium">${row.sekolah_tujuan || '-'}</td>
