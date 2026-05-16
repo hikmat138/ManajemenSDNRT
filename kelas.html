@@ -480,55 +480,112 @@ document.addEventListener("DOMContentLoaded", loadData);
 
 async function loadData() {
     try {
-        document.getElementById('stat-murid').innerText = "Memuat...";
+        // Beri indikasi loading pada elemen statistik utama
+        const statMurid = document.getElementById('stat-murid');
+        if (statMurid) statMurid.innerText = "Memuat...";
         
+        // 1. Tarik seluruh data dari web app Apps Script
         const res = await fetch(`${API_URL}?action=getAllData`);
         const result = await res.json();
         
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
+        // 2. Simpan ke dalam variabel global (pastikan lowercase sesuai objek server)
         masterData = result.data.siswa || [];
         masterDataLulus = result.data.siswa_lulus || [];
         masterDataMutasiMasuk = result.data.mutasi_masuk || [];
         masterDataMutasiKeluar = result.data.mutasi_keluar || [];
 
-        // Penyesuaian Identitas Guru Login berdasarkan data sheet users
-        let userAktif = result.data.users?.[1] || result.data.users?.[0]; 
-        if (userAktif) {
-            userKelasAkses = userAktif.kelas_akses;
-            document.getElementById('admin-name').innerText = userAktif.nama;
-            document.getElementById('admin-kelas').innerText = "Kelas: " + userAktif.kelas_akses;
-            document.getElementById('userMenuBtn').innerText = userAktif.nama.charAt(0);
+        // 3. AMBIL IDENTITAS USER YANG SEDANG LOGIN (Dari Session/LocalStorage)
+        // Saat login berhasil, pastikan Bapak sudah menyimpan data user dengan: localStorage.setItem('userLogon', JSON.stringify(user))
+        const sessionUser = localStorage.getItem('userLogon');
+        
+        if (sessionUser) {
+            let userAktif = JSON.parse(sessionUser);
+            
+            // Set hak akses global untuk filter kelas murid
+            userKelasAkses = userAktif.kelas_akses || "-"; 
+            userRoleAktif = userAktif.role || "guru"; // Menyimpan role admin/guru
+
+            // Render ke UI Header/Sidebar Panel Admin
+            const adminNameEl = document.getElementById('admin-name');
+            const adminKelasEl = document.getElementById('admin-kelas');
+            const userMenuBtnEl = document.getElementById('userMenuBtn');
+
+            if (adminNameEl) adminNameEl.innerText = userAktif.nama || "Pengguna";
+            if (adminKelasEl) {
+                adminKelasEl.innerText = userAktif.role === "admin" ? "Akses: Semua Kelas (Admin)" : "Kelas: " + userAktif.kelas_akses;
+            }
+            if (userMenuBtnEl && userAktif.nama) {
+                userMenuBtnEl.innerText = userAktif.nama.charAt(0).toUpperCase();
+            }
+        } else {
+            // Jika tidak ada session login, tendang balik ke halaman login.html
+            window.location.href = "login.html";
+            return;
         }
 
-        updateStats();
-        filterData();
-        setTimeout(initCharts, 200);
+        // 4. JALANKAN PROSES FILTER DAN GRAFIK DASHBOARD
+        updateStats(); // Memperbarui angka total murid, mutasi, dll.
+        filterData();  // Memfilter data murid berdasarkan menu & kelas akses, lalu otomatis memanggil renderTabelSiswa()
+        
+        // Beri jeda sedikit agar DOM tabel siap sebelum grafik Chart.js digambar
+        setTimeout(initCharts, 300);
 
     } catch (err) {
-        console.error(err);
-        alert("Gagal terhubung dengan Database Spreadsheet. Pastikan koneksi internet stabil.");
+        console.error("Detail Error LoadData: ", err);
+        alert("Gagal terhubung dengan Database Spreadsheet.\n\nTips:\n1. Pastikan koneksi internet stabil.\n2. Periksa kembali URL API_URL Apps Script Anda.");
     }
 }
 
 function updateStats() {
-    let aktifKelas = masterData.filter(s => 
-        String(s.status_aktif).toLowerCase() === "aktif" && 
-        String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase()
-    );
+    // 1. FILTER MURID AKTIF BERDASARKAN ROLE LOGIN (GURU ATAU ADMIN)
+    let aktifKelas = masterData.filter(s => {
+        let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
+        
+        // Jika yang login adalah Admin (Akses Semua Kelas)
+        if (userRoleAktif === "admin" || userKelasAkses === "-") {
+            return isAktif; // Ambil semua yang berstatus aktif tanpa pandang kelas
+        } else {
+            // Jika yang login Guru Kelas, filter sesuai kelasnya saja (misal: "1A")
+            return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+        }
+    });
 
+    // 2. HITUNG RASIO JENIS KELAMIN (L / P)
     let l = aktifKelas.filter(x => x.jk === "L" || x.jk === "Laki-laki").length;
     let p = aktifKelas.filter(x => x.jk === "P" || x.jk === "Perempuan").length;
 
-    document.getElementById('stat-murid').innerText = aktifKelas.length + " Murid";
-    document.getElementById('L').innerText = l + " Orang";
-    document.getElementById('P').innerText = p + " Orang";
+    // 3. AMBIL DATA REKAP ALUMNI & MUTASI (Opsional untuk Widget Dashboard Bapak)
+    let totalLulus = masterDataLulus.length;
+    let totalMutasiMasuk = masterDataMutasiMasuk.length;
+    let totalMutasiKeluar = masterDataMutasiKeluar.length;
+
+    // 4. RENDER / MASUKKAN DATA KE WIDGET HTML DASHBOARD
+    const statMuridEl = document.getElementById('stat-murid');
+    const lEl = document.getElementById('L');
+    const pEl = document.getElementById('P');
+    
+    // Elemen tambahan pendukung ringkasan data dashboard (jika ada di HTML Bapak)
+    const statLulusEl = document.getElementById('stat-lulus');
+    const statMasukEl = document.getElementById('stat-mutasi-masuk');
+    const statKeluarEl = document.getElementById('stat-mutasi-keluar');
+
+    if (statMuridEl) statMuridEl.innerText = aktifKelas.length + " Murid";
+    if (lEl) lEl.innerText = l + " Orang";
+    if (pEl) pEl.innerText = p + " Orang";
+    
+    // Render angka alumni dan mutasi ke card dashboard agar tidak statis
+    if (statLulusEl) statLulusEl.innerText = totalLulus + " Alumni";
+    if (statMasukEl) statMasukEl.innerText = totalMutasiMasuk + " Kasus";
+    if (statKeluarEl) statKeluarEl.innerText = totalMutasiKeluar + " Kasus";
 }
 
 function filterData() {
     let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
     let source = [];
 
+    // 1. TENTUKAN SUMBER DATA BERDASARKAN MENU YANG SEDANG DIBUKA
     if (currentMenu === "siswa-lulus") {
         source = masterDataLulus;
     } else if (currentMenu === "mutasi-masuk") {
@@ -536,15 +593,35 @@ function filterData() {
     } else if (currentMenu === "mutasi-keluar") {
         source = masterDataMutasiKeluar;
     } else {
-        // Default Murid Aktif Kelas Guru
-        source = masterData.filter(s => String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase());
+        // Menu Murid Aktif (siswa-pribadi, siswa-alamat, siswa-ortu, dll.)
+        source = masterData.filter(s => {
+            // Pastikan hanya menarik murid yang berstatus Aktif
+            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
+            
+            // Cek Hak Akses: Jika Admin atau kelas_akses "-", loloskan seluruh kelas
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return isAktif;
+            } else {
+                // Jika Guru Kelas, filter wajib ketat berdasarkan kelasnya saja
+                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
     }
 
+    // 2. PROSES PENCARIAN (Bisa berdasarkan Nama, NISN, atau NIS)
     filteredData = source.filter(s => {
         let nama = String(s.nama || "").toLowerCase();
-        return nama.includes(keyword);
+        let nisn = String(s.nisn || "").toLowerCase();
+        let nis = String(s.nis || "").toLowerCase();
+        
+        // Memungkinkan user mencari berdasarkan nama ataupun nomor identitas murid
+        return nama.includes(keyword) || nisn.includes(keyword) || nis.includes(keyword);
     });
 
+    // Setiap kali user mengubah filter menu atau mengetik kata kunci baru, reset halaman ke halaman 1
+    currentPage = 1; 
+
+    // Jalankan paginasi untuk memotong data dan merender tabel
     updatePagination();
 }
 
@@ -552,12 +629,26 @@ function updatePagination() {
     let start = (currentPage - 1) * rowsPerPage;
     let end = start + rowsPerPage;
     
-    renderTabelSiswa(filteredData.slice(start, end));
+    // Potong data hasil filter untuk halaman ini saja (misal baris 1 sampai 10)
+    let dataPerHalaman = filteredData.slice(start, end);
+    
+    // PANGGIL RENDER TABEL UTAMA YANG SUDAH KITA PERBAIKI KOLOMNYA
+    renderTabelSiswa(dataPerHalaman);
 
-    document.getElementById('pagination-info').innerText = 
-        `Menampilkan ${filteredData.length == 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
+    // RENDERING INFORMASI NAVIGASI PAGINASI DI BAWAH TABEL
+    const infoEl = document.getElementById('pagination-info');
+    if (infoEl) {
+        let textTampil = `Menampilkan ${filteredData.length === 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
+        infoEl.innerText = textTampil;
+    }
+    
+    // Opsi Tambahan: Update status tombol 'Next' dan 'Previous' agar tidak diklik jika halaman habis
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    
+    if (btnPrev) btnPrev.disabled = (currentPage === 1);
+    if (btnNext) btnNext.disabled = (end >= filteredData.length);
 }
-
 function renderTabelSiswa(dataList) {
     // 1. Tentukan target tbody berdasarkan menu aktif saat ini (currentMenu)
     let targetTbodyId = 'tbody-data'; // default cadangan
