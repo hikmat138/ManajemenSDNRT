@@ -582,7 +582,7 @@ function filterData() {
     let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
     let source = [];
 
-    // 1. TENTUKAN SUMBER DATA BERDASARKAN MENU YANG SEDANG DIBUKA
+    // 1. Tentukan sumber data berdasarkan menu aktif
     if (currentMenu === "siswa-lulus") {
         source = masterDataLulus;
     } else if (currentMenu === "mutasi-masuk") {
@@ -590,61 +590,44 @@ function filterData() {
     } else if (currentMenu === "mutasi-keluar") {
         source = masterDataMutasiKeluar;
     } else {
-        // Menu Murid Aktif (siswa-pribadi, siswa-alamat, siswa-ortu, dll.)
+        // Filter Murid Aktif
         source = masterData.filter(s => {
-            // Pastikan hanya menarik murid yang berstatus Aktif
             let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
-            
-            // Cek Hak Akses: Jika Admin atau kelas_akses "-", loloskan seluruh kelas
             if (userRoleAktif === "admin" || userKelasAkses === "-") {
                 return isAktif;
             } else {
-                // Jika Guru Kelas, filter wajib ketat berdasarkan kelasnya saja
                 return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
             }
         });
     }
 
-    // 2. PROSES PENCARIAN (Bisa berdasarkan Nama, NISN, atau NIS)
+    // 2. Filter berdasarkan kata kunci pencarian
     filteredData = source.filter(s => {
         let nama = String(s.nama || "").toLowerCase();
         let nisn = String(s.nisn || "").toLowerCase();
         let nis = String(s.nis || "").toLowerCase();
-        
-        // Memungkinkan user mencari berdasarkan nama ataupun nomor identitas murid
         return nama.includes(keyword) || nisn.includes(keyword) || nis.includes(keyword);
     });
 
-    // Setiap kali user mengubah filter menu atau mengetik kata kunci baru, reset halaman ke halaman 1
-    currentPage = 1; 
-
-    // Jalankan paginasi untuk memotong data dan merender tabel
-    updatePagination();
+    currentPage = 1; // Reset ke halaman pertama setiap kali filter berubah
+    updatePagination(); // <--- Panggil fungsi paginasi
 }
 
 function updatePagination() {
     let start = (currentPage - 1) * rowsPerPage;
     let end = start + rowsPerPage;
     
-    // Potong data hasil filter untuk halaman ini saja (misal baris 1 sampai 10)
+    // Potong data untuk halaman aktif saat ini
     let dataPerHalaman = filteredData.slice(start, end);
     
-    // PANGGIL RENDER TABEL UTAMA YANG SUDAH KITA PERBAIKI KOLOMNYA
+    // PANGGIL FUNGSI RENDER TABEL UTAMA
     renderTabelSiswa(dataPerHalaman);
 
-    // RENDERING INFORMASI NAVIGASI PAGINASI DI BAWAH TABEL
+    // Update info teks di bawah tabel
     const infoEl = document.getElementById('pagination-info');
     if (infoEl) {
-        let textTampil = `Menampilkan ${filteredData.length === 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
-        infoEl.innerText = textTampil;
+        infoEl.innerText = `Menampilkan ${filteredData.length === 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
     }
-    
-    // Opsi Tambahan: Update status tombol 'Next' dan 'Previous' agar tidak diklik jika halaman habis
-    const btnPrev = document.getElementById('btn-prev');
-    const btnNext = document.getElementById('btn-next');
-    
-    if (btnPrev) btnPrev.disabled = (currentPage === 1);
-    if (btnNext) btnNext.disabled = (end >= filteredData.length);
 }
 function renderTabelSiswa(dataList) {
     // 1. Tentukan target tbody berdasarkan menu aktif saat ini (currentMenu)
@@ -661,11 +644,11 @@ function renderTabelSiswa(dataList) {
         targetTbodyId = `tbody-${currentMenu}`;
     }
 
-    const tbody = document.getElementById(targetTbodyId);
-    if (!tbody) return; // Keamanan jika elemen id belum termuat di HTML
-
-    // 2. Kosongkan isi tabel sebelum diisi data baru (proses reset)
-    tbody.innerHTML = "";
+    const tbody = document.getElementById('tbody-data');
+    if (!tbody) {
+        console.error("Elemen tbody-data tidak ditemukan di HTML!");
+        return; 
+    }
 
     // 3. JIKA DATA KOSONG
     if (!dataList || dataList.length === 0) {
