@@ -747,7 +747,7 @@ let end=
 start+
 rowsPerPage;
 
-renderTable(
+renderTableSiswa(
 filteredData.slice(
 start,
 end
@@ -838,124 +838,88 @@ filterData();
 TABEL
 ==================== */
 
-function renderTable(list){
+function renderTabelSiswa() {
+    const tbody = document.getElementById('tabel-body-siswa');
+    tbody.innerHTML = "";
 
-let tbody=
-document.getElementById(
-'tbody-data'
-);
+    if (DATA_MURID_LOKAL.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400"><i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>Tidak ada data murid di kelas ini.</td></tr>`;
+        return;
+    }
 
-let thead=
-document.getElementById(
-'thead-data'
-);
+    DATA_MURID_LOKAL.forEach((row, index) => {
+        let barisAsli = row[0];   // ID baris spreadsheet disimpan backend pada index 0
+        
+        // PEMETAAN KOLOM BERDASARKAN SHEET SISWA SISWA.CSV ASLI:
+        let nama = row[2] || '-';  // Kolom B spreadsheet asli (Indeks 2 setelah ID Baris disisipkan)
+        let nis  = row[3] || '-';  // Kolom C spreadsheet asli
+        let jk   = row[4] || '-';  // Kolom D spreadsheet asli (L/P)
+        let nisn = row[5] || '-';  // Kolom E spreadsheet asli
+        let ttl  = (row[6] ? row[6] : '') + (row[7] ? ', ' + row[7] : '-'); // Tempat & Tgl Lahir (Kolom F & G)
 
-let cols=[];
-
-
-if(
-currentMenu==="siswa-pribadi"
-){
-
-cols=[
-'nama',
-'kelas',
-'nis',
-'nisn',
-'jk',
-'agama',
-'alamat'
-];
-
+        let tr = document.createElement('tr');
+        tr.className = "border-b border-gray-200 hover:bg-gray-50 transition";
+        tr.innerHTML = `
+            <td class="px-6 py-3 text-center font-medium text-gray-400">${index + 1}</td>
+            <td class="px-6 py-3 font-semibold text-gray-800">${nama}</td>
+            <td class="px-6 py-3 text-gray-500">NISN: ${nisn} / NIS: ${nis}</td>
+            <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${jk.trim().toUpperCase() === 'L' ? 'bg-teal-50 text-teal-700' : 'bg-pink-50 text-pink-700'}">${jk}</span></td>
+            <td class="px-6 py-3 text-gray-500">${ttl}</td>
+            <td class="px-6 py-3 text-center space-x-2">
+                <button onclick="bukaModalEditSiswa(${barisAsli})" class="bg-gray-100 text-gray-700 hover:bg-teal-600 hover:text-white px-2.5 py-1 rounded font-medium transition"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <button onclick="naikKelasIndividu(${barisAsli}, '${nama.replace(/'/g, "\\'")}')" class="bg-teal-50 text-teal-700 hover:bg-teal-600 hover:text-white px-2.5 py-1 rounded font-medium transition"><i class="fa-solid fa-turn-up"></i> Naik</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
-else if(
-currentMenu==="siswa-periodik"
-){
+function hitungDanRenderStatistik() {
+    let total = DATA_MURID_LOKAL.length;
+    let l = 0; let p = 0;
+    
+    DATA_MURID_LOKAL.forEach(row => {
+        let jk = String(row[4]).trim().toUpperCase(); // Kolom D (JK) tergeser ke index 4 karena ada ID baris tambahan
+        if (jk === 'L') l++;
+        else if (jk === 'P') p++;
+    });
 
-cols=[
-'nama',
-'umur',
-'bb',
-'tb'
-];
+    document.getElementById('card-total').innerText = total;
+    document.getElementById('card-laki').innerText = l;
+    document.getElementById('card-perempuan').innerText = p;
 
+    // Render ulang Pie Chart
+    const ctx = document.getElementById('chartGender').getContext('2d');
+    if (CHART_GENDER_OBJ) CHART_GENDER_OBJ.destroy();
+    
+    CHART_GENDER_OBJ = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Laki-Laki', 'Perempuan'],
+            datasets: [{
+                data: [l, p],
+                backgroundColor: ['#009688', '#ec4899'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold' },
+                    formatter: (value, ctx) => {
+                        let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        return sum > 0 ? (value * 100 / sum).toFixed(1) + "%" : "0%";
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
 }
-
-else if(
-currentMenu==="siswa-lulus"
-){
-
-cols=[
-'nama',
-'kelas',
-'nis',
-'nisn',
-'tgl_lulus'
-];
-
-}
-
-else{
-
-cols=[
-'nama',
-'kelas',
-'jk'
-];
-
-}
-
-
-thead.innerHTML=
-
-"<tr>"+
-
-cols.map(
-
-x=>
-
-`<th class="p-3">
-
-${x}
-
-</th>`
-
-).join("")
-
-+
-
-"</tr>";
-
-
-tbody.innerHTML=
-
-list.map(
-
-s=>
-
-"<tr>"+
-
-cols.map(
-
-c=>
-
-`<td class="p-3">
-
-${s[c]||'-'}
-
-</td>`
-
-).join("")
-
-+
-
-"</tr>"
-
-).join("");
-
-}
-
 
 
 /* ====================
