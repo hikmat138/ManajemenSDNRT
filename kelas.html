@@ -391,6 +391,9 @@
     </div>
 
     <script>
+        // VARIABLE ENDPOINT APPS SCRIPT ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
+
         let DATA_MENTAH = [];
         let kelasUser = "";
         let chartInstance = null;
@@ -408,9 +411,8 @@
 
         async function ambilDataSistem() {
             try {
-                // Mengirim payload kosong ke backend API ts.docx, 
-                // data otomatis difilter oleh backend berdasarkan session/kelas login pengakses
-                const response = await fetch('<?= ScriptApp.getService().getUrl(); ?>', {
+                // Mengirim aksi GET_DATA_AWAL langsung ke url API_URL
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'GET_DATA_AWAL' })
                 });
@@ -622,7 +624,7 @@
             buildTable(key);
         }
 
-        // AKSI MODAL EDIT SISWA
+        // AKSI MODAL EDIT SISWA PRIBADI
         function bukaEditSiswa(nis) {
             let s = DATA_MENTAH.find(item => item.nis == nis);
             if (!s) return;
@@ -653,7 +655,7 @@
             };
 
             try {
-                const res = await fetch('<?= ScriptApp.getService().getUrl(); ?>', {
+                const res = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'EDIT_SISWA',
@@ -695,10 +697,10 @@
             };
 
             try {
-                const res = await fetch('<?= ScriptApp.getService().getUrl(); ?>', {
+                const res = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({
-                        action: 'EDIT_SISWA_PERIODIK', // Sesuaikan action ini dengan fungsi pembaruan biometrik di ts.docx Anda
+                        action: 'EDIT_SISWA_PERIODIK',
                         nis: nis,
                         payload: payload
                     })
