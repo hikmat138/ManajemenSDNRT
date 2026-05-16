@@ -147,126 +147,317 @@
 
 <div class="flex h-screen">
     <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
-        <div class="p-6">
-            <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL GURU</h1>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
-        </div>
-        
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition">
-                <i class="fas fa-home mr-3 w-5"></i> Dashboard
-            </a>
+    <div class="p-6">
+        <h1 class="text-xl font-bold text-blue-600 uppercase">PANEL GURU</h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 font-bold">SD NEGERI RANCA TALES</p>
+    </div>
+    
+    <nav class="flex-1 px-4 space-y-1 pb-6">
+        <a href="#" onclick="showSection('dashboard')" id="link-dashboard" class="sidebar-link active flex items-center p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
+            <i class="fas fa-home mr-3 w-5 text-blue-500"></i> Dashboard
+        </a>
 
-            <div>
-                <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5"></i> Data Murid</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-murid" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('siswa-pribadi')" class="submenu-link">Murid Aktif Kelas</div>
-                    <div onclick="showSection('siswa-lulus')" class="submenu-link">Alumni / Lulus</div>
-                </div>
+        <div>
+            <button onclick="toggleSubmenu('sub-murid')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
+                <span class="flex items-center"><i class="fas fa-user-graduate mr-3 w-5 text-blue-500"></i> Data Murid Aktif</span>
+                <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="icon-murid"></i>
+            </button>
+            <div id="sub-murid" class="hidden pl-8 pr-2 mt-1 space-y-1 border-l-2 border-slate-100 ml-5">
+                <div onclick="showSection('siswa-pribadi')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">1. Identitas Pribadi</div>
+                <div onclick="showSection('siswa-alamat')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">2. Data Alamat & GPS</div>
+                <div onclick="showSection('siswa-keadaan')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">3. Data Keadaan</div>
+                <div onclick="showSection('siswa-ortu')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">4. Data Orang Tua / Wali</div>
+                <div onclick="showSection('siswa-periodik')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">5. Data Periodik</div>
+                <div onclick="showSection('siswa-registrasi')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">6. Registrasi & Kelulusan</div>
+                <div onclick="showSection('siswa-kontak')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">7. Kontak Murid</div>
             </div>
+        </div>
 
-            <div>
-                <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition">
-                    <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5"></i> Riwayat Mutasi</span>
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                </button>
-                <div id="sub-mutasi" class="hidden space-y-1 mt-1">
-                    <div onclick="showSection('mutasi-masuk')" class="submenu-link">Mutasi Masuk</div>
-                    <div onclick="showSection('mutasi-keluar')" class="submenu-link">Mutasi Keluar</div>
-                </div>
-            </div>   
-        </nav>
-    </aside>
+        <a href="#" onclick="showSection('siswa-lulus')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
+            <i class="fas fa-graduation-cap mr-3 w-5 text-blue-500"></i> Alumni / Lulus
+        </a>
+
+        <div>
+            <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
+                <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5 text-blue-500"></i> Riwayat Mutasi</span>
+                <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="icon-mutasi"></i>
+            </button>
+            <div id="sub-mutasi" class="hidden pl-8 pr-2 mt-1 space-y-1 border-l-2 border-slate-100 ml-5">
+                <div onclick="showSection('mutasi-masuk')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">Mutasi Masuk</div>
+                <div onclick="showSection('mutasi-keluar')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">Mutasi Keluar</div>
+            </div>
+        </div>   
+    </nav>
+</aside>
 
     <main class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
-            <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <div class="text-right">
-                    <p id="admin-name" class="text-sm font-bold uppercase italic">Memuat...</p>
-                    <p id="admin-kelas" class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Kelas: -</p>
-                </div>
-                <div class="relative">
-                    <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase" id="userMenuBtn">-</button>
-                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
-                        <a href="#" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
-                            <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
-            
-            <div id="section-dashboard" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid Terdaftar</p>
-                        <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Laki-Laki</p>
-                        <h4 id="L" class="text-2xl font-bold text-indigo-600 mt-2">Memuat...</h4>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
-                        <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Perempuan</p>
-                        <h4 id="P" class="text-2xl font-bold text-red-600 mt-2">Memuat...</h4>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-4 rounded-xl border shadow-sm h-[300px]">
-                        <canvas id="chartGender"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-tabel-container" class="hidden space-y-4">
-                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
-                    <div class="flex flex-wrap gap-4 justify-between items-center p-4 border-b bg-gray-50/50">
-                        <div class="flex gap-2 items-center">
-                            <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none">
-                                <option value="10">10 Baris</option>
-                                <option value="50">50 Baris</option>
-                                <option value="100">100 Baris</option>
-                            </select>
-                            <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama Murid..." class="border p-2 rounded-lg text-sm w-64 outline-none">
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto" style="max-height: 65vh;">
-                        <table class="w-full text-left border-collapse">
-                            <thead id="thead-kolom" class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
-                                </thead>
-                            <tbody id="tbody-data" class="text-sm divide-y bg-white">
-                                </tbody>
-                        </table>
-                    </div>
-
-                    <div class="p-4 border-t flex justify-between items-center bg-gray-50">
-                        <div id="pagination-info" class="text-sm text-gray-500 font-medium">
-                            Menampilkan 0 - 0 dari 0 murid
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-50 transition">Sebelumnya</button>
-                            <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-50 transition">Selanjutnya</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    <header class="bg-white border-b p-4 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <h2 id="section-title" class="font-bold text-gray-700 uppercase">Dashboard Utama</h2>
         </div>
-    </main>
+        
+        <div class="flex items-center space-x-3">
+            <div class="text-right">
+                <p id="admin-name" class="text-sm font-bold uppercase italic">Memuat...</p>
+                <p id="admin-kelas" class="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">Kelas: -</p>
+            </div>
+            <div class="relative">
+                <button onclick="toggleUserMenu()" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold uppercase" id="userMenuBtn">-</button>
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50">
+                    <a href="#" onclick="prosesLogout()" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition font-semibold">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Keluar / Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6">
+        
+        <div id="section-dashboard" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-blue-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Murid Terdaftar</p>
+                    <h4 id="stat-murid" class="text-2xl font-bold text-blue-600 mt-2">Memuat...</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-indigo-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Laki-Laki</p>
+                    <h4 id="L" class="text-2xl font-bold text-indigo-600 mt-2">Memuat...</h4>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-l-4 border-l-red-600 shadow-sm">
+                    <p class="text-[10px] text-gray-500 font-bold uppercase">Jumlah Perempuan</p>
+                    <h4 id="P" class="text-2xl font-bold text-red-600 mt-2">Memuat...</h4>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-xl border shadow-sm h-[300px]">
+                    <canvas id="chartGender"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="global-filter-container" class="hidden bg-white p-4 rounded-xl border shadow-sm flex flex-wrap gap-4 justify-between items-center">
+            <div class="flex gap-2 items-center w-full sm:w-auto">
+                <select id="row-per-page" onchange="changeRowsPerPage()" class="border p-2 rounded-lg text-xs font-bold uppercase outline-none bg-gray-50">
+                    <option value="10">10 Baris</option>
+                    <option value="50">50 Baris</option>
+                    <option value="100">100 Baris</option>
+                </select>
+                <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama Murid..." class="border p-2 rounded-lg text-sm w-full sm:w-64 outline-none focus:border-blue-500">
+            </div>
+            <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase">
+                Menampilkan 0 - 0 dari 0 murid
+            </div>
+        </div>
+
+
+        <div id="section-siswa-pribadi" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">NIS</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">NISN</th>
+                            <th class="p-3 border-b">Tempat Lahir</th>
+                            <th class="p-3 border-b">Tanggal Lahir</th>
+                            <th class="p-3 border-b">NIK</th>
+                            <th class="p-3 border-b">Agama</th>
+                            <th class="p-3 border-b">No. Akte</th>
+                            <th class="p-3 border-b">Anak Ke</th>
+                            <th class="p-3 border-b">Status Aktif</th>
+                            <th class="p-3 border-b text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-pribadi" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-alamat" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">Alamat Rumah</th>
+                            <th class="p-3 border-b">RT</th>
+                            <th class="p-3 border-b">RW</th>
+                            <th class="p-3 border-b">Kelurahan</th>
+                            <th class="p-3 border-b">Kecamatan</th>
+                            <th class="p-3 border-b">Kodepos</th>
+                            <th class="p-3 border-b">Jenis Tinggal</th>
+                            <th class="p-3 border-b">Jarak (Km)</th>
+                            <th class="p-3 border-b">Titik Lintang</th>
+                            <th class="p-3 border-b">Titik Bujur</th>
+                            <th class="p-3 border-b">Status Aktif</th>
+                            <th class="p-3 border-b text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-alamat" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-keadaan" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">No. KK</th>
+                            <th class="p-3 border-b">Jml Saudara</th>
+                            <th class="p-3 border-b">Transportasi</th>
+                            <th class="p-3 border-b">No. KIP</th>
+                            <th class="p-3 border-b">Layak PIP</th>
+                            <th class="p-3 border-b">Alasan PIP</th>
+                            <th class="p-3 border-b">Kebutuhan Khusus</th>
+                            <th class="p-3 border-b">Umur</th>
+                            <th class="p-3 border-b text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-keadaan" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-ortu" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b bg-blue-50/50">Nama Murid</th>
+                            <th class="p-3 border-b bg-blue-50/50">Kelas</th>
+                            <th class="p-3 border-b bg-blue-50/50">JK</th>
+                            <th class="p-3 border-b border-l-2 bg-gray-50">Nama Ayah</th>
+                            <th class="p-3 border-b bg-gray-50">NIK Ayah</th>
+                            <th class="p-3 border-b bg-gray-50">Pendidikan</th>
+                            <th class="p-3 border-b bg-gray-50">Pekerjaan</th>
+                            <th class="p-3 border-b bg-gray-50">Penghasilan</th>
+                            <th class="p-3 border-b bg-gray-50">Disabilitas</th>
+                            <th class="p-3 border-b bg-gray-50">Tahun Lahir</th>
+                            <th class="p-3 border-b border-l-2 bg-rose-50/30">Nama Ibu</th>
+                            <th class="p-3 border-b bg-rose-50/30">NIK Ibu</th>
+                            <th class="p-3 border-b bg-rose-50/30">Pendidikan</th>
+                            <th class="p-3 border-b bg-rose-50/30">Pekerjaan</th>
+                            <th class="p-3 border-b bg-rose-50/30">Penghasilan</th>
+                            <th class="p-3 border-b bg-rose-50/30">Disabilitas</th>
+                            <th class="p-3 border-b bg-rose-50/30">Tahun Lahir</th>
+                            <th class="p-3 border-b border-l-2 bg-emerald-50/30">Nama Wali</th>
+                            <th class="p-3 border-b bg-emerald-50/30">NIK Wali</th>
+                            <th class="p-3 border-b bg-emerald-50/30">Pendidikan</th>
+                            <th class="p-3 border-b bg-emerald-50/30">Pekerjaan</th>
+                            <th class="p-3 border-b bg-emerald-50/30">Penghasilan</th>
+                            <th class="p-3 border-b bg-emerald-50/30">Disabilitas</th>
+                            <th class="p-3 border-b bg-emerald-50/30">Tahun Lahir</th>
+                            <th class="p-3 border-b text-center border-l-2">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-ortu" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-periodik" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">Berat Badan (kg)</th>
+                            <th class="p-3 border-b">Tinggi Badan (cm)</th>
+                            <th class="p-3 border-b">Lingkar Kepala (cm)</th>
+                            <th class="p-3 border-b">Hobi</th>
+                            <th class="p-3 border-b">Cita-Cita</th>
+                            <th class="p-3 border-b text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-periodik" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-registrasi" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="p-4 border-b bg-amber-50/40 flex justify-end gap-2">
+                <button onclick="prosesKenaikanMassal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase transition">
+                    <i class="fas fa-angles-up mr-1"></i> Naik Semua Kelas
+                </button>
+                <button id="btn-lulus-massal" onclick="prosesKelulusanMassal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase transition hidden">
+                    <i class="fas fa-graduation-cap mr-1"></i> Luluskan Kelas 6 Semua
+                </button>
+            </div>
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">Tanggal Masuk</th>
+                            <th class="p-3 border-b">Sekolah Asal</th>
+                            <th class="p-3 border-b">Status Aktif</th>
+                            <th class="p-3 border-b">Keterangan</th>
+                            <th class="p-3 border-b text-center">Aksi Individu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-registrasi" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="section-siswa-kontak" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
+            <div class="overflow-x-auto" style="max-height: 60vh;">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
+                        <tr>
+                            <th class="p-3 border-b">Nama Murid</th>
+                            <th class="p-3 border-b">Kelas</th>
+                            <th class="p-3 border-b">JK</th>
+                            <th class="p-3 border-b">Nomor HP / WA</th>
+                            <th class="p-3 border-b">Nomor Telp Rumah</th>
+                            <th class="p-3 border-b">Email Aktif</th>
+                            <th class="p-3 border-b text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-siswa-kontak" class="text-sm divide-y bg-white">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="global-pagination-nav" class="hidden flex justify-end gap-2 pt-2">
+            <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Sebelumnya</button>
+            <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Selanjutnya</button>
+        </div>
+
+    </div>
+</main>
 </div>
 
 <script>
@@ -368,149 +559,267 @@ function updatePagination() {
 }
 
 function renderTabelSiswa(dataList) {
-    const thead = document.getElementById('thead-kolom');
-    const tbody = document.getElementById('tbody-data');
+    // 1. Tentukan target tbody berdasarkan menu aktif saat ini (currentMenu)
+    let targetTbodyId = 'tbody-data'; // default cadangan
     
-    tbody.innerHTML = "";
-    thead.innerHTML = "";
-
-    // 1. TENTUKAN STRUKTUR HEADER KOLOM SEUAI MENU SEKARANG
     if (currentMenu === "siswa-lulus") {
-        thead.innerHTML = `
-            <tr>
-                <th class="px-6 py-3 text-center w-16">No</th>
-                <th class="px-6 py-3">Nama Lengkap</th>
-                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
-                <th class="px-6 py-3">JK</th>
-                <th class="px-6 py-3">Tahun Lulus</th>
-                <th class="px-6 py-3">No. Ijazah</th>
-                <th class="px-6 py-3 text-center w-32">Aksi</th>
-            </tr>`;
+        targetTbodyId = "tbody-siswa-lulus"; // Jika Bapak buat container khusus alumni
     } else if (currentMenu === "mutasi-masuk") {
-        thead.innerHTML = `
-            <tr>
-                <th class="px-6 py-3 text-center w-16">No</th>
-                <th class="px-6 py-3">Nama Lengkap</th>
-                <th class="px-6 py-3">NISN</th>
-                <th class="px-6 py-3">JK</th>
-                <th class="px-6 py-3">Sekolah Asal</th>
-                <th class="px-6 py-3">Tanggal Masuk</th>
-                <th class="px-6 py-3 text-center w-32">Aksi</th>
-            </tr>`;
+        targetTbodyId = "tbody-mutasi-masuk";
     } else if (currentMenu === "mutasi-keluar") {
-        thead.innerHTML = `
-            <tr>
-                <th class="px-6 py-3 text-center w-16">No</th>
-                <th class="px-6 py-3">Nama Lengkap</th>
-                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
-                <th class="px-6 py-3">Sekolah Tujuan</th>
-                <th class="px-6 py-3">Alasan Keluar</th>
-                <th class="px-6 py-3">Tanggal Keluar</th>
-                <th class="px-6 py-3 text-center w-32">Aksi</th>
-            </tr>`;
-    } else {
-        // Default Murid Aktif Kelas
-        thead.innerHTML = `
-            <tr>
-                <th class="px-6 py-3 text-center w-16">No</th>
-                <th class="px-6 py-3">Nama Lengkap</th>
-                <th class="px-6 py-3">Identitas (NISN/NIS)</th>
-                <th class="px-6 py-3">JK</th>
-                <th class="px-6 py-3">Tempat, Tanggal Lahir</th>
-                <th class="px-6 py-3 text-center w-32">Aksi</th>
-            </tr>`;
+        targetTbodyId = "tbody-mutasi-keluar";
+    } else if (currentMenu.startsWith("siswa-")) {
+        // Otomatis mengarah ke: tbody-siswa-pribadi, tbody-siswa-alamat, tbody-siswa-keadaan, dll.
+        targetTbodyId = `tbody-${currentMenu}`;
     }
 
-    // 2. JIKA DATA KOSONG
-    if (dataList.length === 0) {
-        let totalKolom = thead.querySelectorAll('th').length;
-        tbody.innerHTML = `<tr><td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-400"><i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>Tidak ada data murid untuk ditampilkan.</td></tr>`;
+    const tbody = document.getElementById(targetTbodyId);
+    if (!tbody) return; // Keamanan jika elemen id belum termuat di HTML
+
+    // 2. Kosongkan isi tabel sebelum diisi data baru (proses reset)
+    tbody.innerHTML = "";
+
+    // 3. JIKA DATA KOSONG
+    if (!dataList || dataList.length === 0) {
+        // Hitung jumlah kolom di atasnya agar tampilan pesan kosongnya penuh (colspan)
+        const tableElement = tbody.closest('table');
+        const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
+        
+        tbody.innerHTML = `<tr>
+            <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-400">
+                <i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>
+                Tidak ada data murid untuk ditampilkan pada kriteria ini.
+            </td>
+        </tr>`;
         return;
     }
 
-    // 3. RENDER DATA BARIS
+    // 4. LOOPING & RENDER DATA BARIS BERDASARKAN SUB-MENU
     dataList.forEach((row, index) => {
         let barisNomor = (currentPage - 1) * rowsPerPage + (index + 1);
         let tr = document.createElement('tr');
-        tr.className = "hover:bg-gray-50 transition";
+        tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
 
-        if (currentMenu === "siswa-lulus") {
-            tr.innerHTML = `
-                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
-                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
-                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
-                <td class="px-6 py-3 text-gray-600 font-medium">${row.thn_ajaran_lulus || '-'}</td>
-                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.no_ijazah || '-'}</td>
-                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Lulus')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
-        } else if (currentMenu === "mutasi-masuk") {
-            tr.innerHTML = `
-                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
-                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                <td class="px-6 py-3 text-gray-500 font-mono text-xs">${row.nisn || '-'}</td>
-                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
-                <td class="px-6 py-3 text-gray-600">${row.sekolah_asal || '-'}</td>
-                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.tgl_masuk || '-'}</td>
-                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
-        } else if (currentMenu === "mutasi-keluar") {
-            tr.innerHTML = `
-                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
-                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
-                <td class="px-6 py-3 text-gray-600 font-medium">${row.sekolah_tujuan || '-'}</td>
-                <td class="px-6 py-3 text-gray-600 italic text-xs">${row.alasan_mutasi || '-'}</td>
-                <td class="px-6 py-3 text-gray-600 font-mono text-xs">${row.tgl_keluar || '-'}</td>
-                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i></button></td>`;
-        } else {
-            // Default Murid Aktif Kelas
-            let ttl = (row.tmpt_lahir || '') + (row.tgl_lahir ? ', ' + row.tgl_lahir : '');
-            tr.innerHTML = `
-                <td class="px-6 py-3 text-center font-medium text-gray-400">${barisNomor}</td>
-                <td class="px-6 py-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                <td class="px-6 py-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
-                <td class="px-6 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span></td>
-                <td class="px-6 py-3 text-gray-600">${ttl || '-'}</td>
-                <td class="px-6 py-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas || userKelasAkses}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-medium text-xs transition"><i class="fa-solid fa-gear"></i> Aksi</button></td>`;
+        // Shortcut badge Jenis Kelamin biar kodenya pendek & rapi
+        let badgeJK = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span>`;
+
+        // Pengkondisian isi kolom data (TD) mengikuti sub-menu yang sedang dibuka
+        switch (currentMenu) {
+            
+            case "siswa-pribadi": // 1. Identitas Pribadi
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600 font-medium">${row.kelas || '-'}</td>
+                    <td class="p-3 font-mono text-xs text-gray-500">${row.nis || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 font-mono text-xs text-gray-500">${row.nisn || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.tmpt_lahir || '-'}</td>
+                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_lahir || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.nik || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.agama || '-'}</td>
+                    <td class="p-3 text-gray-600 font-mono text-xs">${row.akte || '-'}</td>
+                    <td class="p-3 text-gray-600 font-medium">${row.anak_ke || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-alamat": // 2. Data Alamat & GPS
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 text-gray-600">${row.alamat || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.rt || '0'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.rw || '0'}</td>
+                    <td class="p-3 text-gray-600">${row.kelurahan || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kecamatan || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kodepos || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.jns_tinggal || '-'}</td>
+                    <td class="p-3 text-gray-600 font-medium">${row.jarak || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.lintang || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.bujur || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-keadaan": // 3. Data Keadaan
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kk || '-'}</td>
+                    <td class="p-3 text-gray-600 text-center">${row.saudara || '0'}</td>
+                    <td class="p-3 text-gray-600">${row.transportasi || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kip || '-'}</td>
+                    <td class="p-3 font-medium">${row.layak_pip === 'Ya' ? '<span class="text-emerald-600">Ya</span>' : '<span class="text-gray-400">Tidak</span>'}</td>
+                    <td class="p-3 text-gray-500 text-xs">${row.alasan_pip || '-'}</td>
+                    <td class="p-3 text-gray-500 text-xs">${row.disabilitas || 'Tidak'}</td>
+                    <td class="p-3 font-medium text-blue-600 text-xs">${row.umur || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-ortu": // 4. Data Orang Tua / Wali
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 border-l bg-gray-50/50 font-medium">${row.ayah_nama || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 font-mono text-xs text-gray-500">${row.ayah_nik || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pendidikan || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pekerjaan || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_penghasilan || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_disabilitas || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 font-mono text-xs">${row.ayah_thn_lahir || '-'}</td>
+                    <td class="p-3 border-l bg-rose-50/10 font-medium">${row.ibu_nama || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 font-mono text-xs text-gray-500">${row.ibu_nik || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_pendidikan || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_pekerjaan || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_penghasilan || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_disabilitas || '-'}</td>
+                    <td class="p-3 bg-rose-50/10 font-mono text-xs">${row.ibu_thn_lahir || '-'}</td>
+                    <td class="p-3 border-l bg-emerald-50/10 font-medium">${row.wali_nama || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 font-mono text-xs text-gray-500">${row.wali_nik || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_pendidikan || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_pekerjaan || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_penghasilan || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_disabilitas || '-'}</td>
+                    <td class="p-3 bg-emerald-50/10 font-mono text-xs">${row.wali_thn_lahir || '-'}</td>
+                    <td class="p-3 text-center border-l"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-periodik": // 5. Data Periodik
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 font-mono text-center">${row.bb || '-'} Kg</td>
+                    <td class="p-3 font-mono text-center">${row.tb || '-'} Cm</td>
+                    <td class="p-3 font-mono text-center">${row.lingkar_kepala || '-'} Cm</td>
+                    <td class="p-3 text-gray-600">${row.hobi || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.cita_cita || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-registrasi": // 6. Registrasi & Kenaikan/Kelulusan
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 font-bold text-blue-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 font-mono text-xs text-gray-500">${row.tgl_masuk || '-'}</td>
+                    <td class="p-3 text-gray-600 text-xs">${row.sekolah_asal || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-gray-500 text-xs">${row.keterangan_siswa || '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-bold text-xs transition">
+                            <i class="fa-solid fa-arrows-up-down"></i> Proses
+                        </button>
+                    </td>
+                `;
+                break;
+
+            case "siswa-kontak": // 7. Kontak Murid
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 font-mono text-sm text-emerald-600 font-bold">${row.hp || '-'}</td>
+                    <td class="p-3 font-mono text-xs text-gray-500">${row.telp || '-'}</td>
+                    <td class="p-3 text-gray-600 text-xs">${row.email || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "siswa-lulus": // Alumni / Lulusan
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 text-gray-600 font-bold">${row.thn_ajaran_lulus || '-'}</td>
+                    <td class="p-3 text-gray-600 font-mono text-xs">${row.no_ijazah || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Lulus')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "mutasi-masuk": // Rekap Mutasi Masuk
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">${row.nisn || '-'}</td>
+                    <td class="p-3">${badgeJK}</td>
+                    <td class="p-3 text-gray-600">${row.sekolah_asal || '-'}</td>
+                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_masuk || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
+
+            case "mutasi-keluar": // Rekap Mutasi Keluar
+                tr.innerHTML = `
+                    <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
+                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
+                    <td class="p-3 text-gray-600 font-medium">${row.sekolah_tujuan || '-'}</td>
+                    <td class="p-3 text-gray-600 italic text-xs">${row.alasan_mutasi || '-'}</td>
+                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_keluar || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                `;
+                break;
         }
+
         tbody.appendChild(tr);
     });
 }
 
-function updateSidebarUI(activeId) {
-    const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link');
-    allLinks.forEach(link => link.classList.remove('active'));
-
-    if (activeId === 'dashboard') {
-        const dashLink = document.getElementById('link-dashboard');
-        if (dashLink) dashLink.classList.add('active');
-    } else {
-        allLinks.forEach(link => {
-            const onClickAttr = link.getAttribute('onclick') || "";
-            if (onClickAttr.includes(`'${activeId}'`)) {
-                link.classList.add('active');
-            }
-        });
-    }
-}
-
-function showSection(id) {
+function showSection(sectionId) {
+    // 1. Ambil elemen judul di header untuk di-update nama sub-menunya
+    const titleEl = document.getElementById('section-title');
+    
+    // 2. Sembunyikan dashboard utama dan semua section murid
     document.getElementById('section-dashboard').classList.add('hidden');
-    document.getElementById('section-tabel-container').classList.add('hidden');
-
-    if (id === "dashboard") {
+    document.querySelectorAll('.section-murid').forEach(el => el.classList.add('hidden'));
+    
+    // 3. Reset tampilan kontrol bar pencarian & pagination global
+    const filterBar = document.getElementById('global-filter-container');
+    const paginationNav = document.getElementById('global-pagination-nav');
+    
+    if (sectionId === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
-        currentMenu = "dashboard";
-    } else {
-        document.getElementById('section-tabel-container').classList.remove('hidden');
-        currentMenu = id;
+        if(titleEl) titleEl.innerText = "Dashboard Utama";
+        filterBar.classList.add('hidden');
+        paginationNav.classList.add('hidden');
+    } 
+    else if (sectionId.startsWith('siswa-')) {
+        // Tampilkan tabel sub-menu yang dipilih
+        const targetSection = document.getElementById(`section-${sectionId}`);
+        if (targetSection) targetSection.classList.remove('hidden');
+        
+        // Tampilkan bar pencarian & pagination karena kita membuka menu data murid
+        filterBar.classList.remove('hidden');
+        paginationNav.classList.remove('hidden');
+        
+        // Ubah judul header secara otomatis
+        if(titleEl) {
+            titleEl.innerText = sectionId.replace('siswa-', 'Data Murid: ').toUpperCase();
+        }
+        
+        // Panggil fungsi render data Bapak untuk sub-menu ini
+        renderSubMenuTables(); 
     }
-
-    updateSidebarUI(id);
-    resetAndFilter();
-
-    let formatTitle = id.replaceAll('-', ' ').toUpperCase();
-    if (id === 'siswa-pribadi') formatTitle = "MURID AKTIF KELAS";
-    document.getElementById('section-title').innerText = formatTitle;
+    
+    // Update warna highlight di sidebar
+    updateSidebarUI(sectionId);
 }
 
 function nextPage() {
@@ -594,6 +903,26 @@ function initCharts() {
             }
         }
     });
+}
+    function updateSidebarUI(activeId) {
+    // 1. Bersihkan semua status active di semua link sidebar dan sub-menu
+    const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link, nav a');
+    allLinks.forEach(link => link.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'font-bold'));
+    
+    // 2. Jika dashboard aktif
+    if (activeId === 'dashboard') {
+        const dashLink = document.getElementById('link-dashboard');
+        if (dashLink) dashLink.classList.add('active', 'bg-blue-50', 'text-blue-600');
+    } 
+    // 3. Cari sub-menu atau link biasa berdasarkan kecocokan string di atribut onclick
+    else {
+        allLinks.forEach(link => {
+            const onClickAttr = link.getAttribute('onclick') || "";
+            if (onClickAttr.includes(`'${activeId}'`)) {
+                link.classList.add('active', 'bg-blue-50', 'text-blue-600', 'font-bold');
+            }
+        });
+    }
 }
 </script>
 </body>
