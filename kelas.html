@@ -197,7 +197,7 @@
     <script>
         // 1. Inisialisasi Environment Session Data Sekolah
         const session = JSON.parse(localStorage.getItem('session_sdnrt'));
-        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; // GANTI DENGAN URL WEB APP GAS BAPAK
+        const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; 
         
         let masterDataSiswa = [];
 
@@ -209,17 +209,19 @@
                 return;
             }
             loadDataKelas();
+
+            // Pasang event listener interceptor submit form
+            const form = document.getElementById('formEditSiswa');
+            form.addEventListener('submit', simpanIdentitas);
         });
 
         // 2. Ajax Ambil Data Khusus Kelas Login Guru (Ringan & Terbimbing)
         async function loadDataKelas() {
-            // Set Identitas Header Sesuai Aturan Penamaan Bapak
             document.getElementById('guru-name').innerText = session.nama;
             document.getElementById('userInitial').innerText = session.nama.charAt(0).toUpperCase();
             document.getElementById('label-kelas-sidebar').innerText = `KELAS ${session.kelas_akses}`;
 
             try {
-                // Tembak action getDataKelas membawa parameter filter k=kelas_akses ke doGet GAS
                 const res = await fetch(`${API_URL}?action=getDataKelas&u=${session.username}&k=${session.kelas_akses}`);
                 const result = await res.json();
                 
@@ -256,25 +258,27 @@
             });
 
             if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400 font-medium"><i class="fas fa-folder-open text-2xl mb-2 block"></i> Tidak ada data murid ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 font-medium"><i class="fas fa-folder-open text-3xl mb-2 block text-slate-300"></i> Tidak ada data murid ditemukan.</td></tr>`;
                 return;
             }
 
             filteredData.forEach((siswa, index) => {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50/80 transition">
-                        <td class="py-3.5 px-6 text-center font-mono font-bold text-gray-400 text-xs">${index + 1}</td>
-                        <td class="py-3.5 px-6 font-bold text-gray-800">${siswa.nama}</td>
-                        <td class="py-3.5 px-6 font-mono text-xs text-gray-500">${siswa.nis || '-'} / ${siswa.nisn || '-'}</td>
-                        <td class="py-3.5 px-4 text-center"><span class="px-2 py-0.5 rounded-md text-xs font-bold ${siswa.jk === 'L' ? 'bg-teal-50 text-teal-600' : 'bg-pink-50 text-pink-600'}">${siswa.jk}</span></td>
-                        <td class="py-3.5 px-6 text-gray-600 text-xs">${siswa.tmpt_lahir || '-'}, ${siswa.tgl_lahir || '-'}</td>
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="py-3.5 px-6 text-center font-mono font-bold text-slate-400 text-xs">${index + 1}</td>
+                        <td class="py-3.5 px-6 font-bold text-slate-800">${siswa.nama}</td>
+                        <td class="py-3.5 px-6 font-mono text-xs text-slate-500">${siswa.nis || '-'} / ${siswa.nisn || '-'}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold ${String(siswa.jk).toUpperCase() === 'L' ? 'bg-teal-50 text-teal-600' : 'bg-pink-50 text-pink-600'}">${siswa.jk}</span>
+                        </td>
+                        <td class="py-3.5 px-6 text-slate-600 text-xs">${siswa.tmpt_lahir || '-'}, ${siswa.tgl_lahir || '-'}</td>
                         <td class="py-3.5 px-6 text-center">
-                            <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 shadow-sm gap-1">
+                            <div class="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm gap-1">
                                 <button onclick="openEditModal('${siswa.nis}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-semibold flex items-center gap-1 transition" title="Edit Identitas 58 Kolom"><i class="fas fa-edit"></i> Edit</button>
-                                <span class="text-gray-200 py-1">|</span>
-                                <button onclick="prosesAksiSatuan('${siswa.id || siswa.nis}', 'NAIK_KELAS')" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg text-xs font-semibold transition" title="Naikkan Kelas Individu"><i class="fas fa-angle-up"></i> Naik</button>
-                                <span class="text-gray-200 py-1">|</span>
-                                <button onclick="prosesAksiSatuan('${siswa.id || siswa.nis}', 'MUTASI_KELUAR')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs font-semibold transition" title="Mutasi Murid Keluar"><i class="fas fa-door-open"></i> Keluar</button>
+                                <span class="text-slate-200 py-1">|</span>
+                                <button onclick="prosesAksiSatuan('${siswa.nis}', 'NAIK_KELAS')" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg text-xs font-semibold transition" title="Naikkan Kelas Individu"><i class="fas fa-angle-up"></i> Naik</button>
+                                <span class="text-slate-200 py-1">|</span>
+                                <button onclick="prosesAksiSatuan('${siswa.nis}', 'MUTASI_KELUAR')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs font-semibold transition" title="Mutasi Murid Keluar"><i class="fas fa-door-open"></i> Keluar</button>
                             </div>
                         </td>
                     </tr>
@@ -292,14 +296,13 @@
             document.getElementById('modalTitle').innerText = `Edit Instrumen: ${siswa.nama}`;
             switchTab('tab-biodata');
 
-            // Isi nilai form input secara otomatis berdasarkan mapping json objek lowercase hasil getSheetData
             const fields = [
                 'nama', 'nis', 'jk', 'nisn', 'tmpt_lahir', 'tgl_lahir', 'nik', 'agama', 'akte', 'kk',
                 'alamat', 'rt', 'rw', 'kelurahan', 'kecamatan', 'kodepos', 'jns_tinggal', 'lintang', 'bujur', 'jarak',
                 'anak_ke', 'saudara', 'transportasi', 'kip', 'layak_pip', 'alasan_pip', 'disabilitas',
-                'ayah_nama', 'ayah_nik', 'ayah_pendidikan', 'ayah_pekerjaan', 'ayah_penghasilan', 'ayah_disabilitas', 'ayah_thn_lahir',
-                'ibu_nama', 'ibu_nik', 'ibu_pendidikan', 'ibu_pekerjaan', 'ibu_penghasilan', 'ibu_disabilitas', 'ibu_thn_lahir',
-                'wali_nama', 'wali_nik', 'wali_pendidikan', 'wali_pekerjaan', 'wali_penghasilan', 'wali_disabilitas', 'wali_thn_lahir',
+                'ayah_nama', 'ayah_nik', 'ayah_pendidikan', 'ayah_pekerjaan', 'ayah_penghasilan', 'ayah_thn_lahir',
+                'ibu_nama', 'ibu_nik', 'ibu_pendidikan', 'ibu_pekerjaan', 'ibu_penghasilan', 'ibu_thn_lahir',
+                'wali_nama', 'wali_nik', 'wali_pendidikan', 'wali_pekerjaan', 'wali_penghasilan', 'wali_thn_lahir',
                 'kelas', 'bb', 'tb', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'hp', 'telp', 'email'
             ];
 
@@ -308,7 +311,6 @@
                 if (el) el.value = siswa[f] === "-" ? "" : (siswa[f] || "");
             });
 
-            // Kunci kelas agar selalu sinkron dengan hak akses login guru kelas
             document.getElementById('form_kelas').value = session.kelas_akses;
 
             document.getElementById('modalEdit').classList.remove('hidden');
@@ -325,18 +327,16 @@
             document.getElementById(tabId).classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('border-blue-600', 'text-blue-600');
-                b.classList.add('border-transparent', 'text-gray-500');
+                b.classList.remove('border-teal-600', 'text-teal-600');
+                b.classList.add('border-transparent', 'text-slate-500');
             });
-            document.getElementById(`btn-${tabId}`).classList.add('border-blue-600', 'text-blue-600');
-            document.getElementById(`btn-${tabId}`).classList.remove('border-transparent', 'text-gray-500');
+            document.getElementById(`btn-${tabId}`).classList.add('border-teal-600', 'text-teal-600');
+            document.getElementById(`btn-${tabId}`).classList.remove('border-transparent', 'text-slate-500');
         }
 
         // ==========================================
         // FITUR AJAX SUBMIT DATA KE CODE.GS BAPAK
         // ==========================================
-        
-        // 1. Simpan Perubahan Edit 58 Kolom Identitas Murid
         async function simpanIdentitas(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSimpan');
@@ -357,7 +357,7 @@
                 if (resData.status === "success") {
                     alert(resData.message);
                     closeModal();
-                    loadDataKelas(); // Reload data real-time
+                    loadDataKelas(); 
                 } else {
                     alert("Gagal menyimpan: " + resData.message);
                 }
@@ -369,16 +369,28 @@
             }
         }
 
-        // 2. Fungsi Eksekusi Operasional Aksi Satuan (Naik / Mutasi Keluar)
-        async function prosesAksiSatuan(idMurid, jenisAksi) {
-            let konfirmasiMsg = jenisAksi === 'NAIK_KELAS' ? 'Yakin ingin menaikkan kelas murid ini?' : 'Yakin ingin memutasi keluar murid ini?';
+        async function prosesAksiSatuan(nisMurid, jenisAksi) {
+            const murid = masterDataSiswa.find(s => String(s.nis) === String(nisMurid));
+            if (!murid) {
+                alert("Data murid tidak ditemukan dalam cache sistem.");
+                return;
+            }
+
+            let konfirmasiMsg = jenisAksi === 'NAIK_KELAS' 
+                ? `Apakah Bapak yakin ingin menaikkan kelas murid: ${murid.nama}?` 
+                : `Apakah Bapak yakin ingin memutasi KELUAR murid: ${murid.nama}?`;
+                
             if (!confirm(konfirmasiMsg)) return;
 
-            let payloadAksi = { id: idMurid, tipe: jenisAksi };
+            let payloadAksi = { nis: nisMurid, tipe: jenisAksi };
             if (jenisAksi === 'MUTASI_KELUAR') {
-                let tujuan = prompt("Masukkan alasan / nama sekolah tujuan mutasi:");
-                if (!tujuan) return;
-                payloadAksi.tujuan = tujuan;
+                let tujuan = prompt("Masukkan alasan / nama sekolah tujuan mutasi:", "Pindah mengikuti orang tua");
+                if (tujuan === null) return; 
+                if (tujuan.trim() === "") {
+                    alert("Alasan atau sekolah tujuan mutasi wajib diisi!");
+                    return;
+                }
+                payloadAksi.tujuan = tujuan.trim();
                 payloadAksi.tgl = new Date().toISOString().split('T')[0];
             }
 
@@ -388,16 +400,20 @@
                     body: JSON.stringify({ action: "prosesAksi", payload: payloadAksi })
                 });
                 const result = await res.json();
-                alert(result.message);
-                loadDataKelas();
+                
+                if (result.status === "success") {
+                    alert(result.message);
+                    loadDataKelas(); 
+                } else {
+                    alert("Gagal memproses: " + result.message);
+                }
             } catch (e) {
                 alert("Gagal mengeksekusi operasi aksi satuan.");
             }
         }
 
-        // 3. Fitur Naik Kelas Masal Terkunci Sesuai Kelas Login Guru
         async function prosesNaikKelasMasal() {
-            if (!confirm(`PERINGATAN: Apakah Bapak yakin ingin menaikkan kelas SELURUH murid di KELAS ${session.kelas_akses} secara masal?`)) return;
+            if (!confirm(`PERINGATAN UTAMA:\nApakah Bapak yakin ingin menaikkan kelas SELURUH murid di KELAS ${session.kelas_akses} secara masal?`)) return;
 
             try {
                 const res = await fetch(API_URL, {
@@ -405,16 +421,23 @@
                     body: JSON.stringify({ action: "NAIK_SEMUA", kelas_akses: session.kelas_akses })
                 });
                 const result = await res.json();
-                alert(result.message);
-                loadDataKelas();
+                
+                if (result.status === "success") {
+                    alert(result.message);
+                    loadDataKelas();
+                } else {
+                    alert("Gagal eksekusi massal: " + result.message);
+                }
             } catch (e) {
                 alert("Gagal melakukan penuaan kelas masal.");
             }
         }
 
         function toggleUserMenu() {
-            // Tempat penambahan toggle drop menu profil jika diperlukan ke depan
-            alert(`User Aktif: ${session.nama}\nHak Akses: Guru Kelas ${session.kelas_akses}`);
+            if (confirm(`User Aktif: ${session.nama}\nHak Akses: Guru Kelas ${session.kelas_akses}\n\nApakah Bapak ingin keluar (Logout) dari sistem?`)) {
+                localStorage.removeItem('session_sdnrt');
+                window.location.href = "index.html";
+            }
         }
     </script>
 </body>
