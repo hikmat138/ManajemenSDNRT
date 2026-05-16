@@ -490,22 +490,21 @@ async function loadData() {
         
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
-        // 2. Simpan ke dalam variabel global (pastikan lowercase sesuai objek server)
+        // 2. Simpan ke dalam variabel global
         masterData = result.data.siswa || [];
         masterDataLulus = result.data.siswa_lulus || [];
         masterDataMutasiMasuk = result.data.mutasi_masuk || [];
         masterDataMutasiKeluar = result.data.mutasi_keluar || [];
 
-        // 3. AMBIL IDENTITAS USER YANG SEDANG LOGIN (Dari Session/LocalStorage)
-        // Saat login berhasil, pastikan Bapak sudah menyimpan data user dengan: localStorage.setItem('userLogon', JSON.stringify(user))
-        const sessionUser = localStorage.getItem('userLogin');
+        // 3. AMBIL IDENTITAS USER DARI LOCALSTORAGE
+        const sessionUser = localStorage.getItem('userLogon');
         
         if (sessionUser) {
             let userAktif = JSON.parse(sessionUser);
             
             // Set hak akses global untuk filter kelas murid
             userKelasAkses = userAktif.kelas_akses || "-"; 
-            userRoleAktif = userAktif.role || "guru"; // Menyimpan role admin/guru
+            userRoleAktif = userAktif.role || "guru"; 
 
             // Render ke UI Header/Sidebar Panel Admin
             const adminNameEl = document.getElementById('admin-name');
@@ -519,15 +518,32 @@ async function loadData() {
             if (userMenuBtnEl && userAktif.nama) {
                 userMenuBtnEl.innerText = userAktif.nama.charAt(0).toUpperCase();
             }
+
+            // Pastikan kontainer utama aplikasi tampil jika sebelumnya disembunyikan
+            // (Sesuaikan id 'main-app-container' atau 'form-login' dengan kode asli Bapak)
+            // document.getElementById('main-app-container')?.classList.remove('hidden');
+            // document.getElementById('form-login')?.classList.add('hidden');
+
         } else {
-            // Jika tidak ada session login, tendang balik ke halaman login.html
-            window.location.href = "index.html";
-            return;
+            // JIKA BELUM LOGIN: Tampilkan form login yang ada di index.html Bapak
+            console.warn("Sesi login tidak ditemukan. Silakan login terlebih dahulu.");
+            
+            // Contoh jika Bapak mengontrol tampilan login dengan class 'hidden' (Tailwind):
+            // const formLogin = document.getElementById('form-login'); // Id form login Bapak
+            // const mainApp = document.getElementById('main-app-container'); // Id dashboard Bapak
+            // if (formLogin) formLogin.classList.remove('hidden');
+            // if (mainApp) mainApp.classList.add('hidden');
+            
+            // Panggil fungsi atau tampilkan modal login bawaan index.html Bapak di sini
+            if (typeof tampilkanFormLogin === "function") {
+                tampilkanFormLogin();
+            }
+            return; // Hentikan proses render data karena belum terautentikasi
         }
 
-        // 4. JALANKAN PROSES FILTER DAN GRAFIK DASHBOARD
-        updateStats(); // Memperbarui angka total murid, mutasi, dll.
-        filterData();  // Memfilter data murid berdasarkan menu & kelas akses, lalu otomatis memanggil renderTabelSiswa()
+        // 4. JALANKAN PROSES FILTER DAN GRAFIK DASHBOARD (Hanya jika user sudah login)
+        updateStats(); 
+        filterData();  
         
         // Beri jeda sedikit agar DOM tabel siap sebelum grafik Chart.js digambar
         setTimeout(initCharts, 300);
