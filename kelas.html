@@ -462,6 +462,7 @@
 
 <script>
 // URL Web App Google Apps Script
+// URL Web App Google Apps Script
 const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
 let masterData = [];
@@ -474,6 +475,7 @@ let currentPage = 1;
 let rowsPerPage = 10;
 let currentMenu = "dashboard";
 let userKelasAkses = ""; 
+let userRoleAktif = "guru"; // Inisialisasi default
 let charts = {};
 
 document.addEventListener("DOMContentLoaded", loadData);
@@ -489,13 +491,12 @@ async function loadData() {
         
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
+        // ========================================================
+        // KODE PEMBERSIHAN DATA (SINKRON DENGAN CODE.GS BARU)
+        // ========================================================
+        let rawSiswa = result.data.siswa || [];
+        masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
 
-        // ========================================================
-        // MASUKKAN KODE PEMBERSIHANNYA DI SINI (DI BAWAH RESULT)
-        // ========================================================
-       let rawSiswa = result.data.siswa || [];
-// Kita bersihkan data kosong, tapi tidak memeriksa nama spesifik dulu
-masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "");
         let rawLulus = result.data.siswa_lulus || [];
         masterDataLulus = rawLulus.filter(s => s.nama && String(s.nama).trim() !== "");
 
@@ -506,8 +507,7 @@ masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "");
         masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
         // ========================================================
 
-
-        // 2. Ambil sesi login dari localStorage (Menggunakan session_sdnrt sesuai index.html)
+        // 2. Ambil sesi login dari localStorage
         const sessionUser = localStorage.getItem('session_sdnrt');
         
         if (sessionUser) {
@@ -534,8 +534,10 @@ masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "");
             return;
         }
 
-        // 3. Jalankan kalkulasi angka ringkasan dan pembagian baris tabel murid
+        // 3. Jalankan kalkulasi angka ringkasan dashboard
         updateStats(); 
+        
+        // PENTING: Memicu filter pertama kali agar filteredData terisi
         filterData();  
         
         setTimeout(initCharts, 300);
@@ -545,35 +547,31 @@ masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "");
         alert("Gagal terhubung dengan Database Spreadsheet. Pastikan koneksi internet stabil.");
     }
 }
+
 function updateStats() {
-    // 1. FILTER MURID AKTIF BERDASARKAN ROLE LOGIN (GURU ATAU ADMIN)
+    // 1. FILTER MURID AKTIF BERDASARKAN ROLE LOGIN (SINKRON 100%)
     let aktifKelas = masterData.filter(s => {
         let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
         
-        // Jika yang login adalah Admin (Akses Semua Kelas)
         if (userRoleAktif === "admin" || userKelasAkses === "-") {
-            return isAktif; // Ambil semua yang berstatus aktif tanpa pandang kelas
+            return isAktif; 
         } else {
-            // Jika yang login Guru Kelas, filter sesuai kelasnya saja (misal: "1A")
             return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
         }
     });
 
-    // 2. HITUNG RASIO JENIS KELAMIN (L / P)
+    // 2. HITUNG RASIO JENIS KELAMIN
     let l = aktifKelas.filter(x => x.jk === "L" || x.jk === "Laki-laki").length;
     let p = aktifKelas.filter(x => x.jk === "P" || x.jk === "Perempuan").length;
 
-    // 3. AMBIL DATA REKAP ALUMNI & MUTASI (Opsional untuk Widget Dashboard Bapak)
     let totalLulus = masterDataLulus.length;
     let totalMutasiMasuk = masterDataMutasiMasuk.length;
     let totalMutasiKeluar = masterDataMutasiKeluar.length;
 
-    // 4. RENDER / MASUKKAN DATA KE WIDGET HTML DASHBOARD
+    // 3. RENDER KE HTML WIDGET
     const statMuridEl = document.getElementById('stat-murid');
     const lEl = document.getElementById('L');
     const pEl = document.getElementById('P');
-    
-    // Elemen tambahan pendukung ringkasan data dashboard (jika ada di HTML Bapak)
     const statLulusEl = document.getElementById('stat-lulus');
     const statMasukEl = document.getElementById('stat-mutasi-masuk');
     const statKeluarEl = document.getElementById('stat-mutasi-keluar');
@@ -581,8 +579,6 @@ function updateStats() {
     if (statMuridEl) statMuridEl.innerText = aktifKelas.length + " Murid";
     if (lEl) lEl.innerText = l + " Orang";
     if (pEl) pEl.innerText = p + " Orang";
-    
-    // Render angka alumni dan mutasi ke card dashboard agar tidak statis
     if (statLulusEl) statLulusEl.innerText = totalLulus + " Alumni";
     if (statMasukEl) statMasukEl.innerText = totalMutasiMasuk + " Kasus";
     if (statKeluarEl) statKeluarEl.innerText = totalMutasiKeluar + " Kasus";
@@ -600,24 +596,18 @@ function filterData() {
     } else if (currentMenu === "mutasi-keluar") {
         source = masterDataMutasiKeluar;
     } else {
-        // Filter Murid Aktif
+        // Filter Murid Aktif Berdasarkan Kelas Akses Akun
         source = masterData.filter(s => {
-    // Karena kolom status_aktif bergeser ke kolom 'tgl_masuk', kita cek dua-duanya agar aman
-    let cekStatus = String(s.status_aktif || '').toLowerCase() === "aktif" || 
-                    String(s.tgl_masuk || '').toLowerCase() === "aktif" ||
-                    String(s.status_aktif || '') === "1A"; // Antisipasi bocor kolom
-
-    if (userRoleAktif === "admin" || userKelasAkses === "-") {
-        return true; // Loloskan dulu semua biar muncul di tabel admin
-    } else {
-        // Karena kolom kelas berisi teks acak, kita cek jika s.status_aktif atau kolom lainnya berisi "1A"
-        return String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase() || 
-               String(s.status_aktif).toUpperCase() === userKelasAkses.toUpperCase();
-    }
-});
+            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return isAktif;
+            } else {
+                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
     }
 
-    // 2. Filter berdasarkan kata kunci pencarian
+    // 2. Filter berdasarkan kata kunci pencarian (Nama, NISN, NIS)
     filteredData = source.filter(s => {
         let nama = String(s.nama || "").toLowerCase();
         let nisn = String(s.nisn || "").toLowerCase();
@@ -626,49 +616,50 @@ function filterData() {
     });
 
     currentPage = 1; // Reset ke halaman pertama setiap kali filter berubah
-    updatePagination(); // <--- Panggil fungsi paginasi
+    updatePagination(); 
 }
 
 function updatePagination() {
     let start = (currentPage - 1) * rowsPerPage;
     let end = start + rowsPerPage;
     
-    // Potong data untuk halaman aktif saat ini
     let dataPerHalaman = filteredData.slice(start, end);
     
-    // PANGGIL FUNGSI RENDER TABEL UTAMA
+    // Panggil fungsi pembuat baris tabel
     renderTabelSiswa(dataPerHalaman);
 
-    // Update info teks di bawah tabel
     const infoEl = document.getElementById('pagination-info');
     if (infoEl) {
         infoEl.innerText = `Menampilkan ${filteredData.length === 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
     }
 }
+
 function renderTabelSiswa(dataList) {
-    // 1. Tentukan target tbody berdasarkan menu aktif saat ini (currentMenu)
-    let targetTbodyId = 'tbody-data'; // default cadangan
+    // 1. Logika Pendeteksi ID tbody HTML Bapak secara otomatis
+    let targetTbodyId = 'tbody-data'; 
     
     if (currentMenu === "siswa-lulus") {
-        targetTbodyId = "tbody-siswa-lulus"; // Jika Bapak buat container khusus alumni
+        targetTbodyId = "tbody-siswa-lulus"; 
     } else if (currentMenu === "mutasi-masuk") {
         targetTbodyId = "tbody-mutasi-masuk";
     } else if (currentMenu === "mutasi-keluar") {
         targetTbodyId = "tbody-mutasi-keluar";
     } else if (currentMenu.startsWith("siswa-")) {
-        // Otomatis mengarah ke: tbody-siswa-pribadi, tbody-siswa-alamat, tbody-siswa-keadaan, dll.
         targetTbodyId = `tbody-${currentMenu}`;
     }
 
-    const tbody = document.getElementById('tbody-data');
+    // Coba cari ID spesifik sub-menu dulu, jika tidak ketemu, baru pakai fallback 'tbody-data'
+    let tbody = document.getElementById(targetTbodyId) || document.getElementById('tbody-data');
+    
     if (!tbody) {
-        console.error("Elemen tbody-data tidak ditemukan di HTML!");
+        console.error(`Elemen tabel dengan ID '${targetTbodyId}' atau 'tbody-data' tidak ditemukan!`);
         return; 
     }
 
-    // 3. JIKA DATA KOSONG
+    tbody.innerHTML = ""; // Bersihkan baris lama sebelum rendering
+
+    // 2. Jika Data Kosong
     if (!dataList || dataList.length === 0) {
-        // Hitung jumlah kolom di atasnya agar tampilan pesan kosongnya penuh (colspan)
         const tableElement = tbody.closest('table');
         const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
         
@@ -681,19 +672,16 @@ function renderTabelSiswa(dataList) {
         return;
     }
 
-    // 4. LOOPING & RENDER DATA BARIS BERDASARKAN SUB-MENU
+    // 3. Looping Pembuatan Baris Baru
     dataList.forEach((row, index) => {
         let barisNomor = (currentPage - 1) * rowsPerPage + (index + 1);
         let tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
 
-        // Shortcut badge Jenis Kelamin biar kodenya pendek & rapi
         let badgeJK = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span>`;
 
-        // Pengkondisian isi kolom data (TD) mengikuti sub-menu yang sedang dibuka
         switch (currentMenu) {
-            
-            case "siswa-pribadi": // 1. Identitas Pribadi
+            case "siswa-pribadi":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -712,7 +700,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-alamat": // 2. Data Alamat & GPS
+            case "siswa-alamat":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -733,7 +721,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-keadaan": // 3. Data Keadaan
+            case "siswa-keadaan":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -751,7 +739,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-ortu": // 4. Data Orang Tua / Wali
+            case "siswa-ortu":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -782,7 +770,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-periodik": // 5. Data Periodik
+            case "siswa-periodik":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -797,7 +785,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-registrasi": // 6. Registrasi & Kenaikan/Kelulusan
+            case "siswa-registrasi":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -815,7 +803,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-kontak": // 7. Kontak Murid
+            case "siswa-kontak":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -828,7 +816,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "siswa-lulus": // Alumni / Lulusan
+            case "siswa-lulus":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -840,7 +828,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "mutasi-masuk": // Rekap Mutasi Masuk
+            case "mutasi-masuk":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -852,7 +840,7 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-            case "mutasi-keluar": // Rekap Mutasi Keluar
+            case "mutasi-keluar":
                 tr.innerHTML = `
                     <td class="p-3 text-center text-gray-400 font-medium">${barisNomor}</td>
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -870,42 +858,40 @@ function renderTabelSiswa(dataList) {
 }
 
 function showSection(sectionId) {
-    // 1. Ambil elemen judul di header untuk di-update nama sub-menunya
+    currentMenu = sectionId; // Kunci: Simpan status menu aktif secara global
+    
     const titleEl = document.getElementById('section-title');
     
-    // 2. Sembunyikan dashboard utama dan semua section murid
+    // Sembunyikan dashboard utama dan semua container section data murid
     document.getElementById('section-dashboard').classList.add('hidden');
     document.querySelectorAll('.section-murid').forEach(el => el.classList.add('hidden'));
     
-    // 3. Reset tampilan kontrol bar pencarian & pagination global
     const filterBar = document.getElementById('global-filter-container');
     const paginationNav = document.getElementById('global-pagination-nav');
     
     if (sectionId === 'dashboard') {
         document.getElementById('section-dashboard').classList.remove('hidden');
         if(titleEl) titleEl.innerText = "Dashboard Utama";
-        filterBar.classList.add('hidden');
-        paginationNav.classList.add('hidden');
+        if(filterBar) filterBar.classList.add('hidden');
+        if(paginationNav) paginationNav.classList.add('hidden');
     } 
-    else if (sectionId.startsWith('siswa-')) {
-        // Tampilkan tabel sub-menu yang dipilih
+    else {
+        // Tampilkan container induk section murid
         const targetSection = document.getElementById(`section-${sectionId}`);
         if (targetSection) targetSection.classList.remove('hidden');
         
-        // Tampilkan bar pencarian & pagination karena kita membuka menu data murid
-        filterBar.classList.remove('hidden');
-        paginationNav.classList.remove('hidden');
+        if(filterBar) filterBar.classList.remove('hidden');
+        if(paginationNav) paginationNav.classList.remove('hidden');
         
-        // Ubah judul header secara otomatis
         if(titleEl) {
             titleEl.innerText = sectionId.replace('siswa-', 'Data Murid: ').toUpperCase();
         }
         
-        // Panggil fungsi render data Bapak untuk sub-menu ini
-        renderSubMenuTables(); 
+        // PERBAIKAN UTAMA: Ganti pemanggilan fungsi renderSubMenuTables() yang eror jadi filterData()
+        currentPage = 1;
+        filterData(); 
     }
     
-    // Update warna highlight di sidebar
     updateSidebarUI(sectionId);
 }
 
@@ -926,7 +912,7 @@ function prevPage() {
 function changeRowsPerPage() {
     rowsPerPage = parseInt(document.getElementById('row-per-page').value);
     currentPage = 1;
-    updatePagination();
+    filterData();
 }
 
 function resetAndFilter() {
@@ -991,17 +977,15 @@ function initCharts() {
         }
     });
 }
-    function updateSidebarUI(activeId) {
-    // 1. Bersihkan semua status active di semua link sidebar dan sub-menu
+
+function updateSidebarUI(activeId) {
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link, nav a');
     allLinks.forEach(link => link.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'font-bold'));
     
-    // 2. Jika dashboard aktif
     if (activeId === 'dashboard') {
         const dashLink = document.getElementById('link-dashboard');
         if (dashLink) dashLink.classList.add('active', 'bg-blue-50', 'text-blue-600');
     } 
-    // 3. Cari sub-menu atau link biasa berdasarkan kecocokan string di atribut onclick
     else {
         allLinks.forEach(link => {
             const onClickAttr = link.getAttribute('onclick') || "";
