@@ -498,7 +498,7 @@ async function loadData() {
 
         // 3. AMBIL IDENTITAS USER YANG SEDANG LOGIN (Dari Session/LocalStorage)
         // Saat login berhasil, pastikan Bapak sudah menyimpan data user dengan: localStorage.setItem('userLogon', JSON.stringify(user))
-        const sessionUser = localStorage.getItem('userLogon');
+        const sessionUser = localStorage.getItem('userLogin');
         
         if (sessionUser) {
             let userAktif = JSON.parse(sessionUser);
