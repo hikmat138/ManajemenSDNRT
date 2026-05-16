@@ -31,9 +31,17 @@
 
             <nav class="p-4 flex-1 space-y-6">
                 <div>
+                    <p class="px-4 text-[10px] font-bold tracking-wider text-slate-500 uppercase mb-2">Ringkasan</p>
+                    <button onclick="setMenuFilter('dashboard')" id="menu-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 bg-teal-600 text-white rounded-xl font-medium transition text-left text-sm">
+                        <i class="fas fa-chart-pie text-base w-5 text-center"></i>
+                        <span>Dashboard Grafik</span>
+                    </button>
+                </div>
+
+                <div>
                     <p class="px-4 text-[10px] font-bold tracking-wider text-slate-500 uppercase mb-2">Instrumen Dapodik</p>
                     <div class="space-y-1">
-                        <button onclick="setMenuFilter('identitas')" id="menu-identitas" class="w-full flex items-center gap-3 px-4 py-2.5 bg-teal-600 text-white rounded-xl font-medium transition text-left text-sm">
+                        <button onclick="setMenuFilter('identitas')" id="menu-identitas" class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl font-medium transition text-left text-sm">
                             <i class="fas fa-id-card text-base w-5 text-center"></i>
                             <span>Identitas Murid</span>
                         </button>
@@ -93,11 +101,11 @@
     <main class="flex-1 flex flex-col min-w-0 min-h-screen">
         <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
             <div>
-                <h2 id="txt-title-dashboard" class="text-xl font-bold text-slate-900">Identitas Murid</h2>
-                <p id="txt-desc-dashboard" class="text-xs text-slate-500">Pembaruan instrumen 58 kolom biodata dasar dapodik murid</p>
+                <h2 id="txt-title-dashboard" class="text-xl font-bold text-slate-900">Dashboard Grafik</h2>
+                <p id="txt-desc-dashboard" class="text-xs text-slate-500">Analisis visual data statistik murid berdasarkan database Dapodik kelas</p>
             </div>
             
-            <div class="w-72 relative hidden sm:block">
+            <div id="searchWrapper" class="w-72 relative hidden">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 <input type="text" id="searchBox" onkeyup="renderTable()" placeholder="Cari Nama / NIS / NISN..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition">
             </div>
@@ -129,7 +137,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div id="section-grafik-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between h-80">
                     <div class="flex items-center justify-between mb-2">
                         <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500"><i class="fas fa-cake-candles text-amber-500 mr-1"></i> Grafik Umur Murid</h4>
@@ -161,7 +169,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div id="section-tabel-container" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hidden">
                 <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
                     <h4 id="label-table-title" class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-table-list text-teal-500"></i> Daftar Anggota Kelas Aktif</h4>
                 </div>
@@ -339,9 +347,8 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec"; 
         
         let masterDataSiswa = [];
-        let currentMenu = 'identitas'; 
+        let currentMenu = 'dashboard'; // Halaman beranda pertama kali load adalah Dashboard Grafik
 
-        // Instances Penyimpan Objek Grafik Chart.js
         let instansiChartUmur = null;
         let instansiChartAgama = null;
         let instansiChartBulan = null;
@@ -364,7 +371,7 @@
         function setMenuFilter(menuKey) {
             currentMenu = menuKey;
             
-            const menus = ['identitas', 'periodik', 'registrasi', 'lulus', 'mutasi_masuk', 'mutasi_keluar'];
+            const menus = ['dashboard', 'identitas', 'periodik', 'registrasi', 'lulus', 'mutasi_masuk', 'mutasi_keluar'];
             menus.forEach(m => {
                 const el = document.getElementById(`menu-${m}`);
                 if(el) {
@@ -379,7 +386,23 @@
                 activeEl.classList.remove('hover:bg-slate-800', 'text-slate-400', 'hover:text-white');
             }
 
+            // Atur Tampilan Kontainer (Sembunyikan/Munculkan Grafik vs Tabel)
+            const grafikSection = document.getElementById('section-grafik-container');
+            const tabelSection = document.getElementById('section-tabel-container');
+            const searchWrapper = document.getElementById('searchWrapper');
+
+            if(menuKey === 'dashboard') {
+                grafikSection.classList.remove('hidden');
+                tabelSection.classList.add('hidden');
+                searchWrapper.classList.add('hidden');
+            } else {
+                grafikSection.classList.add('hidden');
+                tabelSection.classList.remove('hidden');
+                searchWrapper.classList.remove('hidden');
+            }
+
             const titleMap = {
+                'dashboard': { title: "Dashboard Grafik", desc: "Analisis visual data statistik murid berdasarkan database Dapodik kelas", labelStat: "Total Murid Aktif" },
                 'identitas': { title: "Identitas Murid", desc: "Pembaruan instrumen 58 kolom biodata dasar dapodik murid", labelStat: "Total Murid Aktif", lblTab: "Daftar Anggota Kelas Aktif" },
                 'periodik': { title: "Siswa Periodik", desc: "Pemantauan tinggi badan, berat badan, lingkar kepala, dan jarak tempuh berkala", labelStat: "Murid Tercatat", lblTab: "Variabel Atribut Periodik Murid" },
                 'registrasi': { title: "Siswa Registrasi", desc: "Pencatatan nomor induk, jenis pendaftaran masuk, dan riwayat sekolah asal", labelStat: "Terregistrasi", lblTab: "Konfigurasi Dokumen Registrasi Masuk" },
@@ -391,7 +414,9 @@
             document.getElementById('txt-title-dashboard').innerText = titleMap[menuKey].title;
             document.getElementById('txt-desc-dashboard').innerText = titleMap[menuKey].desc;
             document.getElementById('label-stat-total').innerText = titleMap[menuKey].labelStat;
-            document.getElementById('label-table-title').innerText = titleMap[menuKey].lblTab;
+            if(menuKey !== 'dashboard') {
+                document.getElementById('label-table-title').innerText = titleMap[menuKey].lblTab;
+            }
 
             renderTable();
         }
@@ -418,6 +443,7 @@
 
         function filterDataByMenu(data) {
             switch(currentMenu) {
+                case 'dashboard':
                 case 'identitas':
                 case 'periodik':
                 case 'registrasi':
@@ -439,6 +465,18 @@
             const searchKeyword = document.getElementById('searchBox').value.toLowerCase().trim();
             tbody.innerHTML = "";
 
+            let dataSiswaAktif = filterDataByMenu(masterDataSiswa);
+            
+            // Perbarui data Grafik (Selalu menggunakan data murid aktif)
+            if (currentMenu === 'dashboard') {
+                renderCharts(dataSiswaAktif);
+                document.getElementById('stat-murid').innerText = dataSiswaAktif.length;
+                document.getElementById('stat-L').innerText = dataSiswaAktif.filter(s => String(s.jk).toUpperCase() === 'L').length;
+                document.getElementById('stat-P').innerText = dataSiswaAktif.filter(s => String(s.jk).toUpperCase() === 'P').length;
+                return; // Berhenti di sini jika cuma menampilkan dashboard grafik
+            }
+
+            // Pembentukan struktur kolom tabel dinamis
             if (currentMenu === 'identitas') {
                 thead.innerHTML = `
                     <tr class="bg-slate-100 text-slate-600 text-[11px] font-bold tracking-wider uppercase border-b border-slate-200">
@@ -482,18 +520,12 @@
                     </tr>`;
             }
 
-            let dataSiswaAktif = filterDataByMenu(masterDataSiswa);
-            
             const filteredData = dataSiswaAktif.filter(s => {
                 return (s.nama || "").toLowerCase().includes(searchKeyword) || 
                        (s.nis || "").toLowerCase().includes(searchKeyword) || 
                        (s.nisn || "").toLowerCase().includes(searchKeyword);
             });
 
-            // Trigger Regenerasi Data Grafik Berdasarkan Saringan Data Terbaru
-            renderCharts(filteredData);
-
-            // Update Top Mini Stats
             document.getElementById('stat-murid').innerText = filteredData.length;
             document.getElementById('stat-L').innerText = filteredData.filter(s => String(s.jk).toUpperCase() === 'L').length;
             document.getElementById('stat-P').innerText = filteredData.filter(s => String(s.jk).toUpperCase() === 'P').length;
@@ -565,15 +597,14 @@
         }
 
         // ==========================================
-        // ENGINE KONTROLLER GRAFIK (CHART.JS LOGIC)
+        // ENGINE GRAPH (CHART.JS)
         // ==========================================
         function renderCharts(dataSiswa) {
-            // Hancurkan grafik lama jika ada, untuk menghindari visual menumpuk saat ganti menu
             if (instansiChartUmur) instansiChartUmur.destroy();
             if (instansiChartAgama) instansiChartAgama.destroy();
             if (instansiChartBulan) instansiChartBulan.destroy();
 
-            // --- 1. PROSES DATA GRAFIK UMUR ---
+            // 1. Kalkulasi Umur
             let mapUmur = {};
             dataSiswa.forEach(s => {
                 if (s.tgl_lahir && s.tgl_lahir !== '-') {
@@ -587,7 +618,7 @@
             let labelsUmur = Object.keys(mapUmur).sort((a,b) => a-b);
             let valuesUmur = labelsUmur.map(l => mapUmur[l]);
 
-            // --- 2. PROSES DATA GRAFIK AGAMA ---
+            // 2. Kalkulasi Agama
             let mapAgama = {};
             dataSiswa.forEach(s => {
                 let agm = (s.agama || 'Islam').trim();
@@ -596,7 +627,7 @@
             let labelsAgama = Object.keys(mapAgama);
             let valuesAgama = labelsAgama.map(l => mapAgama[l]);
 
-            // --- 3. PROSES DATA GRAFIK BULAN LAHIR ---
+            // 3. Kalkulasi Bulan Lahir
             let namaBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
             let hitungBulan = Array(12).fill(0);
             dataSiswa.forEach(s => {
@@ -609,65 +640,46 @@
                 }
             });
 
-            // --- GENERATE GRAFIK 1: UMUR ---
+            // Pembuatan Grafik
             const ctxUmur = document.getElementById('chartUmur').getContext('2d');
             instansiChartUmur = new Chart(ctxUmur, {
                 type: 'bar',
                 data: {
                     labels: labelsUmur.length ? labelsUmur.map(u => u + ' Thn') : ['0 Thn'],
-                    datasets: [{
-                        label: 'Jumlah Murid',
-                        data: valuesUmur.length ? valuesUmur : [0],
-                        backgroundColor: '#0d9488', // Teal 600
-                        borderRadius: 8
-                    }]
+                    datasets: [{ label: 'Jumlah Murid', data: valuesUmur.length ? valuesUmur : [0], backgroundColor: '#0d9488', borderRadius: 8 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // --- GENERATE GRAFIK 2: AGAMA ---
             const ctxAgama = document.getElementById('chartAgama').getContext('2d');
             instansiChartAgama = new Chart(ctxAgama, {
                 type: 'doughnut',
                 data: {
-                    labels: labelsAgama.length ? labelsAgama : ['Belum Diisi'],
-                    datasets: [{
-                        data: valuesAgama.length ? valuesAgama : [0],
-                        backgroundColor: ['#0f172a', '#06b6d4', '#f59e0b', '#ec4899', '#10b981']
-                    }]
+                    labels: labelsAgama.length ? labelsAgama : ['Islam'],
+                    datasets: [{ data: valuesAgama.length ? valuesAgama : [1], backgroundColor: ['#0f172a', '#06b6d4', '#f59e0b', '#ec4899', '#10b981'] }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
             });
 
-            // --- GENERATE GRAFIK 3: BULAN LAHIR ---
             const ctxBulan = document.getElementById('chartBulan').getContext('2d');
             instansiChartBulan = new Chart(ctxBulan, {
                 type: 'line',
                 data: {
                     labels: namaBulan,
-                    datasets: [{
-                        label: 'Kelahiran',
-                        data: hitungBulan,
-                        borderColor: '#2563eb', // Blue 600
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        borderWidth: 2
-                    }]
+                    datasets: [{ label: 'Kelahiran', data: hitungBulan, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.3, borderWidth: 2 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
         // ==========================================
-        // MANAJEMEN MODAL & TAB CONTROL
+        // WINDOW MODAL MUTATION & FORM SUBMIT
         // ==========================================
         function openEditModal(nis) {
             const siswa = masterDataSiswa.find(s => String(s.nis) === String(nis));
             if (!siswa) return;
 
             document.getElementById('modalTitle').innerText = `Edit Instrumen Murid: ${siswa.nama}`;
-            
             if(currentMenu === 'periodik') switchTab('tab-fisik');
             else switchTab('tab-biodata');
 
@@ -677,8 +689,7 @@
                 'anak_ke', 'saudara', 'transportasi', 'kip', 'layak_pip', 'alasan_pip', 'disabilitas',
                 'ayah_nama', 'ayah_nik', 'ayah_pendidikan', 'ayah_pekerjaan', 'ayah_penghasilan', 'ayah_thn_lahir',
                 'ibu_nama', 'ibu_nik', 'ibu_pendidikan', 'ibu_pekerjaan', 'ibu_penghasilan', 'ibu_thn_lahir',
-                'wali_nama', 'wali_nik', 'wali_pendidikan', 'wali_pekerjaan', 'wali_penghasilan', 'wali_thn_lahir',
-                'kelas', 'bb', 'tb', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'hp', 'telp', 'email'
+                'kelas', 'bb', 'tb', 'lingkar_kepala', 'hobi', 'cita_cita', 'sekolah_asal', 'hp', 'email'
             ];
 
             fields.forEach(f => {
@@ -708,9 +719,6 @@
             document.getElementById(`btn-${tabId}`).classList.remove('border-transparent', 'text-slate-500');
         }
 
-        // ==========================================
-        // FITUR AJAX SUBMIT DATA
-        // ==========================================
         async function simpanIdentitas(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSimpan');
