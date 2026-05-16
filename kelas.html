@@ -489,18 +489,31 @@ async function loadData() {
         
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
-        masterData = result.data.siswa || [];
-        masterDataLulus = result.data.siswa_lulus || [];
-        masterDataMutasiMasuk = result.data.mutasi_masuk || [];
-        masterDataMutasiKeluar = result.data.mutasi_keluar || [];
 
-        // 2. KUNCI UTAMA: Ambil sesi menggunakan nama 'session_sdnrt' (Sesuai dengan index.html)
+        // ========================================================
+        // MASUKKAN KODE PEMBERSIHANNYA DI SINI (DI BAWAH RESULT)
+        // ========================================================
+        let rawSiswa = result.data.siswa || [];
+        // Kita cek s.nama, jadi walaupun kolom id kosong karena rumus, data 1 murid tetap lolos!
+        masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "nama siswa");
+
+        let rawLulus = result.data.siswa_lulus || [];
+        masterDataLulus = rawLulus.filter(s => s.nama && String(s.nama).trim() !== "");
+
+        let rawMutasiMasuk = result.data.mutasi_masuk || [];
+        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => s.nama && String(s.nama).trim() !== "");
+
+        let rawMutasiKeluar = result.data.mutasi_keluar || [];
+        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
+        // ========================================================
+
+
+        // 2. Ambil sesi login dari localStorage (Menggunakan session_sdnrt sesuai index.html)
         const sessionUser = localStorage.getItem('session_sdnrt');
         
         if (sessionUser) {
             let userAktif = JSON.parse(sessionUser);
             
-            // Ambil data properti langsung dari response login server Anda
             userKelasAkses = userAktif.kelas_akses || "-"; 
             userRoleAktif = userAktif.role ? userAktif.role.toLowerCase() : "guru"; 
 
@@ -517,7 +530,6 @@ async function loadData() {
                 userMenuBtnEl.innerText = userAktif.nama.charAt(0).toUpperCase();
             }
         } else {
-            // Jika tidak ada sesi di localStorage, kembalikan user ke form login utama
             console.warn("Sesi tidak valid. Kembali ke halaman login.");
             window.location.href = "index.html";
             return;
@@ -531,10 +543,9 @@ async function loadData() {
 
     } catch (err) {
         console.error("Detail Error LoadData: ", err);
-        alert("Gagal terhubung dengan Database Spreadsheet. Sila periksa kembali jaringan internet Anda.");
+        alert("Gagal terhubung dengan Database Spreadsheet. Pastikan koneksi internet stabil.");
     }
 }
-
 function updateStats() {
     // 1. FILTER MURID AKTIF BERDASARKAN ROLE LOGIN (GURU ATAU ADMIN)
     let aktifKelas = masterData.filter(s => {
