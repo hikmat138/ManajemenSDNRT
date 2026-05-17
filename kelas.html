@@ -744,7 +744,7 @@ function renderTabelSiswa(dataList) {
     let tbody = document.getElementById(targetTbodyId) || document.getElementById('tbody-data');
     
     if (!tbody) {
-        console.error(`Elemen tabel dengan ID '${targetTbodyId}' atau 'tbody-data' tidak ditemukan!`);
+        alert(`🚨 MASALAH HTML: Elemen tabel dengan ID '${targetTbodyId}' tidak ditemukan di halaman! Periksa penulisan ID di tag <tbody> Anda.`);
         return; 
     }
 
@@ -752,17 +752,22 @@ function renderTabelSiswa(dataList) {
 
     // 2. Jika Data Kosong
     if (!dataList || dataList.length === 0) {
-    const tableElement = tbody.closest('table');
-    const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
-    
-    tbody.innerHTML = `<tr>
-        <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-900 whitespace-nowrap">
-            <i class="fa-regular fa-folder-open text-2xl mb-2 block text-gray-400"></i>
-            Tidak ada data murid untuk ditampilkan pada kriteria ini.
-        </td>
-    </tr>`;
-    return;
-}
+        const tableElement = tbody.closest('table');
+        const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
+        
+        tbody.innerHTML = `<tr>
+            <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-900 whitespace-nowrap">
+                <i class="fa-regular fa-folder-open text-2xl mb-2 block text-gray-400"></i>
+                Tidak ada data murid untuk ditampilkan pada kriteria ini.
+            </td>
+        </tr>`;
+        return;
+    }
+    let sampelData = dataList[0];
+    // Jika row.nama kosong DAN row.NAMA juga kosong, berarti nama kolomnya beda
+    if (!sampelData.nama && !sampelData.NAMA && !sampelData.Nama) {
+        alert("🚨 MASALAH DATABASE: Data mutasi berhasil ditarik, tetapi sistem tidak mengenali nama kolomnya. Struktur properti yang terbaca adalah:\n\n" + JSON.stringify(sampelData));
+    }
 
 // 3. Looping Pembuatan Baris Baru
 dataList.forEach((row, index) => {
