@@ -720,45 +720,47 @@ function filterData() {
     }
 }
 function updatePagination() {
-    // 1. Hitung total data yang lolos filter (bisa data murid aktif atau mutasi)
-    let totalData = (typeof filteredData !== 'undefined') ? filteredData.length : 0;
-    
-    // Jika rowsPerPage tidak terdefinisi, set default ke 10
-    if (typeof rowsPerPage === 'undefined') rowsPerPage = 10;
-    if (typeof currentPage === 'undefined') currentPage = 1;
+    // 1. Validasi jika data terfilter kosong
+    if (!filteredData) filteredData = [];
 
-    let totalPages = Math.ceil(totalData / rowsPerPage);
-    if (totalPages < 1) totalPages = 1;
+    const totalItems = filteredData.length;
+    // rowsPerPage biasanya bernilai 10 (dari dropdown 10 BARIS milik Bapak)
+    const totalPages = Math.ceil(totalItems / (typeof rowsPerPage !== 'undefined' ? rowsPerPage : 10)) || 1;
 
-    // 2. Potong data menggunakan rumus slice berdasarkan halaman aktif saat ini
-    let start = (currentPage - 1) * rowsPerPage;
-    let end = start + rowsPerPage;
-    let dataHalamanIni = (typeof filteredData !== 'undefined') ? filteredData.slice(start, end) : [];
+    // 2. Amankan batas halaman agar tidak minus atau melompat melewati batas max
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // 3. Potong data berdasarkan halaman aktif saat ini (Pagination Slicing)
+    const klsRowsPerPage = typeof rowsPerPage !== 'undefined' ? rowsPerPage : 10;
+    const startIndex = (currentPage - 1) * klsRowsPerPage;
+    const endIndex = startIndex + klsRowsPerPage;
+    const dataHalamanIni = filteredData.slice(startIndex, endIndex);
+
+    // 4. Perbarui Teks Navigasi Pagination di Web ("MENAMPILKAN 1 - 5 DARI 5 MURID")
+    const infoEl = document.getElementById('pagination-info') || document.getElementById('global-pagination-nav')?.querySelector('span');
+    if (infoEl && totalItems > 0) {
+        const tglStart = startIndex + 1;
+        const tglEnd = Math.min(endIndex, totalItems);
+        infoEl.innerText = `MENAMPILKAN ${tglStart} - ${tglEnd} DARI ${totalItems} MURID`;
+    } else if (infoEl) {
+        infoEl.innerText = "MENAMPILKAN 0 - 0 DARI 0 MURID";
+    }
+
+    // 5. Atur tombol aktif/nonaktif (Sebelumnya / Selanjutnya)
+    const btnPrev = document.getElementById('btn-prev') || document.getElementById('prev-page');
+    const btnNext = document.getElementById('btn-next') || document.getElementById('next-page');
+    if (btnPrev) btnPrev.disabled = (currentPage === 1);
+    if (btnNext) btnNext.disabled = (currentPage === totalPages || totalItems === 0);
 
     // ========================================================
-    // KUNCI UTAMA: LEMPAR DATA HASIL POTONGAN KE FUNGSI RENDER
+    // SAKLAR UTAMA: LEMPAR DATA HALAMAN INI KE MESIN GAMBAR TABEL
     // ========================================================
     if (typeof renderTabelSiswa === "function") {
-        renderTabelSiswa(dataHalamanIni); 
+        renderTabelSiswa(dataHalamanIni);
+    } else {
+        alert("🚨 MASALAH CRITICAL: Fungsi renderTabelSiswa() tidak ditemukan saat dipanggil dari Pagination!");
     }
-
-    // 3. Update Teks Informasi Pagination di Bar Bawah (Misal: MENAMPILKAN 1 - 10 DARI 46 MURID)
-    const paginationInfoEl = document.getElementById('pagination-info');
-    if (paginationInfoEl) {
-        if (totalData === 0) {
-            paginationInfoEl.innerText = "MENAMPILKAN 0 DARI 0 MURID";
-        } else {
-            let catatanAkhir = Math.min(end, totalData);
-            paginationInfoEl.innerText = `MENAMPILKAN ${start + 1} - ${catatanAkhir} DARI ${totalData} MURID`;
-        }
-    }
-
-    // 4. Logika untuk mengaktifkan/menonaktifkan tombol Next & Prev Bapak
-    const btnPrev = document.getElementById('btn-prev');
-    const btnNext = document.getElementById('btn-next');
-    
-    if (btnPrev) btnPrev.disabled = (currentPage === 1);
-    if (btnNext) btnNext.disabled = (currentPage === totalPages || totalData === 0);
 }
 function renderTabelSiswa(dataList) {
     // ========================================================
