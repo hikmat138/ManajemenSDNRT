@@ -1391,18 +1391,57 @@ function updateSidebarUI(activeId) {
 }
 
 function dapatkanDataTerfilter() {
-    if (!masterData) return []; 
+    // 1. Tentukan SUMBER DATA secara dinamis berdasarkan menu aktif saat ini
+    let sumberDataMaster = [];
+    
+    if (currentMenu === "mutasi-masuk") {
+        sumberDataMaster = (typeof masterDataMutasiMasuk !== 'undefined') ? masterDataMutasiMasuk : [];
+    } else if (currentMenu === "mutasi-keluar") {
+        sumberDataMaster = (typeof masterDataMutasiKeluar !== 'undefined') ? masterDataMutasiKeluar : [];
+    } else {
+        // Jika menunya siswa-pribadi, siswa-alamat, dll, gunakan masterData siswa aktif
+        sumberDataMaster = (typeof masterData !== 'undefined') ? masterData : [];
+    }
 
-    // Ambil nilai dari dropdown pilih kelas di web Bapak
-    const filterKelas = document.getElementById("pilih-kelas")?.value || "Semua";
+    // Jika sumber data kosong atau belum siap, langsung kembalikan array kosong
+    if (!sumberDataMaster || sumberDataMaster.length === 0) return []; 
 
-    return masterData.filter(row => {
-        // Jika dropdown bernilai "Semua", loloskan semua data yang sudah ditarik backend
-        if (filterKelas === "Semua") return true;
+    // 2. Ambil nilai filter dropdown kelas (Mendukung ID "pilih-kelas" atau "filter-kelas")
+    const filterKelasEl = document.getElementById("pilih-kelas") || document.getElementById("filter-kelas");
+    const filterKelas = filterKelasEl ? filterKelasEl.value.trim() : "Semua";
 
-        // Sandingkan kolom 'kelas' dari data sheet mutasi dengan dropdown pilihan kelas
-        const kelasRow = row.kelas || "";
-        return kelasRow.toString().toLowerCase() === filterKelas.toString().toLowerCase();
+    // 3. Ambil kata kunci dari kotak pencarian global (Pencarian Nama/NISN jika ada)
+    const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
+    const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+    // 4. Proses Penyaringan Data Murid
+    return sumberDataMaster.filter(row => {
+        // Ambil data kelas dari baris data (toleransi jika di database ditulis KELAS/kelas)
+        const kelasRow = (row.kelas || row.KELAS || "").toString().trim();
+        const namaRow = (row.nama || row.NAMA || "").toString().toLowerCase().trim();
+        const nisnRow = (row.nisn || row.NISN || "").toString().toLowerCase().trim();
+
+        // --- FILTER 1: FILTER BERDASARKAN KELAS AKSES LOGIN GURU ---
+        // Jika user yang login bukan admin, dia HANYA boleh melihat kelas aksesnya sendiri
+        const klsAksesClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toString().trim().toUpperCase();
+        const roleClean = (typeof userRoleAktif !== 'undefined' ? userRoleAktif : "guru").toString().toLowerCase().trim();
+        
+        if (roleClean !== "admin" && klsAksesClean !== "-" && klsAksesClean !== "SEMUA KELAS") {
+            if (kelasRow.toUpperCase() !== klsAksesClean) return false;
+        } 
+        // Jika yang login adalah ADMIN, filter bekerja berdasarkan pilihan dropdown kelas di web
+        else {
+            if (filterKelas !== "Semua" && filterKelas !== "ALL" && filterKelas !== "") {
+                if (kelasRow.toLowerCase() !== filterKelas.toLowerCase()) return false;
+            }
+        }
+
+        // --- FILTER 2: FILTER BERDASARKAN KATA KUNCI PENCARIAN ---
+        if (keyword) {
+            return namaRow.includes(keyword) || nisnRow.includes(keyword);
+        }
+
+        return true;
     });
 }
 </script>
