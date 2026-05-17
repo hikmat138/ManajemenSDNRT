@@ -671,9 +671,9 @@ function updateStats() {
 }
 
 function filterData() {
-    // 1. Tentukan sumber data MASTER berdasarkan menu yang sedang aktif
-    let sourceData = [];
+    alert("Pelacak A: Fungsi filterData() mulai jalan.");
     
+    let sourceData = [];
     if (currentMenu === "mutasi-masuk") {
         sourceData = typeof masterDataMutasiMasuk !== 'undefined' ? masterDataMutasiMasuk : [];
     } else if (currentMenu === "mutasi-keluar") {
@@ -682,50 +682,41 @@ function filterData() {
         sourceData = typeof masterData !== 'undefined' ? masterData : [];
     }
 
-    // 2. Ambil kata kunci pencarian dan filter kelas dari elemen HTML
-    const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
-    const filterKelasInput = document.getElementById('filter-kelas') || document.getElementById('pilih-kelas');
-    
+    alert("Pelacak B: Sumber data ketemu. Jumlah data mentah = " + sourceData.length + " baris.");
+
+    const searchInput = document.getElementById('search-data');
+    const filterKelasInput = document.getElementById('filter-kelas');
     let keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
     let kelasFilter = filterKelasInput ? filterKelasInput.value.toUpperCase().trim() : "";
 
-    // 3. Lakukan penyaringan (Filtering)
-    filteredData = sourceData.filter(item => {
-        // AMBIL DATA KELAS DENGAN TOLERANSI SEMUA JENIS NAMA KOLOM SPREADSHEET
-        let itemKelas = (item.kelas || item.KELAS || item.Kelas || item.kelas_tujuan || item.kelas_asal || "").toString().toUpperCase().trim();
-        let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase().trim();
-        let itemNisn = (item.nisn || item.NISN || "").toString().toLowerCase().trim();
-
-        // Validasi Hak Akses Kelas (Guru Kelas vs Admin)
-        let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
-        let roleClean = (typeof userRoleAktif !== 'undefined' ? userRoleAktif : "guru").toLowerCase().trim();
-
-        if (roleClean !== "admin" && klsClean !== "-" && klsClean !== "SEMUA KELAS") {
-            // Jika data kelas di baris kosong, kita loloskan dulu (khawatir nama kolom mutasi beda)
-            if (itemKelas !== "" && itemKelas !== klsClean) {
-                return false; 
+    // Proses penyaringan loop
+    try {
+        filteredData = sourceData.filter(item => {
+            let itemKelas = (item.kelas || item.KELAS || item.Kelas || "").toString().toUpperCase().trim();
+            let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase();
+            
+            let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
+            if (typeof userRoleAktif !== 'undefined' && userRoleAktif !== "admin") {
+                if (itemKelas !== klsClean) return false;
+            } else {
+                if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && itemKelas !== kelasFilter) return false;
             }
-        } else {
-            // Jika dia Admin, filter berdasarkan dropdown filter kelas
-            if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && kelasFilter !== "SEMUA KELAS" && itemKelas !== "") {
-                if (itemKelas !== kelasFilter) return false;
-            }
-        }
+            if (keyword) return itemNama.includes(keyword);
+            return true;
+        });
+    } catch(err) {
+        alert("🚨 EROR DI PROSES FILTER: " + err.message);
+    }
 
-        // Filter berdasarkan kata kunci pencarian (Nama atau NISN)
-        if (keyword) {
-            return itemNama.includes(keyword) || itemNisn.includes(keyword);
-        }
+    alert("Pelacak C: Selesai menyaring. Data lolos filter = " + filteredData.length + " baris.");
 
-        return true;
-    });
-
-    // 4. Set kembalian halaman ke angka 1 setiap kali data berubah
     currentPage = 1;
 
-    // 5. PENTING: Lempar hasilnya ke sistem pembagi halaman (Pagination)
     if (typeof updatePagination === "function") {
+        alert("Pelacak D: Memanggil fungsi updatePagination().");
         updatePagination();
+    } else {
+        alert("🚨 PELACAK D-EROR: Fungsi updatePagination() tidak ditemukan di file ini!");
     }
 }
 function updatePagination() {
