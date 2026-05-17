@@ -647,6 +647,9 @@ function updatePagination() {
 
     // Kode update teks "MENAMPILKAN X - Y DARI Z MURID" milik Bapak di bawahnya...
     let infoKeterangan = document.getElementById('pagination-info'); // sesuaikan ID nya
+    if (currentMenu === "dashboard") {
+        return; 
+    }
     if (infoKeterangan) {
         infoKeterangan.innerText = `MENAMPILKAN ${start + 1} - ${Math.min(end, totalData)} DARI ${totalData} MURID`;
     }
@@ -710,7 +713,7 @@ dataList.forEach((row, index) => {
 
     switch (currentMenu) {
         case "siswa-pribadi":
-            let tglIndo = formatTanggalIndo(row.tgl_lahir);
+            let tglIndo = formatTanggalIndo(row);
             tr.innerHTML = `
                 <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
                 <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
@@ -1230,26 +1233,32 @@ function updateSidebarUI(activeId) {
         });
     }
 }
-function formatTanggalIndo(tglStr) {
-    if (!tglStr) return '-';
+function formatTanggalIndo(row) {
+    // Jika baris data kosong, langsung kembalikan strip
+    if (!row) return '-';
+    
+    // Ambil data tanggal lahir dengan toleransi Huruf Besar / Huruf Kecil pada properti objek
+    let tglMentah = row.tgl_lahir || row.TGL_LAHIR || row.Tgl_Lahir || row.tglLahir || "";
+    
+    let stringTgl = String(tglMentah).trim();
+    if (!stringTgl || stringTgl === "undefined" || stringTgl === "-") return '-';
     
     let tahun = '', bulan = '', tanggal = '';
-    let stringTgl = String(tglStr).trim();
 
-    // Cek jika format YYYY-MM-DD (contoh: 2015-08-17)
+    // Cek jika format YYYY-MM-DD atau DD-MM-YYYY (Menggunakan strip)
     if (stringTgl.includes('-')) {
         let parts = stringTgl.split('-');
-        if (parts[0].length === 4) { // YYYY-MM-DD
+        if (parts[0].length === 4) { // YYYY-MM-DD (Contoh: 2016-05-09)
             tahun = parts[0];
             bulan = parts[1];
             tanggal = parts[2];
-        } else { // DD-MM-YYYY
+        } else { // DD-MM-YYYY (Contoh: 09-05-2016)
             tanggal = parts[0];
             bulan = parts[1];
             tahun = parts[2];
         }
     } 
-    // Cek jika format DD/MM/YYYY (contoh: 17/08/2015)
+    // Cek jika format DD/MM/YYYY (Menggunakan garis miring)
     else if (stringTgl.includes('/')) {
         let parts = stringTgl.split('/');
         tanggal = parts[0];
@@ -1257,20 +1266,22 @@ function formatTanggalIndo(tglStr) {
         tahun = parts[2];
     } 
     else {
-        return stringTgl; // Kembalikan apa adanya jika format tidak dikenali
+        // Jika formatnya sudah berupa teks atau format lain, kembalikan apa adanya
+        return stringTgl; 
     }
 
-    // Buat nama bulan Indonesia
+    // Pemetaan nama bulan standar Indonesia
     const namaBulanIndo = {
         '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
         '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
         '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
     };
 
-    // Bersihkan angka nol di depan tanggal (misal "05" jadi "5")
+    // Bersihkan angka nol di depan tanggal (misal "09" menjadi "9") dan pastikan bulan 2 digit
     let tglClean = parseInt(tanggal, 10);
     let blnClean = namaBulanIndo[bulan.padStart(2, '0')] || bulan;
 
+    // Jika hasil parsing gagal, kembalikan data asli penampung agar tidak merusak tampilan
     if (isNaN(tglClean) || !tahun) return stringTgl;
 
     return `${tglClean} ${blnClean} ${tahun}`;
