@@ -579,13 +579,24 @@ async function loadData() {
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
         let rawSiswa = result.data.siswa || [];
-        masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
+        masterData = rawSiswa.filter(s => {
+            let namaSiswa = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
+            return String(namaSiswa).trim() !== "" && String(namaSiswa).toLowerCase() !== "-";
+        });
 
+        // FILTER UNTUK MUTASI MASUK (Memeriksa segala variasi nama kolom nama)
         let rawMutasiMasuk = result.data.mutasi_masuk || [];
-        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => s.nama && String(s.nama).trim() !== "");
+        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => {
+            let namaMutasi = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
+            return String(namaMutasi).trim() !== "";
+        });
 
+        // FILTER UNTUK MUTASI KELUAR (Memeriksa segala variasi nama kolom nama)
         let rawMutasiKeluar = result.data.mutasi_keluar || [];
-        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
+        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => {
+            let namaMutasiK = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
+            return String(namaMutasiK).trim() !== "";
+        });
 
         const sessionUser = localStorage.getItem('session_sdnrt');
         if (sessionUser) {
