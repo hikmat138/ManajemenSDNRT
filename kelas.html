@@ -496,8 +496,6 @@
 </main>
 </div>
 
-<script>
-// URL Web App Google Apps Script
 // URL Web App Google Apps Script
 const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
@@ -511,7 +509,7 @@ let rowsPerPage = 10;
 let currentMenu = "dashboard";
 let userKelasAkses = ""; 
 let userRoleAktif = "guru"; // Inisialisasi default
-let charts = {};
+let instancesChart = {}; // Menggunakan objek ini secara konsisten untuk instance Chart.js
 
 document.addEventListener("DOMContentLoaded", loadData);
 
@@ -701,7 +699,7 @@ function renderTabelSiswa(dataList) {
         let tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
 
-        let badgeJK = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span>`;
+        let badgeJK = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' || row.jk === 'Laki-laki' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span>`;
 
         switch (currentMenu) {
             case "siswa-pribadi":
@@ -832,7 +830,6 @@ function renderTabelSiswa(dataList) {
                 `;
                 break;
 
-
             case "mutasi-masuk":
                 tr.innerHTML = `
                     <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
@@ -877,6 +874,7 @@ function showSection(sectionId) {
         if(titleEl) titleEl.innerText = "Dashboard Utama";
         if(filterBar) filterBar.classList.add('hidden');
         if(paginationNav) paginationNav.classList.add('hidden');
+        setTimeout(initCharts, 100); // Re-render chart agar ukurannya pas saat kembali ke dashboard
     } 
     else {
         // Tampilkan container induk section murid
@@ -890,12 +888,14 @@ function showSection(sectionId) {
             titleEl.innerText = sectionId.replace('siswa-', 'Data Murid: ').toUpperCase();
         }
         
-        // PERBAIKAN UTAMA: Ganti pemanggilan fungsi renderSubMenuTables() yang eror jadi filterData()
         currentPage = 1;
         filterData(); 
     }
     
-    updateSidebarUI(sectionId);
+    // Pastikan fungsi ini tersedia di script layout utama Bapak
+    if (typeof updateSidebarUI === "function") {
+        updateSidebarUI(sectionId);
+    }
 }
 
 function nextPage() {
@@ -926,7 +926,7 @@ function resetAndFilter() {
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('-ml-72');
     setTimeout(() => {
-        Object.values(charts).forEach(x => { if(x) x.resize(); });
+        Object.values(instancesChart).forEach(x => { if(x) x.resize(); });
     }, 300);
 }
 
@@ -947,22 +947,26 @@ function bukaModalAksi(nama, kelas) {
 function closeModal() {
     document.getElementById('modalAction').classList.add('hidden');
 }
+
+// ========================================================
+// CORE CHART ENGINE & FUNCTIONS WITH DATALABELS PLUGIN
+// ========================================================
 Chart.register(ChartDataLabels);
-let instancesChart = {};
+
 function buatChartLingkaran(idCanvas, judul, labelData, nilaiData, warnaKustom = []) {
-    // Jika chart sudah ada sebelumnya, hancurkan dulu supaya tidak tumpang tindih saat datanya berubah
     if (instancesChart[idCanvas]) {
         instancesChart[idCanvas].destroy();
     }
 
-    const ctx = document.getElementById(idCanvas).getContext('2d');
+    const canvasEl = document.getElementById(idCanvas);
+    if (!canvasEl) return;
     
-    // Warna default cerah jika warnaKustom kosong
+    const ctx = canvasEl.getContext('2d');
     const warnaDefault = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#64748b', '#a855f7'];
     const warnaDipakai = warnaKustom.length > 0 ? warnaKustom : warnaDefault;
 
     instancesChart[idCanvas] = new Chart(ctx, {
-        type: 'doughnut', // Bapak bisa ganti 'pie' atau 'doughnut' sesuai selera
+        type: 'doughnut',
         data: {
             labels: labelData,
             datasets: [{
@@ -983,23 +987,17 @@ function buatChartLingkaran(idCanvas, judul, labelData, nilaiData, warnaKustom =
                     padding: { bottom: 10 }
                 },
                 legend: {
-                    position: 'right', // Legenda nama ditaruh di sebelah kanan agar rapi
+                    position: 'right',
                     labels: { boxWidth: 12, font: { size: 11 } }
                 },
-                // --- CONFIG PERSENTASE DI DALAM LINGKARAN ---
                 datalabels: {
-                    color: '#ffffff', // Warna teks angka/persentase
+                    color: '#ffffff',
                     font: { weight: 'bold', size: 11 },
                     formatter: (value, ctx) => {
-                        // Hitung total nilai dalam satu chart
                         let sum = 0;
                         let dataArr = ctx.chart.data.datasets[0].data;
                         dataArr.map(data => { sum += data; });
-                        
-                        // Hitung persentase masing-masing bagian
                         let percentage = ((value * 100) / sum).toFixed(1) + "%";
-                        
-                        // Jika persentasenya terlalu kecil (di bawah 5%), sembunyikan angkanya agar tidak tumpang tindih
                         return ((value * 100) / sum) > 5 ? percentage : '';
                     }
                 }
@@ -1008,10 +1006,13 @@ function buatChartLingkaran(idCanvas, judul, labelData, nilaiData, warnaKustom =
     });
 }
 
-// Fungsi Khusus untuk Chart Batang (Misal: Bulan Lahir atau Penghasilan yang datanya banyak)
 function buatChartBatang(idCanvas, judul, labelData, nilaiData, warna) {
     if (instancesChart[idCanvas]) { instancesChart[idCanvas].destroy(); }
-    const ctx = document.getElementById(idCanvas).getContext('2d');
+    
+    const canvasEl = document.getElementById(idCanvas);
+    if (!canvasEl) return;
+
+    const ctx = canvasEl.getContext('2d');
 
     instancesChart[idCanvas] = new Chart(ctx, {
         type: 'bar',
@@ -1029,11 +1030,11 @@ function buatChartBatang(idCanvas, judul, labelData, nilaiData, warna) {
             maintainAspectRatio: false,
             plugins: {
                 title: { display: true, text: judul, font: { size: 14, weight: 'bold' } },
-                legend: { display: false }, // Sembunyikan legenda untuk chart batang tunggal
+                legend: { display: false },
                 datalabels: {
                     anchor: 'end',
                     align: 'top',
-                    color: '#4b5563', // Angka ditaruh di atas batang chart
+                    color: '#4b5563',
                     font: { weight: 'bold' }
                 }
             },
@@ -1045,189 +1046,133 @@ function buatChartBatang(idCanvas, judul, labelData, nilaiData, warna) {
     });
 }
 
-function inisialisasiSemuaChart(dataDashboard) {
-    // 1. Chart Gender (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartGender', 
-        'Grafik Gender Murid', 
-        ['Laki-laki', 'Perempuan'], 
-        [dataDashboard.gender.L || 0, dataDashboard.gender.P || 0], 
-        ['#3b82f6', '#ec4899']
-    );
-
-    // 2. Chart Umur (Doughnut / Pie atau Batang - Sesuai Selera)
-    // Biasanya sebaran umur murid SD berkisar dari 6 - 13 tahun
-    buatChartLingkaran(
-        'chartUmur', 
-        'Sebaran Umur Murid', 
-        ['6 Tahun', '7 Tahun', '8 Tahun', '9 Tahun', '10 Tahun', '11 Tahun', '12 Tahun', '13+ Tahun'], 
-        [
-            dataDashboard.umur['6'] || 0, 
-            dataDashboard.umur['7'] || 0, 
-            dataDashboard.umur['8'] || 0, 
-            dataDashboard.umur['9'] || 0, 
-            dataDashboard.umur['10'] || 0, 
-            dataDashboard.umur['11'] || 0, 
-            dataDashboard.umur['12'] || 0,
-            dataDashboard.umur['13'] || 0
-        ]
-    );
-
-    // 3. Chart PIP (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPIP', 
-        'Penerima Layak PIP', 
-        ['Layak PIP', 'Tidak Layak'], 
-        [dataDashboard.pip.Ya || 0, dataDashboard.pip.Tidak || 0], 
-        ['#10b981', '#ef4444']
-    );
-
-    // 4. Chart Agama (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartAgama', 
-        'Data Agama Murid', 
-        ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'], 
-        [
-            dataDashboard.agama.Islam || 0, 
-            dataDashboard.agama.Kristen || 0, 
-            dataDashboard.agama.Katolik || 0, 
-            dataDashboard.agama.Hindu || 0, 
-            dataDashboard.agama.Buddha || 0,
-            dataDashboard.agama.Khonghucu || 0
-        ],
-        ['#f59e0b', '#3b82f6', '#6366f1', '#ef4444', '#10b981', '#8b5cf6']
-    );
-
-    // 5. Chart Pekerjaan Ayah (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPekerjaanAyah', 
-        'Pekerjaan Ayah', 
-        Object.keys(dataDashboard.pekerjaanAyah || {}).length > 0 ? Object.keys(dataDashboard.pekerjaanAyah) : ['Belum Diisi'], 
-        Object.keys(dataDashboard.pekerjaanAyah || {}).length > 0 ? Object.values(dataDashboard.pekerjaanAyah) : [0]
-    );
-
-    // 6. Chart Pekerjaan Ibu (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPekerjaanIbu', 
-        'Pekerjaan Ibu', 
-        Object.keys(dataDashboard.pekerjaanIbu || {}).length > 0 ? Object.keys(dataDashboard.pekerjaanIbu) : ['Belum Diisi'], 
-        Object.keys(dataDashboard.pekerjaanIbu || {}).length > 0 ? Object.values(dataDashboard.pekerjaanIbu) : [0]
-    );
-
-    // 7. Chart Pendidikan Ayah (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPendidikanAyah', 
-        'Pendidikan Terakhir Ayah', 
-        ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], 
-        [
-            dataDashboard.pendidikanAyah.SD || 0, 
-            dataDashboard.pendidikanAyah.SMP || 0, 
-            dataDashboard.pendidikanAyah.SMA || 0, 
-            dataDashboard.pendidikanAyah.D3 || 0, 
-            dataDashboard.pendidikanAyah.S1 || 0, 
-            dataDashboard.pendidikanAyah.S2 || 0,
-            dataDashboard.pendidikanAyah.TidakSekolah || 0
-        ]
-    );
-
-    // 8. Chart Pendidikan Ibu (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPendidikanIbu', 
-        'Pendidikan Terakhir Ibu', 
-        ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], 
-        [
-            dataDashboard.pendidikanIbu.SD || 0, 
-            dataDashboard.pendidikanIbu.SMP || 0, 
-            dataDashboard.pendidikanIbu.SMA || 0, 
-            dataDashboard.pendidikanIbu.D3 || 0, 
-            dataDashboard.pendidikanIbu.S1 || 0, 
-            dataDashboard.pendidikanIbu.S2 || 0,
-            dataDashboard.pendidikanIbu.TidakSekolah || 0
-        ]
-    );
-
-    // 9. Chart Penghasilan Ayah (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPenghasilanAyah', 
-        'Penghasilan Bulanan Ayah', 
-        ['< Rp 1 Juta', 'Rp 1 - 2 Juta', 'Rp 2 - 5 Juta', '> Rp 5 Juta', 'Tidak Berpenghasilan'], 
-        [
-            dataDashboard.penghasilanAyah.Kurang1Juta || 0, 
-            dataDashboard.penghasilanAyah.Antara1_2Juta || 0, 
-            dataDashboard.penghasilanAyah.Antara2_5Juta || 0, 
-            dataDashboard.penghasilanAyah.Lebih5Juta || 0,
-            dataDashboard.penghasilanAyah.TidakBerpenghasilan || 0
-        ]
-    );
-
-    // 10. Chart Penghasilan Ibu (Doughnut / Pie)
-    buatChartLingkaran(
-        'chartPenghasilanIbu', 
-        'Penghasilan Bulanan Ibu', 
-        ['< Rp 1 Juta', 'Rp 1 - 2 Juta', 'Rp 2 - 5 Juta', '> Rp 5 Juta', 'Tidak Berpenghasilan'], 
-        [
-            dataDashboard.penghasilanIbu.Kurang1Juta || 0, 
-            dataDashboard.penghasilanIbu.Antara1_2Juta || 0, 
-            dataDashboard.penghasilanIbu.Antara2_5Juta || 0, 
-            dataDashboard.penghasilanIbu.Lebih5Juta || 0,
-            dataDashboard.penghasilanIbu.TidakBerpenghasilan || 0
-        ]
-    );
-
-    // 11. Chart Bulan Lahir (Menggunakan Chart Batang agar Rapi)
-    buatChartBatang(
-        'chartBulanLahir', 
-        'Tren Bulan Kelahiran Murid', 
-        ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], 
-        [
-            dataDashboard.bulanLahir.Jan || 0, 
-            dataDashboard.bulanLahir.Feb || 0, 
-            dataDashboard.bulanLahir.Mar || 0, 
-            dataDashboard.bulanLahir.Apr || 0, 
-            dataDashboard.bulanLahir.Mei || 0, 
-            dataDashboard.bulanLahir.Jun || 0, 
-            dataDashboard.bulanLahir.Jul || 0, 
-            dataDashboard.bulanLahir.Agu || 0, 
-            dataDashboard.bulanLahir.Sep || 0, 
-            dataDashboard.bulanLahir.Okt || 0, 
-            dataDashboard.bulanLahir.Nov || 0, 
-            dataDashboard.bulanLahir.Des || 0
-        ], 
-        '#6366f1' // Warna ungu indigo untuk grafik batang
-    );
-}
-    
+// Fungsi Otomatis Mengolah MasterData Menjadi Format Grafik Dashboard
 function initCharts() {
-    let aktifKelas = masterData.filter(s => 
-        String(s.status_aktif).toLowerCase() === "aktif" && 
-        String(s.kelas).toUpperCase() === userKelasAkses.toUpperCase()
-    );
-
-    let l = aktifKelas.filter(x => x.jk === "L" || x.jk === "Laki-laki").length;
-    let p = aktifKelas.filter(x => x.jk === "P" || x.jk === "Perempuan").length;
-
-    let ctx = document.getElementById("chartGender");
-    if (!ctx) return;
-
-    if (charts["chartGender"]) charts["chartGender"].destroy();
-
-    charts["chartGender"] = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Laki-Laki', 'Perempuan'],
-            datasets: [{
-                data: [l, p],
-                backgroundColor: ['#2563eb', '#ec4899']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
+    // 1. Ambil data murid aktif berdasarkan hak akses kelas login
+    let dataAktif = masterData.filter(s => {
+        let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
+        if (userRoleAktif === "admin" || userKelasAkses === "-") {
+            return isAktif;
+        } else {
+            return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
         }
     });
+
+    // 2. Buat Cetakan Penampung Distribusi Frekuensi Data
+    let dataDashboard = {
+        gender: { L: 0, P: 0 },
+        umur: { '6': 0, '7': 0, '8': 0, '9': 0, '10': 0, '11': 0, '12': 0, '13': 0 },
+        pip: { Ya: 0, Tidak: 0 },
+        agama: { Islam: 0, Kristen: 0, Katolik: 0, Hindu: 0, Buddha: 0, Khonghucu: 0 },
+        pekerjaanAyah: {},
+        pekerjaanIbu: {},
+        pendidikanAyah: { SD: 0, SMP: 0, SMA: 0, D3: 0, S1: 0, S2: 0, TidakSekolah: 0 },
+        pendidikanIbu: { SD: 0, SMP: 0, SMA: 0, D3: 0, S1: 0, S2: 0, TidakSekolah: 0 },
+        penghasilanAyah: { Kurang1Juta: 0, Antara1_2Juta: 0, Antara2_5Juta: 0, Lebih5Juta: 0, TidakBerpenghasilan: 0 },
+        penghasilanIbu: { Kurang1Juta: 0, Antara1_2Juta: 0, Antara2_5Juta: 0, Lebih5Juta: 0, TidakBerpenghasilan: 0 },
+        bulanLahir: { Jan: 0, Feb: 0, Mar: 0, Apr: 0, Mei: 0, Jun: 0, Jul: 0, Agu: 0, Sep: 0, Okt: 0, Nov: 0, Des: 0 }
+    };
+
+    // Mapping singkatan bulan lahir dari string tanggal/bulan
+    const mapBulan = { '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'Mei', '06': 'Jun', '07': 'Jul', '08': 'Agu', '09': 'Sep', '10': 'Okt', '11': 'Nov', '12': 'Des' };
+
+    // 3. Proses Looping Pengelompokan Data Murid
+    dataAktif.forEach(s => {
+        // Gender
+        if (s.jk === 'L' || s.jk === 'Laki-laki') dataDashboard.gender.L++;
+        if (s.jk === 'P' || s.jk === 'Perempuan') dataDashboard.gender.P++;
+
+        // Umur (Ambil angka depannya saja dari teks umur, misal "7 Tahun" -> 7)
+        let nUmur = parseInt(s.umur);
+        if (!isNaN(nUmur)) {
+            if (nUmur >= 13) dataDashboard.umur['13']++;
+            else if (dataDashboard.umur[String(nUmur)] !== undefined) dataDashboard.umur[String(nUmur)]++;
+        }
+
+        // PIP
+        if (String(s.layak_pip).toLowerCase() === 'ya') dataDashboard.pip.Ya++;
+        else dataDashboard.pip.Tidak++;
+
+        // Agama
+        let agm = String(s.agama || '').trim();
+        if (dataDashboard.agama[agm] !== undefined) dataDashboard.agama[agm]++;
+
+        // Pekerjaan Orang Tua (Dinamis menggunakan penampung objek langsung)
+        let pkerjaAyah = String(s.ayah_pekerjaan || '').trim() || 'Belum Diisi';
+        let pkerjaIbu = String(s.ibu_pekerjaan || '').trim() || 'Belum Diisi';
+        dataDashboard.pekerjaanAyah[pkerjaAyah] = (dataDashboard.pekerjaanAyah[pkerjaAyah] || 0) + 1;
+        dataDashboard.pekerjaanIbu[pkerjaIbu] = (dataDashboard.pekerjaanIbu[pkerjaIbu] || 0) + 1;
+
+        // Pendidikan Orang Tua (Kombinasi String Match)
+        ['ayah', 'ibu'].forEach(role => {
+            let pnd = String(s[`${role}_pendidikan`] || '').toUpperCase();
+            let targetObj = role === 'ayah' ? dataDashboard.pendidikanAyah : dataDashboard.pendidikanIbu;
+            if (pnd.includes('SMA') || pnd.includes('SMK') || pnd.includes('ALIAH')) targetObj.SMA++;
+            else if (pnd.includes('SMP') || pnd.includes('TSANAWIYAH')) targetObj.SMP++;
+            else if (pnd.includes('SD') || pnd.includes('IBTIDAIYAH')) targetObj.SD++;
+            else if (pnd.includes('S1') || pnd.includes('D4')) targetObj.S1++;
+            else if (pnd.includes('D3')) targetObj.D3++;
+            else if (pnd.includes('S2') || pnd.includes('S3')) targetObj.S2++;
+            else targetObj.TidakSekolah++;
+        });
+
+        // Penghasilan Orang Tua (Kombinasi String Match)
+        ['ayah', 'ibu'].forEach(role => {
+            let png = String(s[`${role}_penghasilan`] || '').toLowerCase();
+            let targetObj = role === 'ayah' ? dataDashboard.penghasilanAyah : dataDashboard.penghasilanIbu;
+            if (png.includes('kurang') || png.includes('<') || png.includes('500') || png.includes('1 juta')) targetObj.Kurang1Juta++;
+            else if (png.includes('1-2') || png.includes('1 juta - 2')) targetObj.Antara1_2Juta++;
+            else if (png.includes('2-5') || png.includes('2 juta - 5')) targetObj.Antara2_5Juta++;
+            else if (png.includes('lebih') || png.includes('>') || png.includes('5 juta')) targetObj.Lebih5Juta++;
+            else targetObj.TidakBerpenghasilan++;
+        });
+
+        // Bulan Lahir (Mendeteksi format tanggal "YYYY-MM-DD" atau "DD/MM/YYYY")
+        let tgl = String(s.tgl_lahir || '');
+        let blnKey = '';
+        if (tgl.includes('-')) blnKey = tgl.split('-')[1]; // Format "2015-08-12" -> "08"
+        else if (tgl.includes('/')) blnKey = tgl.split('/')[1]; // Format "12/08/2015" -> "08"
+        
+        if (mapBulan[blnKey]) dataDashboard.bulanLahir[mapBulan[blnKey]]++;
+    });
+
+    // 4. Jalankan Pengisian Fungsi Rendering Semua Grafik Terpilih secara Utuh
+    inisialisasiSemuaChart(dataDashboard);
+}
+
+function inisialisasiSemuaChart(dataDashboard) {
+    // 1. Chart Gender
+    buatChartLingkaran('chartGender', 'Grafik Gender Murid', ['Laki-laki', 'Perempuan'], [dataDashboard.gender.L, dataDashboard.gender.P], ['#3b82f6', '#ec4899']);
+
+    // 2. Chart Umur
+    buatChartLingkaran('chartUmur', 'Sebaran Umur Murid', ['6 Thn', '7 Thn', '8 Thn', '9 Thn', '10 Thn', '11 Thn', '12 Thn', '13+ Thn'], Object.values(dataDashboard.umur));
+
+    // 3. Chart PIP
+    buatChartLingkaran('chartPIP', 'Penerima Layak PIP', ['Layak PIP', 'Tidak Layak'], [dataDashboard.pip.Ya, dataDashboard.pip.Tidak], ['#10b981', '#ef4444']);
+
+    // 4. Chart Agama
+    buatChartLingkaran('chartAgama', 'Data Agama Murid', ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'], Object.values(dataDashboard.agama), ['#f59e0b', '#3b82f6', '#6366f1', '#ef4444', '#10b981', '#8b5cf6']);
+
+    // 5. Chart Pekerjaan Ayah
+    buatChartLingkaran('chartPekerjaanAyah', 'Pekerjaan Ayah', Object.keys(dataDashboard.pekerjaanAyah), Object.values(dataDashboard.pekerjaanAyah));
+
+    // 6. Chart Pekerjaan Ibu
+    buatChartLingkaran('chartPekerjaanIbu', 'Pekerjaan Ibu', Object.keys(dataDashboard.pekerjaanIbu), Object.values(dataDashboard.pekerjaanIbu));
+
+    // 7. Chart Pendidikan Ayah
+    buatChartLingkaran('chartPendidikanAyah', 'Pendidikan Terakhir Ayah', ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], Object.values(dataDashboard.pendidikanAyah));
+
+    // 8. Chart Pendidikan Ibu
+    buatChartLingkaran('chartPendidikanIbu', 'Pendidikan Terakhir Ibu', ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], Object.values(dataDashboard.pendidikanIbu));
+
+    // 9. Chart Penghasilan Ayah
+    buatChartLingkaran('chartPenghasilanAyah', 'Penghasilan Bulanan Ayah', ['< 1 Juta', '1 - 2 Juta', '2 - 5 Juta', '> 5 Juta', 'Tidak Berpenghasilan'], Object.values(dataDashboard.penghasilanAyah));
+
+    // 10. Chart Penghasilan Ibu
+    buatChartLingkaran('chartPenghasilanIbu', 'Penghasilan Bulanan Ibu', ['< 1 Juta', '1 - 2 Juta', '2 - 5 Juta', '> 5 Juta', 'Tidak Berpenghasilan'], Object.values(dataDashboard.penghasilanIbu));
+
+    // 11. Chart Bulan Lahir (Batang)
+    buatChartBatang('chartBulanLahir', 'Tren Bulan Kelahiran Murid', ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], Object.values(dataDashboard.bulanLahir), '#6366f1');
 }
 
 function updateSidebarUI(activeId) {
