@@ -1013,38 +1013,48 @@ dataList.forEach((row, index) => {
 });
 }
 function showSection(sectionId) {
-    currentMenu = sectionId; // Kunci: Simpan status menu aktif secara global
+    // 1. Amankan status menu aktif secara global di awal
+    currentMenu = sectionId; 
     
     const titleEl = document.getElementById('section-title');
-    
-    // Sembunyikan dashboard utama dan semua container section data murid
-    document.getElementById('section-dashboard').classList.add('hidden');
-    document.querySelectorAll('.section-murid').forEach(el => el.classList.add('hidden'));
-    
     const filterBar = document.getElementById('global-filter-container');
     const paginationNav = document.getElementById('global-pagination-nav');
     
+    // 2. Sembunyikan dashboard utama
+    const dashboardEl = document.getElementById('section-dashboard');
+    if (dashboardEl) dashboardEl.classList.add('hidden');
+    
+    // 3. Sembunyikan semua container data murid agar tidak tumpang tindih
+    document.querySelectorAll('.section-murid').forEach(el => {
+        el.classList.add('hidden');
+    });
+    
+    // 4. LOGIKA PERMUTASIAN & PENCARIAN SECTION
     if (sectionId === 'dashboard') {
-        document.getElementById('section-dashboard').classList.remove('hidden');
-        if(titleEl) titleEl.innerText = "Dashboard Utama";
-        if(filterBar) filterBar.classList.add('hidden');
-        if(paginationNav) paginationNav.classList.add('hidden');
-        setTimeout(initCharts, 100); // Re-render chart agar ukurannya pas saat kembali ke dashboard
+        if (dashboardEl) dashboardEl.classList.remove('hidden');
+        if (titleEl) titleEl.innerText = "Dashboard Utama";
+        if (filterBar) filterBar.classList.add('hidden');
+        if (paginationNav) paginationNav.classList.add('hidden');
+        setTimeout(initCharts, 100); 
     } 
     else {
-        // Tampilkan container induk section murid
+        // Tampilkan container target secara spesifik dan paksa hapus kelas hidden
         const targetSection = document.getElementById(`section-${sectionId}`);
-        if (targetSection) targetSection.classList.remove('hidden');
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+            // Pastikan jika ada inline style display, kita normalkan
+            targetSection.style.display = "block"; 
+        }
         
-        if(filterBar) filterBar.classList.remove('hidden');
-        if(paginationNav) paginationNav.classList.remove('hidden');
+        if (filterBar) filterBar.classList.remove('hidden');
+        if (paginationNav) paginationNav.classList.remove('hidden');
         
         // ========================================================
-        // LOGIKA PENAMAAN JUDUL HALAMAN YANG ESTETIK & RAPI
+        // SINKRONISASI JUDUL HALAMAN (Koreksi salah ketik MASIK -> MASUK)
         // ========================================================
-        if(titleEl) {
+        if (titleEl) {
             if (sectionId === "mutasi-masuk") {
-                titleEl.innerText = "DATA MUTASI MASIK (MURID)";
+                titleEl.innerText = "DATA MUTASI MASUK (MURID)";
             } else if (sectionId === "mutasi-keluar") {
                 titleEl.innerText = "DATA MUTASI KELUAR (MURID)";
             } else {
@@ -1055,15 +1065,17 @@ function showSection(sectionId) {
         
         currentPage = 1;
         
-        // PENTING: Bersihkan dulu input pencarian global setiap pindah menu 
-        // supaya data mutasi tidak tersaring kata kunci pencarian menu sebelumnya
-        const searchInput = document.getElementById('search-data');
+        // Bersihkan input pencarian global agar tidak menyumbat data menu baru
+        const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
         if (searchInput) searchInput.value = ""; 
 
-        filterData(); 
+        // JALANKAN MESIN FILTER & RENDER DATA SECARA NYATA
+        if (typeof filterData === "function") {
+            filterData(); 
+        }
     }
     
-    // Pastikan fungsi ini tersedia di script layout utama Bapak
+    // 5. Update tampilan menu aktif di sidebar Bapak
     if (typeof updateSidebarUI === "function") {
         updateSidebarUI(sectionId);
     }
