@@ -671,54 +671,57 @@ function updateStats() {
 }
 
 function filterData() {
-    let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
-    let source = [];
-
-    // ========================================================
-    // LOGIKA FILTER MUTASI BERDASARKAN KELAS AKSES (SINKRON)
-    // ========================================================
+    // 1. Tentukan sumber data MASTER berdasarkan menu yang sedang aktif
+    let sourceData = [];
+    
     if (currentMenu === "mutasi-masuk") {
-        source = masterDataMutasiMasuk.filter(s => {
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return true; // Admin bisa melihat semua data mutasi masuk
-            } else {
-                // Guru hanya melihat data mutasi masuk di kelasnya sendiri
-                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
-    } 
-    else if (currentMenu === "mutasi-keluar") {
-        source = masterDataMutasiKeluar.filter(s => {
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return true; // Admin bisa melihat semua data mutasi keluar
-            } else {
-                // Guru hanya melihat data mutasi keluar di kelasnya sendiri
-                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
-    } 
-    else {
-        // Filter Murid Aktif bawaan Anda (Tetap jangan diubah)
-        source = masterData.filter(s => {
-            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return isAktif;
-            } else {
-                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
+        sourceData = typeof masterDataMutasiMasuk !== 'undefined' ? masterDataMutasiMasuk : [];
+    } else if (currentMenu === "mutasi-keluar") {
+        sourceData = typeof masterDataMutasiKeluar !== 'undefined' ? masterDataMutasiKeluar : [];
+    } else {
+        // Jika menunya siswa-pribadi, siswa-alamat, dll, ambil dari data siswa aktif
+        sourceData = typeof masterData !== 'undefined' ? masterData : [];
     }
 
-    // 2. Filter berdasarkan kata kunci pencarian (Nama, NISN, NIS)
-    filteredData = source.filter(s => {
-        let nama = String(s.nama || "").toLowerCase();
-        let nisn = String(s.nisn || "").toLowerCase();
-        let nis = String(s.nis || "").toLowerCase();
-        return nama.includes(keyword) || nisn.includes(keyword) || nis.includes(keyword);
+    // 2. Ambil kata kunci pencarian dan filter kelas
+    const searchInput = document.getElementById('search-data');
+    const filterKelasInput = document.getElementById('filter-kelas');
+    
+    let keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    let kelasFilter = filterKelasInput ? filterKelasInput.value.toUpperCase().trim() : "";
+
+    // 3. Lakukan penyaringan (Filtering)
+    filteredData = sourceData.filter(item => {
+        // Ambil data kelas dari baris murid (toleransi huruf besar/kecil)
+        let itemKelas = (item.kelas || item.KELAS || item.Kelas || "").toString().toUpperCase().trim();
+        let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase();
+        let itemNisn = (item.nisn || item.NISN || "").toString().toLowerCase();
+
+        // Validasi Hak Akses Kelas (Guru Kelas vs Admin)
+        // Jika userRoleAktif bukan admin, maka klsClean wajib sama dengan kelas murid
+        let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
+        if (typeof userRoleAktif !== 'undefined' && userRoleAktif !== "admin") {
+            if (itemKelas !== klsClean) return false;
+        } else {
+            // Jika dia Admin, filter berdasarkan dropdown filter-kelas (jika dipilih)
+            if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && itemKelas !== kelasFilter) {
+                return false;
+            }
+        }
+
+        // Filter berdasarkan kata kunci pencarian (Nama atau NISN)
+        if (keyword) {
+            return itemNama.includes(keyword) || itemNisn.includes(keyword);
+        }
+
+        return true;
     });
 
-    currentPage = 1; // Reset ke halaman pertama setiap kali filter berubah
-    updatePagination(); 
+    // 4. Set kembalian halaman ke angka 1 setiap kali data berubah
+    currentPage = 1;
+
+    // 5. PENTING: Lempar hasilnya ke sistem pembagi halaman (Pagination)
+    updatePagination();
 }
 
 function updatePagination() {
