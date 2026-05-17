@@ -531,13 +531,20 @@
 </div>
         </div>
 
-        <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase">
-                Menampilkan 0 - 0 dari 0 murid
-        </div>
-        <div id="global-pagination-nav" class="hidden flex justify-end gap-2 pt-2">
-            <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Sebelumnya</button>
-            <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Selanjutnya</button>
-        </div>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-gray-100 mt-4">
+    <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase tracking-wider">
+        Menampilkan 0 - 0 dari 0 murid
+    </div>
+    
+    <div id="global-pagination-nav" class="hidden flex items-center gap-2">
+        <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold text-gray-700 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white transition shadow-sm">
+            Sebelumnya
+        </button>
+        <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold text-gray-700 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white transition shadow-sm">
+            Selanjutnya
+        </button>
+    </div>
+</div>
 
     </div>
 </main>
