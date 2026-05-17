@@ -711,23 +711,45 @@ function filterData() {
 }
 
 function updatePagination() {
-    // Jalankan kalkulasi pembagian halaman dari filteredData (46 data)
-    let totalData = filteredData.length;
-    let totalPages = Math.ceil(totalData / rowsPerPage);
+    // 1. Hitung total data yang lolos filter (bisa data murid aktif atau mutasi)
+    let totalData = (typeof filteredData !== 'undefined') ? filteredData.length : 0;
+    
+    // Jika rowsPerPage tidak terdefinisi, set default ke 10
+    if (typeof rowsPerPage === 'undefined') rowsPerPage = 10;
+    if (typeof currentPage === 'undefined') currentPage = 1;
 
-    // Rumus memotong array berdasarkan halaman aktif
+    let totalPages = Math.ceil(totalData / rowsPerPage);
+    if (totalPages < 1) totalPages = 1;
+
+    // 2. Potong data menggunakan rumus slice berdasarkan halaman aktif saat ini
     let start = (currentPage - 1) * rowsPerPage;
     let end = start + rowsPerPage;
-    let dataHalamanIni = filteredData.slice(start, end);
+    let dataHalamanIni = (typeof filteredData !== 'undefined') ? filteredData.slice(start, end) : [];
 
-    // PENTING: Kirim data yang sudah dipotong ke fungsi render tabel
-    renderTabelSiswa(dataHalamanIni); 
-
-    // Kode update teks "MENAMPILKAN X - Y DARI Z MURID" milik Bapak di bawahnya...
-    let infoKeterangan = document.getElementById('pagination-info'); // sesuaikan ID nya
-    if (infoKeterangan) {
-        infoKeterangan.innerText = `MENAMPILKAN ${start + 1} - ${Math.min(end, totalData)} DARI ${totalData} MURID`;
+    // ========================================================
+    // KUNCI UTAMA: LEMPAR DATA HASIL POTONGAN KE FUNGSI RENDER
+    // ========================================================
+    if (typeof renderTabelSiswa === "function") {
+        renderTabelSiswa(dataHalamanIni); 
     }
+
+    // 3. Update Teks Informasi Pagination di Bar Bawah (Misal: MENAMPILKAN 1 - 10 DARI 46 MURID)
+    const paginationInfoEl = document.getElementById('pagination-info');
+    if (paginationInfoEl) {
+        if (totalData === 0) {
+            paginationInfoEl.innerText = "MENAMPILKAN 0 DARI 0 MURID";
+        } else {
+            let catatanAkhir = Math.min(end, totalData);
+            paginationInfoEl.innerText = `MENAMPILKAN ${start + 1} - ${catatanAkhir} DARI ${totalData} MURID`;
+        }
+    }
+
+    // 4. Logika untuk mengaktifkan/menonaktifkan tombol Next & Prev Bapak
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    
+    if (btnPrev) btnPrev.disabled = (currentPage === 1);
+    if (btnNext) btnNext.disabled = (currentPage === totalPages || totalData === 0);
 }
 function renderTabelSiswa(dataList) {
     // ========================================================
