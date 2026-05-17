@@ -1053,10 +1053,20 @@ function initCharts() {
         }
     });
 
-    // 2. Buat Cetakan Penampung Distribusi Frekuensi Data
+    // 2. Buat Cetakan Penampung Distribusi Frekuensi Data (RENTANG UMUR BARU)
     let dataDashboard = {
         gender: { L: 0, P: 0 },
-        umur: { '6': 0, '7': 0, '8': 0, '9': 0, '10': 0, '11': 0, '12': 0, '13': 0 },
+        // CETAKAN SEBARAN UMUR BARU SESUAI REQUEST BAPAK
+        umur: { 
+            'under6': 0, 
+            '6_7': 0, 
+            '7_8': 0, 
+            '8_9': 0, 
+            '9_10': 0, 
+            '10_11': 0, 
+            '11_12': 0, 
+            'over12': 0 
+        },
         pip: { Ya: 0, Tidak: 0 },
         agama: { Islam: 0, Kristen: 0, Katolik: 0, Hindu: 0, Buddha: 0, Khonghucu: 0 },
         pekerjaanAyah: {},
@@ -1077,12 +1087,33 @@ function initCharts() {
         if (s.jk === 'L' || s.jk === 'Laki-laki') dataDashboard.gender.L++;
         if (s.jk === 'P' || s.jk === 'Perempuan') dataDashboard.gender.P++;
 
-        // Umur (Ambil angka depannya saja dari teks umur, misal "7 Tahun" -> 7)
-        let nUmur = parseInt(s.umur);
-        if (!isNaN(nUmur)) {
-            if (nUmur >= 13) dataDashboard.umur['13']++;
-            else if (dataDashboard.umur[String(nUmur)] !== undefined) dataDashboard.umur[String(nUmur)]++;
+        // ========================================================
+        // LOGIKA PENYARINGAN RENTANG UMUR BARU (DESIMAL & VALID)
+        // ========================================================
+        let umurMentah = s.umur || s.UMUR || s.Umur || "0";
+        // Antisipasi koma desimal dari format Excel/Spreadsheet Indonesia
+        let nUmur = parseFloat(umurMentah.toString().replace(',', '.')); 
+
+        if (!isNaN(nUmur) && nUmur > 0) {
+            if (nUmur < 6) {
+                dataDashboard.umur['under6']++;
+            } else if (nUmur >= 6 && nUmur < 7) {
+                dataDashboard.umur['6_7']++;
+            } else if (nUmur >= 7 && nUmur < 8) {
+                dataDashboard.umur['7_8']++;
+            } else if (nUmur >= 8 && nUmur < 9) {
+                dataDashboard.umur['8_9']++;
+            } else if (nUmur >= 9 && nUmur < 10) {
+                dataDashboard.umur['9_10']++;
+            } else if (nUmur >= 10 && nUmur < 11) {
+                dataDashboard.umur['10_11']++;
+            } else if (nUmur >= 11 && nUmur < 12) {
+                dataDashboard.umur['11_12']++;
+            } else if (nUmur >= 12) {
+                dataDashboard.umur['over12']++;
+            }
         }
+        // ========================================================
 
         // PIP
         if (String(s.layak_pip).toLowerCase() === 'ya') dataDashboard.pip.Ya++;
@@ -1092,13 +1123,13 @@ function initCharts() {
         let agm = String(s.agama || '').trim();
         if (dataDashboard.agama[agm] !== undefined) dataDashboard.agama[agm]++;
 
-        // Pekerjaan Orang Tua (Dinamis menggunakan penampung objek langsung)
+        // Pekerjaan Orang Tua
         let pkerjaAyah = String(s.ayah_pekerjaan || '').trim() || 'Belum Diisi';
         let pkerjaIbu = String(s.ibu_pekerjaan || '').trim() || 'Belum Diisi';
         dataDashboard.pekerjaanAyah[pkerjaAyah] = (dataDashboard.pekerjaanAyah[pkerjaAyah] || 0) + 1;
         dataDashboard.pekerjaanIbu[pkerjaIbu] = (dataDashboard.pekerjaanIbu[pkerjaIbu] || 0) + 1;
 
-        // Pendidikan Orang Tua (Kombinasi String Match)
+        // Pendidikan Orang Tua
         ['ayah', 'ibu'].forEach(role => {
             let pnd = String(s[`${role}_pendidikan`] || '').toUpperCase();
             let targetObj = role === 'ayah' ? dataDashboard.pendidikanAyah : dataDashboard.pendidikanIbu;
@@ -1111,7 +1142,7 @@ function initCharts() {
             else targetObj.TidakSekolah++;
         });
 
-        // Penghasilan Orang Tua (Kombinasi String Match)
+        // Penghasilan Orang Tua
         ['ayah', 'ibu'].forEach(role => {
             let png = String(s[`${role}_penghasilan`] || '').toLowerCase();
             let targetObj = role === 'ayah' ? dataDashboard.penghasilanAyah : dataDashboard.penghasilanIbu;
@@ -1122,11 +1153,11 @@ function initCharts() {
             else targetObj.TidakBerpenghasilan++;
         });
 
-        // Bulan Lahir (Mendeteksi format tanggal "YYYY-MM-DD" atau "DD/MM/YYYY")
+        // Bulan Lahir
         let tgl = String(s.tgl_lahir || '');
         let blnKey = '';
-        if (tgl.includes('-')) blnKey = tgl.split('-')[1]; // Format "2015-08-12" -> "08"
-        else if (tgl.includes('/')) blnKey = tgl.split('/')[1]; // Format "12/08/2015" -> "08"
+        if (tgl.includes('-')) blnKey = tgl.split('-')[1];
+        else if (tgl.includes('/')) blnKey = tgl.split('/')[1];
         
         if (mapBulan[blnKey]) dataDashboard.bulanLahir[mapBulan[blnKey]]++;
     });
@@ -1139,8 +1170,16 @@ function inisialisasiSemuaChart(dataDashboard) {
     // 1. Chart Gender
     buatChartLingkaran('chartGender', 'Grafik Gender Murid', ['Laki-laki', 'Perempuan'], [dataDashboard.gender.L, dataDashboard.gender.P], ['#3b82f6', '#ec4899']);
 
-    // 2. Chart Umur
-    buatChartLingkaran('chartUmur', 'Sebaran Umur Murid', ['6 Thn', '7 Thn', '8 Thn', '9 Thn', '10 Thn', '11 Thn', '12 Thn', '13+ Thn'], Object.values(dataDashboard.umur));
+    // ========================================================
+    // 2. CHART UMUR MENGGUNAKAN LABEL RENTANG BARU (ESTETIK)
+    // ========================================================
+    buatChartLingkaran(
+        'chartUmur', 
+        'Sebaran Umur Murid', 
+        ['<6 Tahun', '6-7 Tahun', '7-8 Tahun', '8-9 Tahun', '9-10 Tahun', '10-11 Tahun', '11-12 Tahun', '12> Tahun'], 
+        Object.values(dataDashboard.umur) // Berurutan mengambil nilai dari under6 sampai over12
+    );
+    // ========================================================
 
     // 3. Chart PIP
     buatChartLingkaran('chartPIP', 'Penerima Layak PIP', ['Layak PIP', 'Tidak Layak'], [dataDashboard.pip.Ya, dataDashboard.pip.Tidak], ['#10b981', '#ef4444']);
@@ -1169,7 +1208,6 @@ function inisialisasiSemuaChart(dataDashboard) {
     // 11. Chart Bulan Lahir (Batang)
     buatChartBatang('chartBulanLahir', 'Tren Bulan Kelahiran Murid', ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], Object.values(dataDashboard.bulanLahir), '#6366f1');
 }
-
 function updateSidebarUI(activeId) {
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link, nav a');
     allLinks.forEach(link => link.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'font-bold'));
