@@ -730,7 +730,7 @@ function updatePagination() {
     }
 }
 function renderTabelSiswa(dataList) {
-    // 1. Logika Pendeteksi ID tbody HTML
+    // 1. Logika Pendeteksi ID tbody HTML (Dioptimalkan agar tidak mudah mogok)
     let targetTbodyId = 'tbody-data'; 
     
     if (currentMenu === "mutasi-masuk") {
@@ -741,14 +741,29 @@ function renderTabelSiswa(dataList) {
         targetTbodyId = `tbody-${currentMenu}`;
     }
 
-    let tbody = document.getElementById(targetTbodyId) || document.getElementById('tbody-data');
+    // Cari berdasarkan target menu utama dulu
+    let tbody = document.getElementById(targetTbodyId);
     
+    // Jika gagal, coba cari alternatif id tanpa kata 'tbody-' (misal: id="mutasi-masuk")
     if (!tbody) {
-        alert(`🚨 MASALAH HTML: Elemen tabel dengan ID '${targetTbodyId}' tidak ditemukan di halaman! Periksa penulisan ID di tag <tbody> Anda.`);
+        tbody = document.getElementById(currentMenu);
+    }
+    
+    // Jika masih gagal juga, cari tbody mana saja yang sedang aktif/terlihat di layar
+    if (!tbody) {
+        let sectionAktif = document.getElementById(`section-${currentMenu}`);
+        if (sectionAktif) {
+            tbody = sectionAktif.querySelector('tbody');
+        }
+    }
+    
+    // Jika benar-benar kosong di seluruh penjuru halaman, baru munculkan alert
+    if (!tbody) {
+        alert(`🚨 MASALAH HTML: Sistem gagal menemukan tag <tbody> untuk menu "${currentMenu}". \n\nPastikan di dalam <div id="section-${currentMenu}"> sudah ada tag <tbody>.`);
         return; 
     }
 
-    tbody.innerHTML = ""; // Bersihkan baris lama
+    tbody.innerHTML = ""; // Bersihkan baris lama aman, lanjut proses render...
 
     // 2. Jika Data Kosong
     if (!dataList || dataList.length === 0) {
