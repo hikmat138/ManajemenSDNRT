@@ -618,16 +618,24 @@ async function loadData() {
             return;
         }
 
-        // 3. Jalankan kalkulasi angka ringkasan dashboard
+        // 3. Jalankan kalkulasi angka ringkasan dashboard (Pastikan fungsi ini membaca array mutasi)
         updateStats(); 
         
-        // PENTING: Memicu filter pertama kali agar filteredData terisi
+        // PENTING: Tentukan menu default awal jika belum didefinisikan sebelumnya
+        if (typeof currentMenu === 'undefined' || !currentMenu) {
+            currentMenu = "siswa-pribadi"; 
+        }
+        
+        // Memicu filter pertama kali agar filteredData terisi sesuai menu default
         filterData();  
         
+        if (statMurid) statMurid.innerText = "Selesai"; // Mengubah status memuat menjadi selesai
         setTimeout(initCharts, 300);
 
     } catch (err) {
         console.error("Detail Error LoadData: ", err);
+        const statMurid = document.getElementById('stat-murid');
+        if (statMurid) statMurid.innerText = "Gagal Memuat";
         alert("Gagal terhubung dengan Database Spreadsheet. Pastikan koneksi internet stabil.");
     }
 }
