@@ -579,24 +579,13 @@ async function loadData() {
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
         let rawSiswa = result.data.siswa || [];
-        masterData = rawSiswa.filter(s => {
-            let namaSiswa = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
-            return String(namaSiswa).trim() !== "" && String(namaSiswa).toLowerCase() !== "-";
-        });
+        masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
 
-        // FILTER UNTUK MUTASI MASUK (Memeriksa segala variasi nama kolom nama)
         let rawMutasiMasuk = result.data.mutasi_masuk || [];
-        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => {
-            let namaMutasi = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
-            return String(namaMutasi).trim() !== "";
-        });
+        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => s.nama && String(s.nama).trim() !== "");
 
-        // FILTER UNTUK MUTASI KELUAR (Memeriksa segala variasi nama kolom nama)
         let rawMutasiKeluar = result.data.mutasi_keluar || [];
-        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => {
-            let namaMutasiK = s.nama || s.NAMA || s["Nama Murid"] || s.Nama || "";
-            return String(namaMutasiK).trim() !== "";
-        });
+        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
 
         const sessionUser = localStorage.getItem('session_sdnrt');
         if (sessionUser) {
@@ -671,95 +660,73 @@ function updateStats() {
 }
 
 function filterData() {
-    alert("Pelacak A: Fungsi filterData() mulai jalan.");
-    
-    let sourceData = [];
+    let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
+    let source = [];
+
+    // ========================================================
+    // LOGIKA FILTER MUTASI BERDASARKAN KELAS AKSES (SINKRON)
+    // ========================================================
     if (currentMenu === "mutasi-masuk") {
-        sourceData = typeof masterDataMutasiMasuk !== 'undefined' ? masterDataMutasiMasuk : [];
-    } else if (currentMenu === "mutasi-keluar") {
-        sourceData = typeof masterDataMutasiKeluar !== 'undefined' ? masterDataMutasiKeluar : [];
-    } else {
-        sourceData = typeof masterData !== 'undefined' ? masterData : [];
-    }
-
-    alert("Pelacak B: Sumber data ketemu. Jumlah data mentah = " + sourceData.length + " baris.");
-
-    const searchInput = document.getElementById('search-data');
-    const filterKelasInput = document.getElementById('filter-kelas');
-    let keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    let kelasFilter = filterKelasInput ? filterKelasInput.value.toUpperCase().trim() : "";
-
-    // Proses penyaringan loop
-    try {
-        filteredData = sourceData.filter(item => {
-            let itemKelas = (item.kelas || item.KELAS || item.Kelas || "").toString().toUpperCase().trim();
-            let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase();
-            
-            let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
-            if (typeof userRoleAktif !== 'undefined' && userRoleAktif !== "admin") {
-                if (itemKelas !== klsClean) return false;
+        source = masterDataMutasiMasuk.filter(s => {
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return true; // Admin bisa melihat semua data mutasi masuk
             } else {
-                if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && itemKelas !== kelasFilter) return false;
+                // Guru hanya melihat data mutasi masuk di kelasnya sendiri
+                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
             }
-            if (keyword) return itemNama.includes(keyword);
-            return true;
         });
-    } catch(err) {
-        alert("🚨 EROR DI PROSES FILTER: " + err.message);
+    } 
+    else if (currentMenu === "mutasi-keluar") {
+        source = masterDataMutasiKeluar.filter(s => {
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return true; // Admin bisa melihat semua data mutasi keluar
+            } else {
+                // Guru hanya melihat data mutasi keluar di kelasnya sendiri
+                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
+    } 
+    else {
+        // Filter Murid Aktif bawaan Anda (Tetap jangan diubah)
+        source = masterData.filter(s => {
+            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return isAktif;
+            } else {
+                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
     }
 
-    alert("Pelacak C: Selesai menyaring. Data lolos filter = " + filteredData.length + " baris.");
+    // 2. Filter berdasarkan kata kunci pencarian (Nama, NISN, NIS)
+    filteredData = source.filter(s => {
+        let nama = String(s.nama || "").toLowerCase();
+        let nisn = String(s.nisn || "").toLowerCase();
+        let nis = String(s.nis || "").toLowerCase();
+        return nama.includes(keyword) || nisn.includes(keyword) || nis.includes(keyword);
+    });
 
-    currentPage = 1;
-
-    if (typeof updatePagination === "function") {
-        alert("Pelacak D: Memanggil fungsi updatePagination().");
-        updatePagination();
-    } else {
-        alert("🚨 PELACAK D-EROR: Fungsi updatePagination() tidak ditemukan di file ini!");
-    }
+    currentPage = 1; // Reset ke halaman pertama setiap kali filter berubah
+    updatePagination(); 
 }
+
 function updatePagination() {
-    // 1. Validasi jika data terfilter kosong
-    if (!filteredData) filteredData = [];
+    // Jalankan kalkulasi pembagian halaman dari filteredData (46 data)
+    let totalData = filteredData.length;
+    let totalPages = Math.ceil(totalData / rowsPerPage);
 
-    const totalItems = filteredData.length;
-    // rowsPerPage biasanya bernilai 10 (dari dropdown 10 BARIS milik Bapak)
-    const totalPages = Math.ceil(totalItems / (typeof rowsPerPage !== 'undefined' ? rowsPerPage : 10)) || 1;
+    // Rumus memotong array berdasarkan halaman aktif
+    let start = (currentPage - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+    let dataHalamanIni = filteredData.slice(start, end);
 
-    // 2. Amankan batas halaman agar tidak minus atau melompat melewati batas max
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
+    // PENTING: Kirim data yang sudah dipotong ke fungsi render tabel
+    renderTabelSiswa(dataHalamanIni); 
 
-    // 3. Potong data berdasarkan halaman aktif saat ini (Pagination Slicing)
-    const klsRowsPerPage = typeof rowsPerPage !== 'undefined' ? rowsPerPage : 10;
-    const startIndex = (currentPage - 1) * klsRowsPerPage;
-    const endIndex = startIndex + klsRowsPerPage;
-    const dataHalamanIni = filteredData.slice(startIndex, endIndex);
-
-    // 4. Perbarui Teks Navigasi Pagination di Web ("MENAMPILKAN 1 - 5 DARI 5 MURID")
-    const infoEl = document.getElementById('pagination-info') || document.getElementById('global-pagination-nav')?.querySelector('span');
-    if (infoEl && totalItems > 0) {
-        const tglStart = startIndex + 1;
-        const tglEnd = Math.min(endIndex, totalItems);
-        infoEl.innerText = `MENAMPILKAN ${tglStart} - ${tglEnd} DARI ${totalItems} MURID`;
-    } else if (infoEl) {
-        infoEl.innerText = "MENAMPILKAN 0 - 0 DARI 0 MURID";
-    }
-
-    // 5. Atur tombol aktif/nonaktif (Sebelumnya / Selanjutnya)
-    const btnPrev = document.getElementById('btn-prev') || document.getElementById('prev-page');
-    const btnNext = document.getElementById('btn-next') || document.getElementById('next-page');
-    if (btnPrev) btnPrev.disabled = (currentPage === 1);
-    if (btnNext) btnNext.disabled = (currentPage === totalPages || totalItems === 0);
-
-    // ========================================================
-    // SAKLAR UTAMA: LEMPAR DATA HALAMAN INI KE MESIN GAMBAR TABEL
-    // ========================================================
-    if (typeof renderTabelSiswa === "function") {
-        renderTabelSiswa(dataHalamanIni);
-    } else {
-        alert("🚨 MASALAH CRITICAL: Fungsi renderTabelSiswa() tidak ditemukan saat dipanggil dari Pagination!");
+    // Kode update teks "MENAMPILKAN X - Y DARI Z MURID" milik Bapak di bawahnya...
+    let infoKeterangan = document.getElementById('pagination-info'); // sesuaikan ID nya
+    if (infoKeterangan) {
+        infoKeterangan.innerText = `MENAMPILKAN ${start + 1} - ${Math.min(end, totalData)} DARI ${totalData} MURID`;
     }
 }
 function renderTabelSiswa(dataList) {
@@ -1006,48 +973,38 @@ dataList.forEach((row, index) => {
 });
 }
 function showSection(sectionId) {
-    // 1. Amankan status menu aktif secara global di awal
-    currentMenu = sectionId; 
+    currentMenu = sectionId; // Kunci: Simpan status menu aktif secara global
     
     const titleEl = document.getElementById('section-title');
+    
+    // Sembunyikan dashboard utama dan semua container section data murid
+    document.getElementById('section-dashboard').classList.add('hidden');
+    document.querySelectorAll('.section-murid').forEach(el => el.classList.add('hidden'));
+    
     const filterBar = document.getElementById('global-filter-container');
     const paginationNav = document.getElementById('global-pagination-nav');
     
-    // 2. Sembunyikan dashboard utama
-    const dashboardEl = document.getElementById('section-dashboard');
-    if (dashboardEl) dashboardEl.classList.add('hidden');
-    
-    // 3. Sembunyikan semua container data murid agar tidak tumpang tindih
-    document.querySelectorAll('.section-murid').forEach(el => {
-        el.classList.add('hidden');
-    });
-    
-    // 4. LOGIKA PERMUTASIAN & PENCARIAN SECTION
     if (sectionId === 'dashboard') {
-        if (dashboardEl) dashboardEl.classList.remove('hidden');
-        if (titleEl) titleEl.innerText = "Dashboard Utama";
-        if (filterBar) filterBar.classList.add('hidden');
-        if (paginationNav) paginationNav.classList.add('hidden');
-        setTimeout(initCharts, 100); 
+        document.getElementById('section-dashboard').classList.remove('hidden');
+        if(titleEl) titleEl.innerText = "Dashboard Utama";
+        if(filterBar) filterBar.classList.add('hidden');
+        if(paginationNav) paginationNav.classList.add('hidden');
+        setTimeout(initCharts, 100); // Re-render chart agar ukurannya pas saat kembali ke dashboard
     } 
     else {
-        // Tampilkan container target secara spesifik dan paksa hapus kelas hidden
+        // Tampilkan container induk section murid
         const targetSection = document.getElementById(`section-${sectionId}`);
-        if (targetSection) {
-            targetSection.classList.remove('hidden');
-            // Pastikan jika ada inline style display, kita normalkan
-            targetSection.style.display = "block"; 
-        }
+        if (targetSection) targetSection.classList.remove('hidden');
         
-        if (filterBar) filterBar.classList.remove('hidden');
-        if (paginationNav) paginationNav.classList.remove('hidden');
+        if(filterBar) filterBar.classList.remove('hidden');
+        if(paginationNav) paginationNav.classList.remove('hidden');
         
         // ========================================================
-        // SINKRONISASI JUDUL HALAMAN (Koreksi salah ketik MASIK -> MASUK)
+        // LOGIKA PENAMAAN JUDUL HALAMAN YANG ESTETIK & RAPI
         // ========================================================
-        if (titleEl) {
+        if(titleEl) {
             if (sectionId === "mutasi-masuk") {
-                titleEl.innerText = "DATA MUTASI MASUK (MURID)";
+                titleEl.innerText = "DATA MUTASI MASIK (MURID)";
             } else if (sectionId === "mutasi-keluar") {
                 titleEl.innerText = "DATA MUTASI KELUAR (MURID)";
             } else {
@@ -1058,17 +1015,15 @@ function showSection(sectionId) {
         
         currentPage = 1;
         
-        // Bersihkan input pencarian global agar tidak menyumbat data menu baru
-        const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
+        // PENTING: Bersihkan dulu input pencarian global setiap pindah menu 
+        // supaya data mutasi tidak tersaring kata kunci pencarian menu sebelumnya
+        const searchInput = document.getElementById('search-data');
         if (searchInput) searchInput.value = ""; 
 
-        // JALANKAN MESIN FILTER & RENDER DATA SECARA NYATA
-        if (typeof filterData === "function") {
-            filterData(); 
-        }
+        filterData(); 
     }
     
-    // 5. Update tampilan menu aktif di sidebar Bapak
+    // Pastikan fungsi ini tersedia di script layout utama Bapak
     if (typeof updateSidebarUI === "function") {
         updateSidebarUI(sectionId);
     }
@@ -1400,57 +1355,18 @@ function updateSidebarUI(activeId) {
 }
 
 function dapatkanDataTerfilter() {
-    // 1. Tentukan SUMBER DATA secara dinamis berdasarkan menu aktif saat ini
-    let sumberDataMaster = [];
-    
-    if (currentMenu === "mutasi-masuk") {
-        sumberDataMaster = (typeof masterDataMutasiMasuk !== 'undefined') ? masterDataMutasiMasuk : [];
-    } else if (currentMenu === "mutasi-keluar") {
-        sumberDataMaster = (typeof masterDataMutasiKeluar !== 'undefined') ? masterDataMutasiKeluar : [];
-    } else {
-        // Jika menunya siswa-pribadi, siswa-alamat, dll, gunakan masterData siswa aktif
-        sumberDataMaster = (typeof masterData !== 'undefined') ? masterData : [];
-    }
+    if (!masterData) return []; 
 
-    // Jika sumber data kosong atau belum siap, langsung kembalikan array kosong
-    if (!sumberDataMaster || sumberDataMaster.length === 0) return []; 
+    // Ambil nilai dari dropdown pilih kelas di web Bapak
+    const filterKelas = document.getElementById("pilih-kelas")?.value || "Semua";
 
-    // 2. Ambil nilai filter dropdown kelas (Mendukung ID "pilih-kelas" atau "filter-kelas")
-    const filterKelasEl = document.getElementById("pilih-kelas") || document.getElementById("filter-kelas");
-    const filterKelas = filterKelasEl ? filterKelasEl.value.trim() : "Semua";
+    return masterData.filter(row => {
+        // Jika dropdown bernilai "Semua", loloskan semua data yang sudah ditarik backend
+        if (filterKelas === "Semua") return true;
 
-    // 3. Ambil kata kunci dari kotak pencarian global (Pencarian Nama/NISN jika ada)
-    const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
-    const keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
-    // 4. Proses Penyaringan Data Murid
-    return sumberDataMaster.filter(row => {
-        // Ambil data kelas dari baris data (toleransi jika di database ditulis KELAS/kelas)
-        const kelasRow = (row.kelas || row.KELAS || "").toString().trim();
-        const namaRow = (row.nama || row.NAMA || "").toString().toLowerCase().trim();
-        const nisnRow = (row.nisn || row.NISN || "").toString().toLowerCase().trim();
-
-        // --- FILTER 1: FILTER BERDASARKAN KELAS AKSES LOGIN GURU ---
-        // Jika user yang login bukan admin, dia HANYA boleh melihat kelas aksesnya sendiri
-        const klsAksesClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toString().trim().toUpperCase();
-        const roleClean = (typeof userRoleAktif !== 'undefined' ? userRoleAktif : "guru").toString().toLowerCase().trim();
-        
-        if (roleClean !== "admin" && klsAksesClean !== "-" && klsAksesClean !== "SEMUA KELAS") {
-            if (kelasRow.toUpperCase() !== klsAksesClean) return false;
-        } 
-        // Jika yang login adalah ADMIN, filter bekerja berdasarkan pilihan dropdown kelas di web
-        else {
-            if (filterKelas !== "Semua" && filterKelas !== "ALL" && filterKelas !== "") {
-                if (kelasRow.toLowerCase() !== filterKelas.toLowerCase()) return false;
-            }
-        }
-
-        // --- FILTER 2: FILTER BERDASARKAN KATA KUNCI PENCARIAN ---
-        if (keyword) {
-            return namaRow.includes(keyword) || nisnRow.includes(keyword);
-        }
-
-        return true;
+        // Sandingkan kolom 'kelas' dari data sheet mutasi dengan dropdown pilihan kelas
+        const kelasRow = row.kelas || "";
+        return kelasRow.toString().toLowerCase() === filterKelas.toString().toLowerCase();
     });
 }
 </script>
