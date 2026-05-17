@@ -229,50 +229,51 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-4 rounded-xl border shadow-sm h-[250px]">
-                    <canvas id="chartGender"></canvas>
-                </div>
-                 <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartUmur"></canvas></div>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <div class="h-[250px] relative"><canvas id="chartGender"></canvas></div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-xl border shadow-sm">
+        <div class="h-[250px] relative"><canvas id="chartUmur"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPIP"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPIP"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartAgama"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartAgama"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPekerjaanAyah"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPekerjaanAyah"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPekerjaanIbu"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPekerjaanIbu"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPendidikanAyah"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPendidikanAyah"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPendidikanIbu"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPendidikanIbu"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPenghasilanAyah"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPenghasilanAyah"></canvas></div>
     </div>
 
     <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartPenghasilanIbu"></canvas></div>
+        <div class="h-[250px] relative"><canvas id="chartPenghasilanIbu"></canvas></div>
     </div>
 
-    <div class="bg-white p-4 rounded-xl border shadow-sm">
-        <div class="h-[250px]"><canvas id="chartBulanLahir"></canvas></div>
+    <div class="bg-white p-4 rounded-xl border shadow-sm md:col-span-2">
+        <div class="h-[250px] relative"><canvas id="chartBulanLahir"></canvas></div>
     </div>
-            </div>
+</div>
         </div>
 
 
@@ -946,7 +947,256 @@ function bukaModalAksi(nama, kelas) {
 function closeModal() {
     document.getElementById('modalAction').classList.add('hidden');
 }
+Chart.register(ChartDataLabels);
+let instancesChart = {};
+function buatChartLingkaran(idCanvas, judul, labelData, nilaiData, warnaKustom = []) {
+    // Jika chart sudah ada sebelumnya, hancurkan dulu supaya tidak tumpang tindih saat datanya berubah
+    if (instancesChart[idCanvas]) {
+        instancesChart[idCanvas].destroy();
+    }
 
+    const ctx = document.getElementById(idCanvas).getContext('2d');
+    
+    // Warna default cerah jika warnaKustom kosong
+    const warnaDefault = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#64748b', '#a855f7'];
+    const warnaDipakai = warnaKustom.length > 0 ? warnaKustom : warnaDefault;
+
+    instancesChart[idCanvas] = new Chart(ctx, {
+        type: 'doughnut', // Bapak bisa ganti 'pie' atau 'doughnut' sesuai selera
+        data: {
+            labels: labelData,
+            datasets: [{
+                data: nilaiData,
+                backgroundColor: warnaDipakai,
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: judul,
+                    font: { size: 14, weight: 'bold' },
+                    padding: { bottom: 10 }
+                },
+                legend: {
+                    position: 'right', // Legenda nama ditaruh di sebelah kanan agar rapi
+                    labels: { boxWidth: 12, font: { size: 11 } }
+                },
+                // --- CONFIG PERSENTASE DI DALAM LINGKARAN ---
+                datalabels: {
+                    color: '#ffffff', // Warna teks angka/persentase
+                    font: { weight: 'bold', size: 11 },
+                    formatter: (value, ctx) => {
+                        // Hitung total nilai dalam satu chart
+                        let sum = 0;
+                        let dataArr = ctx.chart.data.datasets[0].data;
+                        dataArr.map(data => { sum += data; });
+                        
+                        // Hitung persentase masing-masing bagian
+                        let percentage = ((value * 100) / sum).toFixed(1) + "%";
+                        
+                        // Jika persentasenya terlalu kecil (di bawah 5%), sembunyikan angkanya agar tidak tumpang tindih
+                        return ((value * 100) / sum) > 5 ? percentage : '';
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Fungsi Khusus untuk Chart Batang (Misal: Bulan Lahir atau Penghasilan yang datanya banyak)
+function buatChartBatang(idCanvas, judul, labelData, nilaiData, warna) {
+    if (instancesChart[idCanvas]) { instancesChart[idCanvas].destroy(); }
+    const ctx = document.getElementById(idCanvas).getContext('2d');
+
+    instancesChart[idCanvas] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labelData,
+            datasets: [{
+                label: 'Jumlah Murid',
+                data: nilaiData,
+                backgroundColor: warna || '#3b82f6',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { display: true, text: judul, font: { size: 14, weight: 'bold' } },
+                legend: { display: false }, // Sembunyikan legenda untuk chart batang tunggal
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#4b5563', // Angka ditaruh di atas batang chart
+                    font: { weight: 'bold' }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+function inisialisasiSemuaChart(dataDashboard) {
+    // 1. Chart Gender (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartGender', 
+        'Grafik Gender Murid', 
+        ['Laki-laki', 'Perempuan'], 
+        [dataDashboard.gender.L || 0, dataDashboard.gender.P || 0], 
+        ['#3b82f6', '#ec4899']
+    );
+
+    // 2. Chart Umur (Doughnut / Pie atau Batang - Sesuai Selera)
+    // Biasanya sebaran umur murid SD berkisar dari 6 - 13 tahun
+    buatChartLingkaran(
+        'chartUmur', 
+        'Sebaran Umur Murid', 
+        ['6 Tahun', '7 Tahun', '8 Tahun', '9 Tahun', '10 Tahun', '11 Tahun', '12 Tahun', '13+ Tahun'], 
+        [
+            dataDashboard.umur['6'] || 0, 
+            dataDashboard.umur['7'] || 0, 
+            dataDashboard.umur['8'] || 0, 
+            dataDashboard.umur['9'] || 0, 
+            dataDashboard.umur['10'] || 0, 
+            dataDashboard.umur['11'] || 0, 
+            dataDashboard.umur['12'] || 0,
+            dataDashboard.umur['13'] || 0
+        ]
+    );
+
+    // 3. Chart PIP (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPIP', 
+        'Penerima Layak PIP', 
+        ['Layak PIP', 'Tidak Layak'], 
+        [dataDashboard.pip.Ya || 0, dataDashboard.pip.Tidak || 0], 
+        ['#10b981', '#ef4444']
+    );
+
+    // 4. Chart Agama (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartAgama', 
+        'Data Agama Murid', 
+        ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu'], 
+        [
+            dataDashboard.agama.Islam || 0, 
+            dataDashboard.agama.Kristen || 0, 
+            dataDashboard.agama.Katolik || 0, 
+            dataDashboard.agama.Hindu || 0, 
+            dataDashboard.agama.Buddha || 0,
+            dataDashboard.agama.Khonghucu || 0
+        ],
+        ['#f59e0b', '#3b82f6', '#6366f1', '#ef4444', '#10b981', '#8b5cf6']
+    );
+
+    // 5. Chart Pekerjaan Ayah (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPekerjaanAyah', 
+        'Pekerjaan Ayah', 
+        Object.keys(dataDashboard.pekerjaanAyah || {}).length > 0 ? Object.keys(dataDashboard.pekerjaanAyah) : ['Belum Diisi'], 
+        Object.keys(dataDashboard.pekerjaanAyah || {}).length > 0 ? Object.values(dataDashboard.pekerjaanAyah) : [0]
+    );
+
+    // 6. Chart Pekerjaan Ibu (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPekerjaanIbu', 
+        'Pekerjaan Ibu', 
+        Object.keys(dataDashboard.pekerjaanIbu || {}).length > 0 ? Object.keys(dataDashboard.pekerjaanIbu) : ['Belum Diisi'], 
+        Object.keys(dataDashboard.pekerjaanIbu || {}).length > 0 ? Object.values(dataDashboard.pekerjaanIbu) : [0]
+    );
+
+    // 7. Chart Pendidikan Ayah (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPendidikanAyah', 
+        'Pendidikan Terakhir Ayah', 
+        ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], 
+        [
+            dataDashboard.pendidikanAyah.SD || 0, 
+            dataDashboard.pendidikanAyah.SMP || 0, 
+            dataDashboard.pendidikanAyah.SMA || 0, 
+            dataDashboard.pendidikanAyah.D3 || 0, 
+            dataDashboard.pendidikanAyah.S1 || 0, 
+            dataDashboard.pendidikanAyah.S2 || 0,
+            dataDashboard.pendidikanAyah.TidakSekolah || 0
+        ]
+    );
+
+    // 8. Chart Pendidikan Ibu (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPendidikanIbu', 
+        'Pendidikan Terakhir Ibu', 
+        ['SD', 'SMP', 'SMA/SMK', 'D3', 'S1/D4', 'S2/S3', 'Tidak Sekolah'], 
+        [
+            dataDashboard.pendidikanIbu.SD || 0, 
+            dataDashboard.pendidikanIbu.SMP || 0, 
+            dataDashboard.pendidikanIbu.SMA || 0, 
+            dataDashboard.pendidikanIbu.D3 || 0, 
+            dataDashboard.pendidikanIbu.S1 || 0, 
+            dataDashboard.pendidikanIbu.S2 || 0,
+            dataDashboard.pendidikanIbu.TidakSekolah || 0
+        ]
+    );
+
+    // 9. Chart Penghasilan Ayah (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPenghasilanAyah', 
+        'Penghasilan Bulanan Ayah', 
+        ['< Rp 1 Juta', 'Rp 1 - 2 Juta', 'Rp 2 - 5 Juta', '> Rp 5 Juta', 'Tidak Berpenghasilan'], 
+        [
+            dataDashboard.penghasilanAyah.Kurang1Juta || 0, 
+            dataDashboard.penghasilanAyah.Antara1_2Juta || 0, 
+            dataDashboard.penghasilanAyah.Antara2_5Juta || 0, 
+            dataDashboard.penghasilanAyah.Lebih5Juta || 0,
+            dataDashboard.penghasilanAyah.TidakBerpenghasilan || 0
+        ]
+    );
+
+    // 10. Chart Penghasilan Ibu (Doughnut / Pie)
+    buatChartLingkaran(
+        'chartPenghasilanIbu', 
+        'Penghasilan Bulanan Ibu', 
+        ['< Rp 1 Juta', 'Rp 1 - 2 Juta', 'Rp 2 - 5 Juta', '> Rp 5 Juta', 'Tidak Berpenghasilan'], 
+        [
+            dataDashboard.penghasilanIbu.Kurang1Juta || 0, 
+            dataDashboard.penghasilanIbu.Antara1_2Juta || 0, 
+            dataDashboard.penghasilanIbu.Antara2_5Juta || 0, 
+            dataDashboard.penghasilanIbu.Lebih5Juta || 0,
+            dataDashboard.penghasilanIbu.TidakBerpenghasilan || 0
+        ]
+    );
+
+    // 11. Chart Bulan Lahir (Menggunakan Chart Batang agar Rapi)
+    buatChartBatang(
+        'chartBulanLahir', 
+        'Tren Bulan Kelahiran Murid', 
+        ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], 
+        [
+            dataDashboard.bulanLahir.Jan || 0, 
+            dataDashboard.bulanLahir.Feb || 0, 
+            dataDashboard.bulanLahir.Mar || 0, 
+            dataDashboard.bulanLahir.Apr || 0, 
+            dataDashboard.bulanLahir.Mei || 0, 
+            dataDashboard.bulanLahir.Jun || 0, 
+            dataDashboard.bulanLahir.Jul || 0, 
+            dataDashboard.bulanLahir.Agu || 0, 
+            dataDashboard.bulanLahir.Sep || 0, 
+            dataDashboard.bulanLahir.Okt || 0, 
+            dataDashboard.bulanLahir.Nov || 0, 
+            dataDashboard.bulanLahir.Des || 0
+        ], 
+        '#6366f1' // Warna ungu indigo untuk grafik batang
+    );
+}
+    
 function initCharts() {
     let aktifKelas = masterData.filter(s => 
         String(s.status_aktif).toLowerCase() === "aktif" && 
