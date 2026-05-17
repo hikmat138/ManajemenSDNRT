@@ -972,11 +972,27 @@ function showSection(sectionId) {
         if(filterBar) filterBar.classList.remove('hidden');
         if(paginationNav) paginationNav.classList.remove('hidden');
         
+        // ========================================================
+        // LOGIKA PENAMAAN JUDUL HALAMAN YANG ESTETIK & RAPI
+        // ========================================================
         if(titleEl) {
-            titleEl.innerText = sectionId.replace('siswa-', 'Data Murid: ').toUpperCase();
+            if (sectionId === "mutasi-masuk") {
+                titleEl.innerText = "DATA MUTASI MASIK (MURID)";
+            } else if (sectionId === "mutasi-keluar") {
+                titleEl.innerText = "DATA MUTASI KELUAR (MURID)";
+            } else {
+                titleEl.innerText = sectionId.replace('siswa-', 'DATA MURID: ').toUpperCase();
+            }
         }
+        // ========================================================
         
         currentPage = 1;
+        
+        // PENTING: Bersihkan dulu input pencarian global setiap pindah menu 
+        // supaya data mutasi tidak tersaring kata kunci pencarian menu sebelumnya
+        const searchInput = document.getElementById('search-data');
+        if (searchInput) searchInput.value = ""; 
+
         filterData(); 
     }
     
@@ -985,7 +1001,6 @@ function showSection(sectionId) {
         updateSidebarUI(sectionId);
     }
 }
-
 function nextPage() {
     if (currentPage * rowsPerPage < filteredData.length) {
         currentPage++;
