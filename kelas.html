@@ -669,13 +669,31 @@ function filterData() {
     let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
     let source = [];
 
-    // 1. Tentukan sumber data berdasarkan menu aktif
+    // ========================================================
+    // LOGIKA FILTER MUTASI BERDASARKAN KELAS AKSES (SINKRON)
+    // ========================================================
     if (currentMenu === "mutasi-masuk") {
-        source = masterDataMutasiMasuk;
-    } else if (currentMenu === "mutasi-keluar") {
-        source = masterDataMutasiKeluar;
-    } else {
-        // Filter Murid Aktif Berdasarkan Kelas Akses Akun
+        source = masterDataMutasiMasuk.filter(s => {
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return true; // Admin bisa melihat semua data mutasi masuk
+            } else {
+                // Guru hanya melihat data mutasi masuk di kelasnya sendiri
+                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
+    } 
+    else if (currentMenu === "mutasi-keluar") {
+        source = masterDataMutasiKeluar.filter(s => {
+            if (userRoleAktif === "admin" || userKelasAkses === "-") {
+                return true; // Admin bisa melihat semua data mutasi keluar
+            } else {
+                // Guru hanya melihat data mutasi keluar di kelasnya sendiri
+                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
+            }
+        });
+    } 
+    else {
+        // Filter Murid Aktif bawaan Anda (Tetap jangan diubah)
         source = masterData.filter(s => {
             let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
             if (userRoleAktif === "admin" || userKelasAkses === "-") {
