@@ -173,10 +173,6 @@
             </div>
         </div>
 
-        <a href="#" onclick="showSection('siswa-lulus')" class="sidebar-link flex items-center p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
-            <i class="fas fa-graduation-cap mr-3 w-5 text-blue-500"></i> Alumni / Lulus
-        </a>
-
         <div>
             <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
                 <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5 text-blue-500"></i> Riwayat Mutasi</span>
@@ -466,7 +462,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
 let masterData = [];
-let masterDataLulus = [];
 let masterDataMutasiMasuk = [];
 let masterDataMutasiKeluar = [];
 let filteredData = [];
@@ -496,9 +491,6 @@ async function loadData() {
         // ========================================================
         let rawSiswa = result.data.siswa || [];
         masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
-
-        let rawLulus = result.data.siswa_lulus || [];
-        masterDataLulus = rawLulus.filter(s => s.nama && String(s.nama).trim() !== "");
 
         let rawMutasiMasuk = result.data.mutasi_masuk || [];
         masterDataMutasiMasuk = rawMutasiMasuk.filter(s => s.nama && String(s.nama).trim() !== "");
@@ -564,7 +556,6 @@ function updateStats() {
     let l = aktifKelas.filter(x => x.jk === "L" || x.jk === "Laki-laki").length;
     let p = aktifKelas.filter(x => x.jk === "P" || x.jk === "Perempuan").length;
 
-    let totalLulus = masterDataLulus.length;
     let totalMutasiMasuk = masterDataMutasiMasuk.length;
     let totalMutasiKeluar = masterDataMutasiKeluar.length;
 
@@ -572,14 +563,12 @@ function updateStats() {
     const statMuridEl = document.getElementById('stat-murid');
     const lEl = document.getElementById('L');
     const pEl = document.getElementById('P');
-    const statLulusEl = document.getElementById('stat-lulus');
     const statMasukEl = document.getElementById('stat-mutasi-masuk');
     const statKeluarEl = document.getElementById('stat-mutasi-keluar');
 
     if (statMuridEl) statMuridEl.innerText = aktifKelas.length + " Murid";
     if (lEl) lEl.innerText = l + " Orang";
     if (pEl) pEl.innerText = p + " Orang";
-    if (statLulusEl) statLulusEl.innerText = totalLulus + " Alumni";
     if (statMasukEl) statMasukEl.innerText = totalMutasiMasuk + " Kasus";
     if (statKeluarEl) statKeluarEl.innerText = totalMutasiKeluar + " Kasus";
 }
@@ -589,9 +578,7 @@ function filterData() {
     let source = [];
 
     // 1. Tentukan sumber data berdasarkan menu aktif
-    if (currentMenu === "siswa-lulus") {
-        source = masterDataLulus;
-    } else if (currentMenu === "mutasi-masuk") {
+    if (currentMenu === "mutasi-masuk") {
         source = masterDataMutasiMasuk;
     } else if (currentMenu === "mutasi-keluar") {
         source = masterDataMutasiKeluar;
@@ -638,9 +625,7 @@ function renderTabelSiswa(dataList) {
     // 1. Logika Pendeteksi ID tbody HTML
     let targetTbodyId = 'tbody-data'; 
     
-    if (currentMenu === "siswa-lulus") {
-        targetTbodyId = "tbody-siswa-lulus"; 
-    } else if (currentMenu === "mutasi-masuk") {
+    if (currentMenu === "mutasi-masuk") {
         targetTbodyId = "tbody-mutasi-masuk";
     } else if (currentMenu === "mutasi-keluar") {
         targetTbodyId = "tbody-mutasi-keluar";
@@ -673,7 +658,6 @@ function renderTabelSiswa(dataList) {
 
     // 3. Looping Pembuatan Baris Baru (Tanpa Kolom ID, Langsung Nama)
     dataList.forEach((row, index) => {
-        let barisNomor = (currentPage - 1) * rowsPerPage + (index + 1);
         let tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
 
@@ -682,66 +666,66 @@ function renderTabelSiswa(dataList) {
         switch (currentMenu) {
             case "siswa-pribadi":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600 font-medium">${row.kelas || '-'}</td>
-                    <td class="p-3 font-mono text-xs text-gray-500">${row.nis || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400 font-medium">${row.kelas || '-'}</td>
+                    <td class="p-3 font-mono text-xs text-gray-400">${row.nis || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-xs text-gray-500">${row.nisn || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.tmpt_lahir || '-'}</td>
-                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_lahir || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.nik || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.agama || '-'}</td>
-                    <td class="p-3 text-gray-600 font-mono text-xs">${row.akte || '-'}</td>
-                    <td class="p-3 text-gray-600 font-medium">${row.anak_ke || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 font-mono text-xs text-gray-400">${row.nisn || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.tmpt_lahir || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.tgl_lahir || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.nik || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.agama || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.akte || '-'}</td>
+                    <td class="p-3 text-gray-400 font-medium">${row.anak_ke || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
             case "siswa-alamat":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-600">${row.alamat || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.rt || '0'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.rw || '0'}</td>
-                    <td class="p-3 text-gray-600">${row.kelurahan || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kecamatan || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kodepos || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.jns_tinggal || '-'}</td>
-                    <td class="p-3 text-gray-600 font-medium">${row.jarak || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.lintang || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.bujur || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-gray-400">${row.alamat || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.rt || '0'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.rw || '0'}</td>
+                    <td class="p-3 text-gray-400">${row.kelurahan || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kecamatan || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kodepos || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.jns_tinggal || '-'}</td>
+                    <td class="p-3 text-gray-400 font-medium">${row.jarak || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.lintang || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.bujur || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
             case "siswa-keadaan":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kk || '-'}</td>
-                    <td class="p-3 text-gray-600 text-center">${row.saudara || '0'}</td>
-                    <td class="p-3 text-gray-600">${row.transportasi || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.kip || '-'}</td>
-                    <td class="p-3 font-medium">${row.layak_pip === 'Ya' ? '<span class="text-emerald-600">Ya</span>' : '<span class="text-gray-400">Tidak</span>'}</td>
-                    <td class="p-3 text-gray-500 text-xs">${row.alasan_pip || '-'}</td>
-                    <td class="p-3 text-gray-500 text-xs">${row.disabilitas || 'Tidak'}</td>
-                    <td class="p-3 font-medium text-blue-600 text-xs">${row.umur || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kk || '-'}</td>
+                    <td class="p-3 text-gray-400 text-center">${row.saudara || '0'}</td>
+                    <td class="p-3 text-gray-400">${row.transportasi || '-'}</td>
+                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kip || '-'}</td>
+                    <td class="p-3 font-medium">${row.layak_pip === 'Ya' ? '<span class="text-emerald-400">Ya</span>' : '<span class="text-gray-400">Tidak</span>'}</td>
+                    <td class="p-3 text-gray-400 text-xs">${row.alasan_pip || '-'}</td>
+                    <td class="p-3 text-gray-400 text-xs">${row.disabilitas || 'Tidak'}</td>
+                    <td class="p-3 font-medium text-blue-400 text-xs">${row.umur || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
             case "siswa-ortu":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
                     <td class="p-3 border-l bg-gray-50/50 font-medium">${row.ayah_nama || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 font-mono text-xs text-gray-500">${row.ayah_nik || '-'}</td>
+                    <td class="p-3 bg-gray-50/50 font-mono text-xs text-gray-400">${row.ayah_nik || '-'}</td>
                     <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pendidikan || '-'}</td>
                     <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pekerjaan || '-'}</td>
                     <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_penghasilan || '-'}</td>
@@ -761,35 +745,35 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_penghasilan || '-'}</td>
                     <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 bg-emerald-50/10 font-mono text-xs">${row.wali_thn_lahir || '-'}</td>
-                    <td class="p-3 text-center border-l"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center border-l"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
             case "siswa-periodik":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
                     <td class="p-3 font-mono text-center">${row.bb || '-'} Kg</td>
                     <td class="p-3 font-mono text-center">${row.tb || '-'} Cm</td>
                     <td class="p-3 font-mono text-center">${row.lingkar_kepala || '-'} Cm</td>
-                    <td class="p-3 text-gray-600">${row.hobi || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.cita_cita || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-gray-400">${row.hobi || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.cita_cita || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
             case "siswa-registrasi":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 font-bold text-blue-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 font-bold text-blue-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-xs text-gray-500">${row.tgl_masuk || '-'}</td>
-                    <td class="p-3 text-gray-600 text-xs">${row.sekolah_asal || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-gray-500 text-xs">${row.keterangan_siswa || '-'}</td>
+                    <td class="p-3 font-mono text-xs text-gray-400">${row.tgl_masuk || '-'}</td>
+                    <td class="p-3 text-gray-400 text-xs">${row.sekolah_asal || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
+                    <td class="p-3 text-gray-400 text-xs">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center">
-                        <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded font-bold text-xs transition">
+                        <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded font-bold text-xs transition">
                             <i class="fa-solid fa-arrows-up-down"></i> Proses
                         </button>
                     </td>
@@ -798,26 +782,16 @@ function renderTabelSiswa(dataList) {
 
             case "siswa-kontak":
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-600">${row.kelas || '-'}</td>
+                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
+                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
                     <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-sm text-emerald-600 font-bold">${row.hp || '-'}</td>
-                    <td class="p-3 font-mono text-xs text-gray-500">${row.telp || '-'}</td>
-                    <td class="p-3 text-gray-600 text-xs">${row.email || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 font-mono text-sm text-emerald-400 font-bold">${row.hp || '-'}</td>
+                    <td class="p-3 font-mono text-xs text-gray-400">${row.telp || '-'}</td>
+                    <td class="p-3 text-gray-400 text-xs">${row.email || '-'}</td>
+                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
                 `;
                 break;
 
-            case "siswa-lulus":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-600 font-bold">${row.thn_ajaran_lulus || '-'}</td>
-                    <td class="p-3 text-gray-600 font-mono text-xs">${row.no_ijazah || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Lulus')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
 
             case "mutasi-masuk":
                 tr.innerHTML = `
