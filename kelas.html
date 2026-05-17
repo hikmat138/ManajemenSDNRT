@@ -679,33 +679,36 @@ function filterData() {
     } else if (currentMenu === "mutasi-keluar") {
         sourceData = typeof masterDataMutasiKeluar !== 'undefined' ? masterDataMutasiKeluar : [];
     } else {
-        // Jika menunya siswa-pribadi, siswa-alamat, dll, ambil dari data siswa aktif
         sourceData = typeof masterData !== 'undefined' ? masterData : [];
     }
 
-    // 2. Ambil kata kunci pencarian dan filter kelas
-    const searchInput = document.getElementById('search-data');
-    const filterKelasInput = document.getElementById('filter-kelas');
+    // 2. Ambil kata kunci pencarian dan filter kelas dari elemen HTML
+    const searchInput = document.getElementById('search-data') || document.getElementById('search-input');
+    const filterKelasInput = document.getElementById('filter-kelas') || document.getElementById('pilih-kelas');
     
     let keyword = searchInput ? searchInput.value.toLowerCase().trim() : "";
     let kelasFilter = filterKelasInput ? filterKelasInput.value.toUpperCase().trim() : "";
 
     // 3. Lakukan penyaringan (Filtering)
     filteredData = sourceData.filter(item => {
-        // Ambil data kelas dari baris murid (toleransi huruf besar/kecil)
-        let itemKelas = (item.kelas || item.KELAS || item.Kelas || "").toString().toUpperCase().trim();
-        let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase();
-        let itemNisn = (item.nisn || item.NISN || "").toString().toLowerCase();
+        // AMBIL DATA KELAS DENGAN TOLERANSI SEMUA JENIS NAMA KOLOM SPREADSHEET
+        let itemKelas = (item.kelas || item.KELAS || item.Kelas || item.kelas_tujuan || item.kelas_asal || "").toString().toUpperCase().trim();
+        let itemNama = (item.nama || item.NAMA || item.Nama || "").toString().toLowerCase().trim();
+        let itemNisn = (item.nisn || item.NISN || "").toString().toLowerCase().trim();
 
         // Validasi Hak Akses Kelas (Guru Kelas vs Admin)
-        // Jika userRoleAktif bukan admin, maka klsClean wajib sama dengan kelas murid
         let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
-        if (typeof userRoleAktif !== 'undefined' && userRoleAktif !== "admin") {
-            if (itemKelas !== klsClean) return false;
+        let roleClean = (typeof userRoleAktif !== 'undefined' ? userRoleAktif : "guru").toLowerCase().trim();
+
+        if (roleClean !== "admin" && klsClean !== "-" && klsClean !== "SEMUA KELAS") {
+            // Jika data kelas di baris kosong, kita loloskan dulu (khawatir nama kolom mutasi beda)
+            if (itemKelas !== "" && itemKelas !== klsClean) {
+                return false; 
+            }
         } else {
-            // Jika dia Admin, filter berdasarkan dropdown filter-kelas (jika dipilih)
-            if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && itemKelas !== kelasFilter) {
-                return false;
+            // Jika dia Admin, filter berdasarkan dropdown filter kelas
+            if (kelasFilter && kelasFilter !== "ALL" && kelasFilter !== "SEMUA" && kelasFilter !== "SEMUA KELAS" && itemKelas !== "") {
+                if (itemKelas !== kelasFilter) return false;
             }
         }
 
@@ -721,9 +724,10 @@ function filterData() {
     currentPage = 1;
 
     // 5. PENTING: Lempar hasilnya ke sistem pembagi halaman (Pagination)
-    updatePagination();
+    if (typeof updatePagination === "function") {
+        updatePagination();
+    }
 }
-
 function updatePagination() {
     // 1. Hitung total data yang lolos filter (bisa data murid aktif atau mutasi)
     let totalData = (typeof filteredData !== 'undefined') ? filteredData.length : 0;
