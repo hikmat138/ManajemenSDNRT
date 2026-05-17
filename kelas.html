@@ -682,181 +682,181 @@ function renderTabelSiswa(dataList) {
 
     // 2. Jika Data Kosong
     if (!dataList || dataList.length === 0) {
-        const tableElement = tbody.closest('table');
-        const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
-        
-        tbody.innerHTML = `<tr>
-            <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-400">
-                <i class="fa-regular fa-folder-open text-2xl mb-2 block"></i>
-                Tidak ada data murid untuk ditampilkan pada kriteria ini.
-            </td>
-        </tr>`;
-        return;
-    }
-
-    // 3. Looping Pembuatan Baris Baru (Tanpa Kolom ID, Langsung Nama)
-    dataList.forEach((row, index) => {
-        let tr = document.createElement('tr');
-        tr.className = "hover:bg-gray-50 transition border-b border-gray-100";
-
-        let badgeJK = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.jk === 'L' || row.jk === 'Laki-laki' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700'}">${row.jk || '-'}</span>`;
-
-        switch (currentMenu) {
-            case "siswa-pribadi":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400 font-medium">${row.kelas || '-'}</td>
-                    <td class="p-3 font-mono text-xs text-gray-400">${row.nis || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-xs text-gray-400">${row.nisn || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.tmpt_lahir || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.tgl_lahir || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.nik || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.agama || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.akte || '-'}</td>
-                    <td class="p-3 text-gray-400 font-medium">${row.anak_ke || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "siswa-alamat":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-400">${row.alamat || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.rt || '0'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.rw || '0'}</td>
-                    <td class="p-3 text-gray-400">${row.kelurahan || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kecamatan || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kodepos || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.jns_tinggal || '-'}</td>
-                    <td class="p-3 text-gray-400 font-medium">${row.jarak || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.lintang || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.bujur || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "siswa-keadaan":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kk || '-'}</td>
-                    <td class="p-3 text-gray-400 text-center">${row.saudara || '0'}</td>
-                    <td class="p-3 text-gray-400">${row.transportasi || '-'}</td>
-                    <td class="p-3 text-gray-400 font-mono text-xs">${row.kip || '-'}</td>
-                    <td class="p-3 font-medium">${row.layak_pip === 'Ya' ? '<span class="text-emerald-400">Ya</span>' : '<span class="text-gray-400">Tidak</span>'}</td>
-                    <td class="p-3 text-gray-400 text-xs">${row.alasan_pip || '-'}</td>
-                    <td class="p-3 text-gray-400 text-xs">${row.disabilitas || 'Tidak'}</td>
-                    <td class="p-3 font-medium text-blue-400 text-xs">${row.umur || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "siswa-ortu":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 border-l bg-gray-50/50 font-medium">${row.ayah_nama || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 font-mono text-xs text-gray-400">${row.ayah_nik || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pendidikan || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_pekerjaan || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_penghasilan || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 text-xs">${row.ayah_disabilitas || '-'}</td>
-                    <td class="p-3 bg-gray-50/50 font-mono text-xs">${row.ayah_thn_lahir || '-'}</td>
-                    <td class="p-3 border-l bg-rose-50/10 font-medium">${row.ibu_nama || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 font-mono text-xs text-gray-500">${row.ibu_nik || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_pendidikan || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_pekerjaan || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_penghasilan || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 text-xs">${row.ibu_disabilitas || '-'}</td>
-                    <td class="p-3 bg-rose-50/10 font-mono text-xs">${row.ibu_thn_lahir || '-'}</td>
-                    <td class="p-3 border-l bg-emerald-50/10 font-medium">${row.wali_nama || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 font-mono text-xs text-gray-500">${row.wali_nik || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_pendidikan || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_pekerjaan || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_penghasilan || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 text-xs">${row.wali_disabilitas || '-'}</td>
-                    <td class="p-3 bg-emerald-50/10 font-mono text-xs">${row.wali_thn_lahir || '-'}</td>
-                    <td class="p-3 text-center border-l"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "siswa-periodik":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-center">${row.bb || '-'} Kg</td>
-                    <td class="p-3 font-mono text-center">${row.tb || '-'} Cm</td>
-                    <td class="p-3 font-mono text-center">${row.lingkar_kepala || '-'} Cm</td>
-                    <td class="p-3 text-gray-400">${row.hobi || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.cita_cita || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "siswa-registrasi":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 font-bold text-blue-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-xs text-gray-400">${row.tgl_masuk || '-'}</td>
-                    <td class="p-3 text-gray-400 text-xs">${row.sekolah_asal || '-'}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-green-50 text-green-400 font-bold">${row.status_aktif || 'Aktif'}</span></td>
-                    <td class="p-3 text-gray-400 text-xs">${row.keterangan_siswa || '-'}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded font-bold text-xs transition">
-                            <i class="fa-solid fa-arrows-up-down"></i> Proses
-                        </button>
-                    </td>
-                `;
-                break;
-
-            case "siswa-kontak":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-400">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-400">${row.kelas || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 font-mono text-sm text-emerald-400 font-bold">${row.hp || '-'}</td>
-                    <td class="p-3 font-mono text-xs text-gray-400">${row.telp || '-'}</td>
-                    <td class="p-3 text-gray-400 text-xs">${row.email || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-400 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "mutasi-masuk":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">${row.nisn || '-'}</td>
-                    <td class="p-3">${badgeJK}</td>
-                    <td class="p-3 text-gray-600">${row.sekolah_asal || '-'}</td>
-                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_masuk || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-
-            case "mutasi-keluar":
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-gray-800">${row.nama || '-'}</td>
-                    <td class="p-3 text-gray-500 font-mono text-xs">NISN: ${row.nisn || '-'} <br> NIS: ${row.nis || '-'}</td>
-                    <td class="p-3 text-gray-600 font-medium">${row.sekolah_tujuan || '-'}</td>
-                    <td class="p-3 text-gray-600 italic text-xs">${row.alasan_mutasi || '-'}</td>
-                    <td class="p-3 text-gray-600 font-mono text-xs">${row.tgl_keluar || '-'}</td>
-                    <td class="p-3 text-center"><button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
-                `;
-                break;
-        }
-
-        tbody.appendChild(tr);
-    });
+    const tableElement = tbody.closest('table');
+    const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 10;
+    
+    tbody.innerHTML = `<tr>
+        <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-900 whitespace-nowrap">
+            <i class="fa-regular fa-folder-open text-2xl mb-2 block text-gray-400"></i>
+            Tidak ada data murid untuk ditampilkan pada kriteria ini.
+        </td>
+    </tr>`;
+    return;
 }
 
+// 3. Looping Pembuatan Baris Baru
+dataList.forEach((row, index) => {
+    let tr = document.createElement('tr');
+    tr.className = "hover:bg-gray-50 transition border-b border-gray-100 text-gray-950 text-sm";
+
+    // Format Jenis Kelamin standar tanpa badge
+    let jkTeks = row.jk || '-';
+
+    switch (currentMenu) {
+        case "siswa-pribadi":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.nis || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.nisn || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.tmpt_lahir || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.tgl_lahir || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.nik || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.agama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.akte || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "siswa-alamat":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.alamat || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.rt || '0'}</td>
+                <td class="p-3 whitespace-nowrap">${row.rw || '0'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelurahan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kecamatan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kodepos || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.jns_tinggal || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.jarak || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.lintang || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "siswa-keadaan":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.kk || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap">${row.saudara || '0'}</td>
+                <td class="p-3 whitespace-nowrap">${row.transportasi || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kip || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.layak_pip || 'Tidak'}</td>
+                <td class="p-3 whitespace-nowrap">${row.alasan_pip || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
+                <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "siswa-ortu":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 border-l whitespace-nowrap">${row.ayah_nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_nik || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_pendidikan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_pekerjaan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_penghasilan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_disabilitas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ayah_thn_lahir || '-'}</td>
+                <td class="p-3 border-l whitespace-nowrap">${row.ibu_nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_nik || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_pendidikan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_pekerjaan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_penghasilan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_disabilitas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.ibu_thn_lahir || '-'}</td>
+                <td class="p-3 border-l whitespace-nowrap">${row.wali_nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_nik || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_pendidikan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_pekerjaan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_penghasilan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
+                <td class="p-3 text-center border-l whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "siswa-periodik":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 text-center whitespace-nowrap">${row.bb || '-'} Kg</td>
+                <td class="p-3 text-center whitespace-nowrap">${row.tb || '-'} Cm</td>
+                <td class="p-3 text-center whitespace-nowrap">${row.lingkar_kepala || '-'} Cm</td>
+                <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "siswa-registrasi":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.tgl_masuk || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.sekolah_asal || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
+                <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap">
+                    <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                        <i class="fa-solid fa-arrows-up-down"></i> Proses
+                    </button>
+                </td>
+            `;
+            break;
+
+        case "siswa-kontak":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.hp || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "mutasi-masuk":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.nisn || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${jkTeks}</td>
+                <td class="p-3 whitespace-nowrap">${row.sekolah_asal || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.tgl_masuk || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+
+        case "mutasi-keluar":
+            tr.innerHTML = `
+                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
+                <td class="p-3 whitespace-nowrap">NISN: ${row.nisn || '-'} | NIS: ${row.nis || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.sekolah_tujuan || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.alasan_mutasi || '-'}</td>
+                <td class="p-3 whitespace-nowrap">${row.tgl_keluar || '-'}</td>
+                <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+            `;
+            break;
+    }
+
+    tbody.appendChild(tr);
+});
+}
 function showSection(sectionId) {
     currentMenu = sectionId; // Kunci: Simpan status menu aktif secara global
     
