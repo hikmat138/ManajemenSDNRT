@@ -570,17 +570,14 @@ document.addEventListener("DOMContentLoaded", loadData);
 async function loadData() {
     try {
         const statMurid = document.getElementById('stat-murid');
-        if (statMurid) statMurid.innerText = "Memuat...";
+        // Bagian memuat, biarkan teks sementara berubah
+        if (statMurid) statMurid.innerText = "..."; 
         
-        // 1. Ambil data mentah dari Google Apps Script
         const res = await fetch(`${API_URL}?action=getAllData`);
         const result = await res.json();
         
         if (result.status !== "success") throw new Error("Gagal mengambil data database.");
 
-        // ========================================================
-        // KODE PEMBERSIHAN DATA (SINKRON DENGAN CODE.GS BARU)
-        // ========================================================
         let rawSiswa = result.data.siswa || [];
         masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
 
@@ -589,18 +586,13 @@ async function loadData() {
 
         let rawMutasiKeluar = result.data.mutasi_keluar || [];
         masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
-        // ========================================================
 
-        // 2. Ambil sesi login dari localStorage
         const sessionUser = localStorage.getItem('session_sdnrt');
-        
         if (sessionUser) {
             let userAktif = JSON.parse(sessionUser);
-            
             userKelasAkses = userAktif.kelas_akses || "-"; 
             userRoleAktif = userAktif.role ? userAktif.role.toLowerCase() : "guru"; 
 
-            // Render data akun ke elemen Header Dashboard
             const adminNameEl = document.getElementById('admin-name');
             const adminKelasEl = document.getElementById('admin-kelas');
             const userMenuBtnEl = document.getElementById('userMenuBtn');
@@ -613,33 +605,27 @@ async function loadData() {
                 userMenuBtnEl.innerText = userAktif.nama.charAt(0).toUpperCase();
             }
         } else {
-            console.warn("Sesi tidak valid. Kembali ke halaman login.");
             window.location.href = "index.html";
             return;
         }
 
-        // 3. Jalankan kalkulasi angka ringkasan dashboard (Pastikan fungsi ini membaca array mutasi)
+        // updateStats() akan menimpa kembali titik-titik dengan ANGKA asli dari database
         updateStats(); 
         
-        // PENTING: Tentukan menu default awal jika belum didefinisikan sebelumnya
         if (typeof currentMenu === 'undefined' || !currentMenu) {
             currentMenu = "siswa-pribadi"; 
         }
         
-        // Memicu filter pertama kali agar filteredData terisi sesuai menu default
         filterData();  
-        
-        if (statMurid) statMurid.innerText = "Selesai"; // Mengubah status memuat menjadi selesai
         setTimeout(initCharts, 300);
 
     } catch (err) {
         console.error("Detail Error LoadData: ", err);
         const statMurid = document.getElementById('stat-murid');
-        if (statMurid) statMurid.innerText = "Gagal Memuat";
-        alert("Gagal terhubung dengan Database Spreadsheet. Pastikan koneksi internet stabil.");
+        if (statMurid) statMurid.innerText = "Error";
+        alert("Gagal terhubung dengan Database Spreadsheet.");
     }
 }
-
 function updateStats() {
     // 1. FILTER MURID AKTIF BERDASARKAN ROLE LOGIN (SINKRON 100%)
     let aktifKelas = masterData.filter(s => {
@@ -725,20 +711,24 @@ function filterData() {
 }
 
 function updatePagination() {
+    // Jalankan kalkulasi pembagian halaman dari filteredData (46 data)
+    let totalData = filteredData.length;
+    let totalPages = Math.ceil(totalData / rowsPerPage);
+
+    // Rumus memotong array berdasarkan halaman aktif
     let start = (currentPage - 1) * rowsPerPage;
     let end = start + rowsPerPage;
-    
-    let dataPerHalaman = filteredData.slice(start, end);
-    
-    // Panggil fungsi pembuat baris tabel
-    renderTabelSiswa(dataPerHalaman);
+    let dataHalamanIni = filteredData.slice(start, end);
 
-    const infoEl = document.getElementById('pagination-info');
-    if (infoEl) {
-        infoEl.innerText = `Menampilkan ${filteredData.length === 0 ? 0 : start + 1} - ${Math.min(end, filteredData.length)} dari ${filteredData.length} murid`;
+    // PENTING: Kirim data yang sudah dipotong ke fungsi render tabel
+    renderTabelSiswa(dataHalamanIni); 
+
+    // Kode update teks "MENAMPILKAN X - Y DARI Z MURID" milik Bapak di bawahnya...
+    let infoKeterangan = document.getElementById('pagination-info'); // sesuaikan ID nya
+    if (infoKeterangan) {
+        infoKeterangan.innerText = `MENAMPILKAN ${start + 1} - ${Math.min(end, totalData)} DARI ${totalData} MURID`;
     }
 }
-
 function renderTabelSiswa(dataList) {
     // 1. Logika Pendeteksi ID tbody HTML
     let targetTbodyId = 'tbody-data'; 
