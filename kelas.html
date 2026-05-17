@@ -172,17 +172,6 @@
                 <div onclick="showSection('siswa-kontak')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">7. Kontak Murid</div>
             </div>
         </div>
-
-        <div>
-            <button onclick="toggleSubmenu('sub-mutasi')" class="w-full sidebar-link flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition text-slate-700 font-medium">
-                <span class="flex items-center"><i class="fas fa-exchange-alt mr-3 w-5 text-blue-500"></i> Riwayat Mutasi</span>
-                <i class="fas fa-chevron-down text-[10px] transition-transform duration-200" id="icon-mutasi"></i>
-            </button>
-            <div id="sub-mutasi" class="hidden pl-8 pr-2 mt-1 space-y-1 border-l-2 border-slate-100 ml-5">
-                <div onclick="showSection('mutasi-masuk')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">Mutasi Masuk</div>
-                <div onclick="showSection('mutasi-keluar')" class="submenu-link block p-2 text-xs text-slate-600 hover:text-blue-600 rounded cursor-pointer transition">Mutasi Keluar</div>
-            </div>
-        </div>   
     </nav>
 </aside>
 
@@ -482,55 +471,7 @@
                         </tbody>
                 </table>
             </div>
-            <div id="section-mutasi-masuk" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
-    <div class="overflow-x-auto" style="max-height: 60vh;">
-        <table class="w-full text-left border-collapse">
-            <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
-                <tr>
-                    <th class="p-3 border-b">Nama Murid</th>
-                    <th class="p-3 border-b">JK</th>
-                    <th class="p-3 border-b">NISN</th>
-                    <th class="p-3 border-b">Tgl Masuk</th>
-                    <th class="p-3 border-b">Kelas</th>
-                    <th class="p-3 border-b">Tahun Ajaran</th>
-                    <th class="p-3 border-b">Sekolah Asal</th>
-                    <th class="p-3 border-b">Alasan Masuk</th>
-                    <th class="p-3 border-b">Status Masuk</th>
-                    <th class="p-3 border-b text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-mutasi-masuk" class="text-sm divide-y bg-white">
-                </tbody>
-        </table>
-    </div>
-</div>
-
-<div id="section-mutasi-keluar" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
-    <div class="overflow-x-auto" style="max-height: 60vh;">
-        <table class="w-full text-left border-collapse">
-            <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm border-b uppercase text-[10px] font-bold text-gray-600">
-                <tr>
-                    <th class="p-3 border-b">Nama Murid</th>
-                    <th class="p-3 border-b">JK</th>
-                    <th class="p-3 border-b">Tempat Lahir</th>
-                    <th class="p-3 border-b">Tanggal Lahir</th>
-                    <th class="p-3 border-b">Kelas</th>
-                    <th class="p-3 border-b">NIS</th>
-                    <th class="p-3 border-b">NISN</th>
-                    <th class="p-3 border-b">Tgl Keluar</th>
-                    <th class="p-3 border-b">Alasan Mutasi</th>
-                    <th class="p-3 border-b">Sekolah Tujuan</th>
-                    <th class="p-3 border-b">Tahun Ajaran</th>
-                    <th class="p-3 border-b text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-mutasi-keluar" class="text-sm divide-y bg-white">
-                </tbody>
-        </table>
-    </div>
-</div>
         </div>
-
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-gray-100 mt-4">
     <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase tracking-wider">
         Menampilkan 0 - 0 dari 0 murid
@@ -554,8 +495,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbweLDASRb8-AbSrlD83kE3GsWBuQdPB0W0uqTW9BMBxrCsCtugADV0O9DFSQjhL0wwPIw/exec";
 
 let masterData = [];
-let masterDataMutasiMasuk = [];
-let masterDataMutasiKeluar = [];
 let filteredData = [];
 
 let currentPage = 1;
@@ -580,12 +519,6 @@ async function loadData() {
 
         let rawSiswa = result.data.siswa || [];
         masterData = rawSiswa.filter(s => s.nama && String(s.nama).trim() !== "" && String(s.nama).toLowerCase() !== "-");
-
-        let rawMutasiMasuk = result.data.mutasi_masuk || [];
-        masterDataMutasiMasuk = rawMutasiMasuk.filter(s => s.nama && String(s.nama).trim() !== "");
-
-        let rawMutasiKeluar = result.data.mutasi_keluar || [];
-        masterDataMutasiKeluar = rawMutasiKeluar.filter(s => s.nama && String(s.nama).trim() !== "");
 
         const sessionUser = localStorage.getItem('session_sdnrt');
         if (sessionUser) {
@@ -642,74 +575,63 @@ function updateStats() {
     let l = aktifKelas.filter(x => x.jk === "L" || x.jk === "Laki-laki").length;
     let p = aktifKelas.filter(x => x.jk === "P" || x.jk === "Perempuan").length;
 
-    let totalMutasiMasuk = masterDataMutasiMasuk.length;
-    let totalMutasiKeluar = masterDataMutasiKeluar.length;
 
     // 3. RENDER KE HTML WIDGET
     const statMuridEl = document.getElementById('stat-murid');
     const lEl = document.getElementById('L');
     const pEl = document.getElementById('P');
-    const statMasukEl = document.getElementById('stat-mutasi-masuk');
-    const statKeluarEl = document.getElementById('stat-mutasi-keluar');
+
 
     if (statMuridEl) statMuridEl.innerText = aktifKelas.length + " Murid";
     if (lEl) lEl.innerText = l + " Orang";
     if (pEl) pEl.innerText = p + " Orang";
-    if (statMasukEl) statMasukEl.innerText = totalMutasiMasuk + " Kasus";
-    if (statKeluarEl) statKeluarEl.innerText = totalMutasiKeluar + " Kasus";
 }
 
 function filterData() {
-    let keyword = document.getElementById('search-data')?.value.toLowerCase() || "";
-    let source = [];
+    // 1. Ambil kata kunci pencarian global
+    let keyword = document.getElementById('search-data')?.value.toLowerCase().trim() || "";
+    
+    // 2. Kunci sumber data hanya ke masterData (Siswa Aktif)
+    let source = typeof masterData !== 'undefined' ? masterData : [];
 
-    // ========================================================
-    // LOGIKA FILTER MUTASI BERDASARKAN KELAS AKSES (SINKRON)
-    // ========================================================
-    if (currentMenu === "mutasi-masuk") {
-        source = masterDataMutasiMasuk.filter(s => {
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return true; // Admin bisa melihat semua data mutasi masuk
-            } else {
-                // Guru hanya melihat data mutasi masuk di kelasnya sendiri
-                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
-    } 
-    else if (currentMenu === "mutasi-keluar") {
-        source = masterDataMutasiKeluar.filter(s => {
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return true; // Admin bisa melihat semua data mutasi keluar
-            } else {
-                // Guru hanya melihat data mutasi keluar di kelasnya sendiri
-                return String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
-    } 
-    else {
-        // Filter Murid Aktif bawaan Anda (Tetap jangan diubah)
-        source = masterData.filter(s => {
-            let isAktif = String(s.status_aktif || '').toLowerCase() === "aktif";
-            if (userRoleAktif === "admin" || userKelasAkses === "-") {
-                return isAktif;
-            } else {
-                return isAktif && String(s.kelas || '').toUpperCase() === userKelasAkses.toUpperCase();
-            }
-        });
-    }
+    // 3. Jalankan penyaringan Hak Akses Kelas & Status Aktif
+    let dataHasilSaring = source.filter(s => {
+        let itemKelas = String(s.kelas || s.KELAS || s.Kelas || '').toUpperCase().trim();
+        let isAktif = String(s.status_aktif || s.STATUS_AKTIF || '').toLowerCase().trim() === "aktif";
 
-    // 2. Filter berdasarkan kata kunci pencarian (Nama, NISN, NIS)
-    filteredData = source.filter(s => {
-        let nama = String(s.nama || "").toLowerCase();
-        let nisn = String(s.nisn || "").toLowerCase();
-        let nis = String(s.nis || "").toLowerCase();
+        // Ambil data akses login guru
+        let klsClean = (typeof userKelasAkses !== 'undefined' ? userKelasAkses : "-").toUpperCase().trim();
+        let roleClean = (typeof userRoleAktif !== 'undefined' ? userRoleAktif : "guru").toLowerCase().trim();
+
+        // Hanya tampilkan murid yang berstatus Aktif
+        if (!isAktif) return false;
+
+        // Validasi Akses: Jika Guru (bukan Admin), wajib sama dengan kelasnya
+        if (roleClean !== "admin" && klsClean !== "-" && klsClean !== "SEMUA KELAS") {
+            if (itemKelas !== klsClean) return false;
+        }
+
+        return true;
+    });
+
+    // 4. Jalankan penyaringan berdasarkan kata kunci (Nama, NISN, NIS)
+    filteredData = dataHasilSaring.filter(s => {
+        let nama = String(s.nama || s.NAMA || "").toLowerCase();
+        let nisn = String(s.nisn || s.NISN || "").toLowerCase();
+        let nis = String(s.nis || s.NIS || "").toLowerCase();
+        
+        if (!keyword) return true; 
+        
         return nama.includes(keyword) || nisn.includes(keyword) || nis.includes(keyword);
     });
 
-    currentPage = 1; // Reset ke halaman pertama setiap kali filter berubah
-    updatePagination(); 
+    // 5. Reset halaman dan jalankan pembagi halaman
+    currentPage = 1; 
+    
+    if (typeof updatePagination === "function") {
+        updatePagination(); 
+    }
 }
-
 function updatePagination() {
     // Jalankan kalkulasi pembagian halaman dari filteredData (46 data)
     let totalData = filteredData.length;
@@ -740,11 +662,7 @@ function renderTabelSiswa(dataList) {
     // 1. Logika Pendeteksi ID tbody HTML
     let targetTbodyId = 'tbody-data'; 
     
-    if (currentMenu === "mutasi-masuk") {
-        targetTbodyId = "tbody-mutasi-masuk";
-    } else if (currentMenu === "mutasi-keluar") {
-        targetTbodyId = "tbody-mutasi-keluar";
-    } else if (currentMenu.startsWith("siswa-")) {
+    if (currentMenu.startsWith("siswa-")) {
         targetTbodyId = `tbody-${currentMenu}`;
     }
 
@@ -784,11 +702,6 @@ function renderTabelSiswa(dataList) {
             </td>
         </tr>`;
         return;
-    }
-    let sampelData = dataList[0];
-    // Jika row.nama kosong DAN row.NAMA juga kosong, berarti nama kolomnya beda
-    if (!sampelData.nama && !sampelData.NAMA && !sampelData.Nama) {
-        alert("🚨 MASALAH DATABASE: Data mutasi berhasil ditarik, tetapi sistem tidak mengenali nama kolomnya. Struktur properti yang terbaca adalah:\n\n" + JSON.stringify(sampelData));
     }
 
 // 3. Looping Pembuatan Baris Baru
@@ -926,47 +839,7 @@ dataList.forEach((row, index) => {
                 <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
                 <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
             `;
-            break;
-
-        case "mutasi-masuk":
-            tr.innerHTML = `
-                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.jk || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.nisn || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tgl_masuk || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tahun_ajaran || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.sekolah_asal || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.alasan_masuk || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.status_masuk || '-'}</td>
-                <td class="p-3 text-center whitespace-nowrap">
-                    <button onclick="bukaModalAksi('${row.nama}', 'Masuk')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-                </td>
-            `;
-            break;
-
-        case "mutasi-keluar":
-            tr.innerHTML = `
-                <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.jk || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tmpt_lahir || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tgl_lahir || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.nis || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.nisn || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tgl_keluar || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.alasan_mutasi || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.sekolah_tujuan || '-'}</td>
-                <td class="p-3 whitespace-nowrap">${row.tahun_ajaran || '-'}</td>
-                <td class="p-3 text-center whitespace-nowrap">
-                    <button onclick="bukaModalAksi('${row.nama}', 'Keluar')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-                </td>
-            `;
-            break;
+            break;    
     }
 
     tbody.appendChild(tr);
@@ -1002,15 +875,7 @@ function showSection(sectionId) {
         // ========================================================
         // LOGIKA PENAMAAN JUDUL HALAMAN YANG ESTETIK & RAPI
         // ========================================================
-        if(titleEl) {
-            if (sectionId === "mutasi-masuk") {
-                titleEl.innerText = "DATA MUTASI MASIK (MURID)";
-            } else if (sectionId === "mutasi-keluar") {
-                titleEl.innerText = "DATA MUTASI KELUAR (MURID)";
-            } else {
-                titleEl.innerText = sectionId.replace('siswa-', 'DATA MURID: ').toUpperCase();
-            }
-        }
+        
         // ========================================================
         
         currentPage = 1;
@@ -1321,53 +1186,6 @@ function updateSidebarUI(activeId) {
             }
         });
     }
-}
-
-    function muatDataDariServer() {
-    // Cek apakah menu yang aktif adalah mutasi atau murid reguler
-    if (currentMenu === "mutasi-masuk" || currentMenu === "mutasi-keluar") {
-        
-        // Panggil fungsi penarik data mutasi
-        google.script.run
-            .withSuccessHandler(function(response) {
-                if (response.status === "success") {
-                    // Simpan ke data tampungan lokal aplikasi Anda
-                    masterData = response.data.siswa; 
-                    tampilkanTabelData(); // Jalankan fungsi filter dropdown dan looping tabel
-                } else {
-                    alert(response.message);
-                }
-            })
-            .handleGetDataMutasi(currentMenu, kelasAksesUser); // Kirim jenis menu & kelas akses user
-
-    } else {
-      
-        // Ini perintah lama Bapak untuk mengambil data siswa reguler
-        google.script.run
-            .withSuccessHandler(function(response) {
-                if (response.status === "success") {
-                    masterData = response.data.siswa;
-                    tampilkanTabelData();
-                }
-            })
-            .handleGetDataKelas(username, kelasAksesUser);
-    }
-}
-
-function dapatkanDataTerfilter() {
-    if (!masterData) return []; 
-
-    // Ambil nilai dari dropdown pilih kelas di web Bapak
-    const filterKelas = document.getElementById("pilih-kelas")?.value || "Semua";
-
-    return masterData.filter(row => {
-        // Jika dropdown bernilai "Semua", loloskan semua data yang sudah ditarik backend
-        if (filterKelas === "Semua") return true;
-
-        // Sandingkan kolom 'kelas' dari data sheet mutasi dengan dropdown pilihan kelas
-        const kelasRow = row.kelas || "";
-        return kelasRow.toString().toLowerCase() === filterKelas.toString().toLowerCase();
-    });
 }
 </script>
 </body>
