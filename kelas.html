@@ -286,9 +286,7 @@
                 </select>
                 <input type="text" id="search-data" onkeyup="resetAndFilter()" placeholder="Cari Nama Murid..." class="border p-2 rounded-lg text-sm w-full sm:w-64 outline-none focus:border-blue-500">
             </div>
-            <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase">
-                Menampilkan 0 - 0 dari 0 murid
-            </div>
+            
         </div>
 
 
@@ -533,7 +531,9 @@
 </div>
         </div>
 
-
+        <div id="pagination-info" class="text-xs text-gray-500 font-bold uppercase">
+                Menampilkan 0 - 0 dari 0 murid
+        </div>
         <div id="global-pagination-nav" class="hidden flex justify-end gap-2 pt-2">
             <button onclick="prevPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Sebelumnya</button>
             <button onclick="nextPage()" class="px-4 py-2 text-sm font-bold border rounded-lg hover:bg-white bg-gray-100 transition shadow-sm">Selanjutnya</button>
