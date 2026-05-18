@@ -759,7 +759,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.lintang || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
+    <i class="fa-solid fa-gear"></i> Aksi
+</button></td>
                 `;
                 break;
 
@@ -776,7 +778,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.alasan_pip || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
+    <i class="fa-solid fa-gear"></i> Aksi
+</button></td>
                 `;
                 break;
 
@@ -806,7 +810,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_penghasilan || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
-                    <td class="p-3 text-center border-l whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center border-l whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
+    <i class="fa-solid fa-gear"></i> Aksi
+</button></td>
                 `;
                 break;
 
@@ -820,7 +826,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 text-center whitespace-nowrap">${row.lingkar_kepala || '-'} Cm</td>
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
+    <i class="fa-solid fa-gear"></i> Aksi
+</button></td>
                 `;
                 break;
 
@@ -850,7 +858,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-400 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
+    <i class="fa-solid fa-gear"></i> Aksi
+</button></td>
                 `;
                 break;   
         }
@@ -1641,6 +1651,23 @@ function tutupModalEdit() {
     
     tutupModalEdit();
     console.log("Data berhasil diupdate lokal.");
+}
+    function tanganiTombolEditDariModalAksi() {
+    // Ambil indeks yang disimpan tadi
+    const inputIndex = document.getElementById('action-index-input');
+    let index;
+    
+    if (inputIndex) {
+        index = parseInt(inputIndex.value);
+    } else {
+        index = parseInt(document.getElementById('modalAction').dataset.indexSiswa);
+    }
+    
+    // 1. Tutup dulu modal aksi
+    tutupModalAksi();
+    
+    // 2. Buka modal edit spesifik sesuai menu aktif dengan indeks murid yang benar
+    bukaModalEdit(index);
 }
 </script>
 </body>
