@@ -1835,7 +1835,7 @@ function simpanPerubahanSiswa(event) {
                 if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
                 if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
                 
-                if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('ibu_nama').value.trim();
+                if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
                 if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
                 if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
                 if (document.getElementById('edit-ibu_pekerjaan')) mSiswa.ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value.trim();
@@ -1885,7 +1885,7 @@ function simpanPerubahanSiswa(event) {
             if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
         }
 
-        // 7. SEGARKAN TABEL SECARA REALTIME (Agar langsung berubah di web lokal)
+        // 7. SEGARKAN TABEL SECARA REALTIME (Web lokal langsung berubah saat itu juga)
         if (typeof filterData === "function") {
             filterData(); 
         } else if (typeof dataFilteredAndSorted === "function") {
@@ -1894,32 +1894,37 @@ function simpanPerubahanSiswa(event) {
             tampilkanTabelData(); 
         }
 
-        // Tutup modal edit terlebih dahulu biar tidak menumpuk di layar
+        // Tutup modal edit & beri indikasi loading ke user biar tahu proses sedang berjalan
         tutupModalEdit();
-        tampilkanToast("Menyimpan data, mohon tunggu...", "success");
+        tampilkanToast("Sedang menyimpan ke Google Sheets, mohon tunggu...", "success");
 
-        // --- 🌐 8. KIRIM KE BACKEND GOOGLE SHEETS VIA GOOGLE.SCRIPT.RUN ---
+        // --- 🌐 8. INTEGRASI SINKRONISASI REALTIME KE GOOGLE SHEETS ---
         if (typeof google !== "undefined" && google.script && google.script.run) {
             let paketData = {
-                action: "EDIT_SISWA",
-                rowIndex: masterIndex + 2, // Indeks baris excel/sheet (ditambah 2 karena offset header & index 0)
+                action: "EDIT_IDENTITAS",
+                rowIndex: masterIndex + 2, // Indeks baris sheet asli
                 payload: mSiswa
             };
 
-            // GANTI 'namaFungsiPusatBackendBapak' dengan nama fungsi router di Code.gs (misal: kelolaRequest)
+            // PENTING: Ganti 'aksesBackendUtama' di bawah ini dengan nama fungsi penangkap utama 
+            // milik Bapak yang ada di Code.gs (fungsi yang di dalamnya ada if (action === ...))
             google.script.run
                 .withSuccessHandler(function(respons) {
-                    console.log("Hasil sinkronisasi:", respons);
-                    tampilkanToast(`Berhasil menyinkronkan data ${mSiswa.nama || namaAsli} ke Google Sheets! 🎉`, "success");
+                    console.log("Hasil sinkronisasi Sheets:", respons);
+                    if (respons && respons.status === "success") {
+                        tampilkanToast(`Berhasil menyinkronkan data ${mSiswa.nama || namaAsli} ke Google Sheets! 🎉`, "success");
+                    } else {
+                        tampilkanToast(respons.message || "Gagal menyimpan ke Google Sheets.", "error");
+                    }
                 })
                 .withFailureHandler(function(err) {
-                    console.error("Gagal sinkronisasi:", err);
-                    tampilkanToast("Gagal menyinkronkan data ke Google Sheets.", "error");
+                    console.error("Gagal sinkronisasi Sheets:", err);
+                    tampilkanToast("Koneksi gagal: Perubahan tidak tersimpan di Google Sheets.", "error");
                 })
-                .namaFungsiPusatBackendBapak(paketData); // <--- Silakan sesuaikan nama fungsinya di sini, Pak!
+                .aksesBackendUtama(paketData); // <--- SILAKAN GANTI 'aksesBackendUtama' DENGAN NAMA FUNGSI DI CODE.GS BAPAK
         } else {
-            // Jika dijalankan di luar lingkungan GAS (misal localhost)
-            tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Lokal)!`, "success");
+            // Jika dijalankan di luar lingkungan Google Apps Script (misal localhost)
+            tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Offline)!`, "success");
         }
 
         console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
