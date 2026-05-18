@@ -122,7 +122,8 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-950 bg-opacity-50 items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+<div id="modalEditSiswa" class="fixed inset-0 z-50 bg-gray-950 bg-opacity-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-200" style="display: none;">
+    
     <div id="modalEditWrapper" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 opacity-0 duration-200">
         
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
@@ -136,6 +137,7 @@
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
+        
         <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 blueprint-scroll">
             <input type="hidden" id="edit-index-input">
             <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -723,14 +725,12 @@ function renderTabelSiswa(dataList) {
         // Format Jenis Kelamin standar tanpa badge
         let jkTeks = row.jk || row.JK || '-';
 
-        // Escape tanda petik satu pada nama murid agar tidak merusak HTML atribut onclick
+        // ✅ BENAR & AMAN: Menggunakan 'row' (sesuai variabel loop) dan meloloskan tanda petik tunggal
         let namaAman = String(row.nama || '-').replace(/'/g, "\\'");
 
         switch (currentMenu) {
             case "siswa-pribadi":
-                // Konversi tanggal lahir ke format Indonesia lewat helper aman kita
                 let tglIndo = formatTanggalIndo(row);
-                
                 tr.innerHTML = `
                     <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
@@ -745,9 +745,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -769,9 +769,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -790,9 +790,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -824,9 +824,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
                     <td class="p-3 text-center border-l whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -842,9 +842,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -860,9 +860,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -876,9 +876,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;   
