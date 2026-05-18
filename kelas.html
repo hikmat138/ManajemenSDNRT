@@ -789,9 +789,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-                            <i class="fa-solid fa-gear"></i> Aksi
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -841,9 +841,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-                            <i class="fa-solid fa-gear"></i> Aksi
-                        </button>
+                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -973,24 +973,6 @@ function toggleSubmenu(id) {
 function toggleUserMenu() {
     document.getElementById('userDropdown').classList.toggle('hidden');
 }
-
-function bukaModalAksi(index, nama, kelas) {
-    // 1. Masukkan teks nama dan kelas ke header modal
-    document.getElementById('m-nama').innerText = nama;
-    document.getElementById('m-kelas').innerText = kelas;
-    
-    // 2. Amankan nilai index ke dalam atribut 'data-index' milik modalAction
-    const modalAksi = document.getElementById('modalAction');
-    modalAksi.dataset.indexMurid = index;
-    
-    // 3. Tampilkan modal ke layar
-    modalAksi.classList.remove('hidden');
-}
-
-function tutupModalAksi() {
-    document.getElementById('modalAction').classList.add('hidden');
-}
-
 
 // ========================================================
 // CORE CHART ENGINE & FUNCTIONS WITH DATALABELS PLUGIN
