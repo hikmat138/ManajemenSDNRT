@@ -1308,7 +1308,7 @@ let mapAplikasi = null;
 let penandaMap = null;
 
 function bukaModalEdit(namaMurid) {
-    // A. Deteksi sumber data yang sedang aktif digunakan di tabel (Gunakan masterData sebagai acuan utama agar indeksnya mutlak)
+    // A. Deteksi sumber data yang sedang aktif digunakan di tabel
     let sumberData = [];
     if (typeof masterData !== "undefined" && masterData && masterData.length > 0) {
         sumberData = masterData;
@@ -1342,15 +1342,40 @@ function bukaModalEdit(namaMurid) {
     }
 
     // D. ISI FORM & SIMPAN INDEKS / NAMA SEBAGAI ACUAN UTAMA
-    // Kita simpan NAMA MURID asli di atribut custom data form agar fungsi simpan nanti tinggal mencari berdasarkan nama ini
     const formEl = document.getElementById('formEditSiswa');
     if (formEl) {
         formEl.setAttribute('data-nama-asal', murid.nama);
     }
     
-    // Tetap simpan indeks mutlak ke input hidden cadangan
     if (indexInput) indexInput.value = index;
     if (subJudul) subJudul.innerText = `${murid.nama} (Kelas ${murid.kelas || '-'})`;
+
+    // SINKRONISASI VISIBILITAS KONTEN MENU DI DALAM MODAL
+    // Menyembunyikan seluruh section menu modal terlebih dahulu agar tidak saling tumpang tindih
+    const semuaSectionModal = ['content-pribadi', 'content-alamat', 'content-keadaan', 'content-ortu', 'content-periodik', 'content-registrasi', 'content-kontak'];
+    semuaSectionModal.forEach(idSection => {
+        const elSection = document.getElementById(idSection);
+        if (elSection) {
+            elSection.classList.add('hidden');
+            elSection.style.display = 'none';
+        }
+    });
+
+    // Menampilkan kontainer yang sesuai dengan currentMenu yang aktif
+    let idSectionAktif = "";
+    if (currentMenu === "siswa-pribadi") idSectionAktif = "content-pribadi";
+    else if (currentMenu === "siswa-alamat") idSectionAktif = "content-alamat";
+    else if (currentMenu === "siswa-keadaan") idSectionAktif = "content-keadaan";
+    else if (currentMenu === "siswa-ortu") idSectionAktif = "content-ortu";
+    else if (currentMenu === "siswa-periodik") idSectionAktif = "content-periodik";
+    else if (currentMenu === "siswa-registrasi") idSectionAktif = "content-registrasi";
+    else if (currentMenu === "siswa-kontak") idSectionAktif = "content-kontak";
+
+    const elSectionAktif = document.getElementById(idSectionAktif);
+    if (elSectionAktif) {
+        elSectionAktif.classList.remove('hidden');
+        elSectionAktif.style.display = 'block';
+    }
 
     // Mapping nilai data objek ke elemen input form secara aman
     try {
@@ -1426,7 +1451,7 @@ function bukaModalEdit(namaMurid) {
         console.error("Gagal memetakan input nilai modal: ", e);
     }
     
-    // E. DOBRAK & MUNCULKAN VISUAL MODAL (Anti-Gagal CSS Tailwind)
+    // E. DOBRAK & MUNCULKAN VISUAL MODAL
     modalEl.style.display = 'flex';
     modalEl.classList.remove('hidden');
 
@@ -1444,14 +1469,11 @@ function bukaModalEdit(namaMurid) {
         modalContentWrapper.classList.remove('hidden');
     }
 
-    // Tampilkan juga form induknya
-    const formInduk = document.getElementById('formEditSiswa');
-    if (formInduk) {
-        formInduk.style.display = 'block';
-        formInduk.classList.remove('hidden');
+    if (formEl) {
+        formEl.style.display = 'block';
+        formEl.classList.remove('hidden');
     }
 }
-
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
