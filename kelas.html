@@ -2025,22 +2025,24 @@ function tampilkanTabelData() {
         }
 
         // 🛠️ 3. KOLOM AKSI DINAMIS (Paling Kanan)
-        if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
-            // Jika menu registrasi aktif, ganti Gear dengan tombol Naik Kelas / Lulus
+       if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
             let kelasTeks = String(item.kelas || "").toUpperCase();
             let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1;
+
+            // Mengubah data murid menjadi string JSON yang aman agar bisa dikirim lewat parameter onclick
+            let stringData = JSON.stringify(item).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
             if (cekKelas6Satuan) {
                 html += `
                     <td class="border px-4 py-3 text-center">
-                        <button type="button" onclick="aksiRegistrasiSatuan('LULUS', '${item.nis || item.id}', '${namaAman}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
+                        <button type="button" onclick="bukaModalRegistrasi('LULUS', ${stringData})" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-graduation-cap mr-1"></i> Lulus
                         </button>
                     </td>`;
             } else {
                 html += `
                     <td class="border px-4 py-3 text-center">
-                        <button type="button" onclick="aksiRegistrasiSatuan('NAIK_KELAS', '${item.nis || item.id}', '${namaAman}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
+                        <button type="button" onclick="bukaModalRegistrasi('NAIK_KELAS', ${stringData})" class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-level-up-alt mr-1"></i> Naik Kelas
                         </button>
                     </td>`;
@@ -2087,6 +2089,128 @@ function tampilkanToast(pesan, tipe = "success") {
         // Jika CDN macet, fallback ke alert bawaan browser agar tidak crash
         alert(pesan);
     }
+}
+    // Variabel penampung data sementara untuk modal registrasi aktif
+let muridTerpilih = null;
+let jenisProsesTerpilih = "";
+
+// A. FUNGSI AWAL SAAT TOMBOL DI TABEL DIKLIK (Ada pertanyaan konfirmasi dulu!)
+function bukaModalRegistrasi(jenisAksi, dataMurid) {
+    let pesanKonfirmasi = jenisAksi === "LULUS" 
+        ? `Apakah Anda yakin ingin memproses kelulusan murid bernama ${dataMurid.nama}?` 
+        : `Apakah Anda yakin ingin memproses kenaikan kelas murid bernama ${dataMurid.nama}?`;
+
+    // 1. Tampilkan pertanyaan konfirmasi awal
+    if (!confirm(pesanKonfirmasi)) return; // Jika klik Batal/Cancel, fungsi langsung berhenti di sini
+
+    // 2. Jika klik OK, simpan data ke penampung global sementara
+    muridTerpilih = dataMurid;
+    jenisProsesTerpilih = jenisAksi;
+
+    // 3. Reset sembunyikan semua kontainer form modal bawaan admin.html agar tidak tumpang tindih
+    document.getElementById("form-lulus").classList.add("hidden");
+    document.getElementById("form-naik-kelas").classList.add("hidden");
+
+    // Tarik elemen pembungkus modal utama Bapak (Sesuaikan ID-nya jika berbeda, misalnya: 'modalEdit')
+    const modalKontainerUtama = document.getElementById("modalEdit") || document.getElementById("modal-utama");
+
+    if (jenisAksi === "LULUS") {
+        // Suntikkan data murid ke elemen teks ID p bawaan komponen Bapak
+        if (document.getElementById("m-nis")) document.getElementById("m-nis").innerText = dataMurid.nis || dataMurid.id || "-";
+        if (document.getElementById("m-nisn")) document.getElementById("m-nisn").innerText = dataMurid.nisn || "-";
+        
+        let ttlTeks = `${dataMurid.tempat_lahir || '-'}, ${dataMurid.tgl_lahir || '-'}`;
+        if (document.getElementById("m-ttl")) document.getElementById("m-ttl").innerText = ttlTeks;
+
+        // Berikan nilai default siap pakai pada kolom input kelulusan
+        if (document.getElementById("m-tapel")) document.getElementById("m-tapel").value = "2025/2026";
+        if (document.getElementById("m-tgl-lulus")) document.getElementById("m-tgl-lulus").value = new Date().toISOString().split('T')[0];
+        if (document.getElementById("m-sk-lulus")) document.getElementById("m-sk-lulus").value = "";
+        if (document.getElementById("m-ijazah")) document.getElementById("m-ijazah").value = "";
+
+        // Buka form kelulusan
+        document.getElementById("form-lulus").classList.remove("hidden");
+    } 
+    else if (jenisAksi === "NAIK_KELAS") {
+        // Kalkulasi target kelas secara otomatis (Angka kelas sekarang + 1)
+        let angkaKelas = parseInt(dataMurid.kelas) || 0;
+        let targetKelasTeks = angkaKelas > 0 ? `KELAS ${angkaKelas + 1}` : "TINGKAT LANJUT";
+
+        if (document.getElementById("m-target-kelas")) {
+            document.getElementById("m-target-kelas").innerText = targetKelasTeks;
+        }
+
+        // Buka form kenaikan kelas
+        document.getElementById("form-naik-kelas").classList.remove("hidden");
+    }
+
+    // 4. Munculkan modal utama ke layar monitor
+    if (modalKontainerUtama) modalKontainerUtama.classList.remove("hidden");
+}
+
+// B. FUNGSI AKHIR SAAT TOMBOL "KONFIRMASI" DI DALAM MODAL DIKLIK USER
+function konfirmasiProses() {
+    if (!muridTerpilih) return;
+
+    // Siapkan struktur paket kiriman data (Payload)
+    let paketData = {
+        action: jenisProsesTerpilih,
+        nis: muridTerpilih.nis || muridTerpilih.id || ""
+    };
+
+    // Jika memproses kelulusan, kumpulkan data ketikan dari inputan di admin.html
+    if (jenisProsesTerpilih === "LULUS") {
+        paketData.tapel = document.getElementById("m-tapel").value;
+        paketData.tglLulus = document.getElementById("m-tgl-lulus").value;
+        paketData.skLulus = document.getElementById("m-sk-lulus").value || "-";
+        paketData.noIjazah = document.getElementById("m-ijazah").value || "-";
+
+        if (!paketData.tapel || !paketData.tglLulus) {
+            alert("Tahun Ajaran dan Tanggal Lulus tidak boleh kosong!");
+            return;
+        }
+    }
+
+    if (typeof tampilkanToast === "function") tampilkanToast("Sedang memproses perubahan data...", "info");
+
+    // Kirim paket data menuju URL Apps Script Google Sheets Bapak
+    fetch(API_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(paketData)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error();
+        return res.json();
+    })
+    .then(respons => {
+        if (respons && respons.status === "success") {
+            if (typeof tampilkanToast === "function") {
+                tampilkanToast(respons.message || "Spreadsheet berhasil diperbarui!", "success");
+            }
+
+            // Tutup jendela modal secara otomatis
+            if (typeof closeModal === "function") closeModal();
+            else if (typeof tutupModal === "function") tutupModal();
+            else {
+                const modalKontainerUtama = document.getElementById("modalEdit") || document.getElementById("modal-utama");
+                if (modalKontainerUtama) modalKontainerUtama.classList.add("hidden");
+            }
+
+            // Muat ulang atau sinkronisasi tampilan tabel web biar datanya ter-update
+            if (typeof ambilDataDariSheets === "function") ambilDataDariSheets();
+            else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
+        } else {
+            alert(respons.message || "Gagal memperbarui database Google Sheets.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Gagal terhubung ke Google Sheets. Silakan periksa jaringan internet.");
+    });
 }
 </script>
 </body>
