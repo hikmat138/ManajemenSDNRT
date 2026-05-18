@@ -124,6 +124,7 @@
 
 <div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-950 bg-opacity-50 items-center justify-center p-4 opacity-0 transition-opacity duration-200">
     <div id="modalEditWrapper" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 opacity-0 duration-200">
+        
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div>
                 <h3 id="modalEditJudul" class="text-base font-bold text-gray-900 flex items-center gap-2">
@@ -136,10 +137,13 @@
             </button>
         </div>
 
-        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 space-y-4 blueprint-scroll">
+        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 blueprint-scroll">
+            
             <input type="hidden" id="edit-index-input">
             
-            <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+            
         </form>
 
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
@@ -150,6 +154,7 @@
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
             </button>
         </div>
+        
     </div>
 </div>
 <div class="flex h-screen">
@@ -744,9 +749,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -768,9 +773,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -789,9 +794,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -823,9 +828,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
                     <td class="p-3 text-center border-l whitespace-nowrap">
-                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -841,9 +846,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -859,9 +864,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                       <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;
@@ -875,9 +880,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
                     </td>
                 `;
                 break;   
@@ -1322,9 +1327,7 @@ let indeksSiswaDipilih = null;
 let mapAplikasi = null;
 let penandaMap = null;
 
-function bukaModalEdit(index) {
-    indeksSiswaDipilih = index;
-    
+function bukaModalEdit(namaMurid) {
     // 1. DETEKSI SUMBER DATA UTAMA (Secara Hierarki dan Adaptif)
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
@@ -1335,19 +1338,18 @@ function bukaModalEdit(index) {
         sumberData = dataListYgAktif;
     }
 
-    // 2. AMBIL DATA MURID BERDASARKAN INDEKS DARI SUMBER DATA YANG PAS
+    // 2. CARI DATA MURID DAN INDEX ASLINYA BERDASARKAN NAMA
+    const index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
+    indeksSiswaDipilih = index; 
+    
     const s = sumberData[index]; 
     if (!s) {
-        console.error("Gagal membuka modal: Data murid pada indeks " + index + " tidak ditemukan di sumber data.");
+        console.error("Gagal membuka modal: Data murid dengan nama '" + namaMurid + "' tidak ditemukan di sumber data.");
         alert("Sistem gagal memuat data murid. Silakan periksa Console (F12).");
         return;
     }
 
-    // ======================================================================
-    // KE BAWAH SINI KODE LAYOUT & SWITCH CASE BAPAK SUDAH AMAN DAN BAGUS
-    // ======================================================================
-
-    // Set Judul Modal
+    // Set Judul Modal & Ambil Elemen Wadah
     document.getElementById('modalEditSubJudul').innerText = `${s.nama || '-'} (${s.kelas || '-'})`;
     document.getElementById('edit-index-input').value = index;
 
@@ -1524,7 +1526,7 @@ function bukaModalEdit(index) {
     const wrapperModal = document.getElementById('modalEditWrapper');
 
     if (!modalEl || !wrapperModal) {
-        console.error("Elemen HTML modalEditSiswa atau modalEditWrapper tidak ditemukan di file HTML.");
+        console.error("Elemen HTML modalEditSiswa atau modalEditWrapper tidak ditemukan.");
         return;
     }
 
@@ -1545,37 +1547,42 @@ function bukaModalEdit(index) {
         wrapperModal.classList.add('scale-100', 'opacity-100');
     }, 20);
 }
+
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     
-    // Kembalikan ke posisi mengecil (scale-95) dan transparan
+    if (!modalEl || !wrapperModal) return;
+
     modalEl.classList.add('opacity-0');
     wrapperModal.classList.remove('scale-100', 'opacity-100');
     wrapperModal.classList.add('scale-95', 'opacity-0');
     
-    // Sembunyikan total setelah durasi animasi css selesai (200ms)
     setTimeout(() => {
         modalEl.classList.remove('flex');
         modalEl.classList.add('hidden');
     }, 200);
 }
-    function initPetaSiswa(lat, lng) {
-    // Parsing titik koordinat, jika rusak arahkan default ke area Banten sekitar Serang
+
+function initPetaSiswa(lat, lng) {
+    // Standardisasi koma ke titik untuk koordinat latitude/longitude
     let posisiLat = parseFloat(String(lat).replace(',', '.')) || -6.12;
     let posisiLng = parseFloat(String(lng).replace(',', '.')) || 106.15;
 
     const mapCenter = { lat: posisiLat, lng: posisiLng };
+    const mapBox = document.getElementById("mapBoxEdit");
 
-    // Validasi apakah Google Maps API sudah termuat sempurna di web Bapak
+    if (!mapBox) return;
+
+    // Validasi apakah Google Maps API sudah termuat sempurna
     if (typeof google === 'object' && typeof google.maps === 'object') {
-        mapAplikasi = new google.maps.Map(document.getElementById("mapBoxEdit"), {
+        mapAplikasi = new google.maps.Map(mapBox, {
             zoom: 15,
             center: mapCenter,
-            mapTypeId: google.maps.MapTypeId.ROADVIEW
+            mapTypeId: google.maps.MapTypeId.ROADMAP
         });
 
-        // Buat pin penanda yang bisa digeser-geser (draggable)
+        // Buat pin penanda yang bisa digeser (draggable)
         penandaMap = new google.maps.Marker({
             position: mapCenter,
             map: mapAplikasi,
@@ -1590,8 +1597,8 @@ function tutupModalEdit() {
             document.getElementById('edit-bujur').value = koordinatBaru.lng().toFixed(6);
         });
     } else {
-        document.getElementById("mapBoxEdit").innerHTML = `
-            <div class="flex items-center justify-center h-full text-xs text-red-500 p-4 text-center">
+        mapBox.innerHTML = `
+            <div class="flex items-center justify-center h-full text-xs text-red-500 p-4 text-center bg-gray-50 rounded-lg border border-dashed">
                 <i class="fa-solid fa-triangle-exclamation mr-1"></i> Gagal memuat Peta. Pastikan API Key Google Maps Bapak aktif atau cek koneksi internet.
             </div>`;
     }
@@ -1599,22 +1606,47 @@ function tutupModalEdit() {
     function simpanPerubahanSiswa(event) {
     if (event) event.preventDefault(); // Stop reload halaman form
     
+    // 1. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF (Hierarki Adaptif)
+    let sumberData = [];
+    if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
+        sumberData = dataFiltered;
+    } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
+        sumberData = dataSiswa;
+    } else if (typeof dataListYgAktif !== "undefined") { 
+        sumberData = dataListYgAktif;
+    }
+
+    // 2. AMBIL INDEX TARGET DARI INPUT FORM
     let index = parseInt(document.getElementById('edit-index-input').value);
-    let sTarget = dataFiltered[index];
-    if (!sTarget) return;
+    let sTarget = sumberData[index];
 
-    // AMANKAN KUNCI PENCARIAN SEBELUM DATA DI FORM DIUBAH
-    const namaAsli = sTarget.nama;
-    const kelasAsli = sTarget.kelas;
+    // JIKA INDEX MISMATCH, LAKUKAN BACKUP PENCARIAN BERDASARKAN NAMA PADA SUB-JUDUL MODAL
+    if (!sTarget) {
+        const subJudul Teks = document.getElementById('modalEditSubJudul').innerText;
+        // Ambil nama sebelum tanda kurung kelas, contoh: "Ahmad Dani (Kelas 4)" -> "Ahmad Dani"
+        const namaDariModal = subJudulTeks.split('(')[0].trim(); 
+        
+        index = sumberData.findIndex(item => String(item.nama).trim() === namaDariModal);
+        sTarget = sumberData[index];
+    }
 
-    let masterIndex = masterData.findIndex(item => item.nama === namaAsli && item.kelas === kelasAsli);
-
-    if (masterIndex === -1) {
-        alert("Gagal menyimpan. Data murid tidak ditemukan di database utama lokal.");
+    if (!sTarget) {
+        alert("Gagal menyimpan. Data murid tidak dapat diidentifikasi pada sistem lokal.");
         return;
     }
 
-    // Gunakan objek referensi singkat untuk mempersingkat kode dan performa
+    // AMANKAN KUNCI PENCARIAN SEBELUM DATA DI FORM DIUBAH
+    const namaAsli = sTarget.nama;
+
+    // CARI INDEX DI MASTER DATA UTAMA
+    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+
+    if (masterIndex === -1) {
+        alert("Gagal menyimpan. Data murid tidak ditemukan di database utama (masterData).");
+        return;
+    }
+
+    // Gunakan objek referensi singkat untuk memperbarui database utama
     const mSiswa = masterData[masterIndex];
 
     // Ambil data yang diketik user sesuai menu yang sedang aktif
@@ -1696,10 +1728,16 @@ function tutupModalEdit() {
             break;
     }
 
-    // SINKRONISASI INSTAN: Pastikan dataFiltered ikut terupdate secara lokal
-    dataFiltered[index] = { ...mSiswa };
+    // 3. RE-SINKRONISASI INSTAN: Perbarui isi array di sumber data yang sedang aktif
+    sumberData[index] = { ...mSiswa };
 
-    // Refresh data array terfilter dan visualisasi tabel secara realtime
+    // Jika dataSiswa terpisah dari masterData, sinkronkan juga nilainya
+    if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
+        let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+        if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
+    }
+
+    // Refresh visualisasi render tabel secara realtime
     if (typeof dataFilteredAndSorted === "function") {
         dataFilteredAndSorted(); 
     } else if (typeof tampilkanTabelData === "function") {
@@ -1707,7 +1745,7 @@ function tutupModalEdit() {
     }
     
     tutupModalEdit();
-    console.log("Data berhasil diupdate lokal.");
+    console.log("Data murid '" + namaAsli + "' berhasil diperbarui di lokal.");
 }
 </script>
 </body>
