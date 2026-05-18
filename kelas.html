@@ -1882,7 +1882,6 @@ function simpanPerubahanSiswa(event) {
         tampilkanToast("Sedang menyimpan ke Google Sheets, mohon tunggu...", "info");
 
         // 🔥 URL WEB APP GOOGLE APPS SCRIPT BAPAK (Salin Tautan /exec Terbaru Bapak ke Sini)
-        const URL_WEB_APP = "https://script.google.com/macros/s/XXXXXXXXX/exec"; 
 
         let paketData = {
             action: "EDIT_IDENTITAS",
@@ -1891,7 +1890,7 @@ function simpanPerubahanSiswa(event) {
         };
 
         // 🌐 PROSES TEMBAK API LINTAS SERVER (GitHub ke Google Sheets)
-        fetch(URL_WEB_APP, {
+        fetch(API_URL, {
             method: "POST",
             redirect: "follow", // Wajib agar menangani pengalihan internal server Google macros
             body: JSON.stringify(paketData)
