@@ -1709,18 +1709,6 @@ function tutupModalEdit() {
     tutupModalEdit();
     console.log("Data berhasil diupdate lokal.");
 }
-
-function tanganiEditDariModalAksi() {
-    const modalAksi = document.getElementById('modalAction');
-    const index = parseInt(modalAksi.dataset.indexMurid);
-    
-    if (!isNaN(index)) {
-        modalAksi.classList.add('hidden'); // Tutup modal aksi gerigi
-        bukaModalEdit(index); // Jalankan modal edit utama
-    } else {
-        console.error("Gagal mengambil indeks murid dari modal aksi.");
-    }
-}
 </script>
 </body>
 </html>
