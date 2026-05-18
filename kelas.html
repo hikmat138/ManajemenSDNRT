@@ -2006,6 +2006,28 @@ function tampilkanTabelData() {
         infoHalaman.innerText = `MENAMPILKAN 1 - ${targetData.length} DARI ${targetData.length} MURID`;
     }
 }
+function tampilkanToast(pesan, tipe = "success") {
+    if (typeof Swal !== "undefined") {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+        Toast.fire({
+            icon: tipe, // 'success', 'error', 'warning', 'info'
+            title: pesan
+        });
+    } else {
+        // Jika CDN macet, fallback ke alert bawaan browser agar tidak crash
+        alert(pesan);
+    }
+}
 </script>
 </body>
 </html>
