@@ -1308,27 +1308,19 @@ let mapAplikasi = null;
 let penandaMap = null;
 
 function bukaModalEdit(namaMurid) {
-    // A. Deteksi sumber data yang sedang aktif digunakan di tabel
+    // A. Deteksi sumber data yang sedang aktif digunakan di tabel (Gunakan masterData sebagai acuan utama agar indeksnya mutlak)
     let sumberData = [];
-    if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
-        sumberData = dataFiltered;
+    if (typeof masterData !== "undefined" && masterData && masterData.length > 0) {
+        sumberData = masterData;
+    } else if (typeof filteredData !== "undefined" && filteredData && filteredData.length > 0) {
+        sumberData = filteredData;
     } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
         sumberData = dataSiswa;
-    } else if (typeof dataListYgAktif !== "undefined") { 
-        sumberData = dataListYgAktif;
     }
 
-    // B. Cari index berdasarkan NAMA MURID yang dikirim dari tombol gerigi
+    // B. Cari index mutlak berdasarkan NAMA MURID
     let index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
     
-    // C. Jika tidak ketemu di data filter, cari langsung di masterData pusat sebagai benteng pertahanan terakhir
-    if (index === -1 && typeof masterData !== "undefined") {
-        index = masterData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
-        if (index !== -1) {
-            sumberData = masterData; // Alihkan sumber ke master data jika ketemu
-        }
-    }
-
     const murid = sumberData[index];
     
     // Jika benar-benar mutlak tidak ditemukan di sistem lokal
@@ -1338,7 +1330,7 @@ function bukaModalEdit(namaMurid) {
         return;
     }
 
-    // D. Mulai proses pengisian form modal
+    // C. Ambil Elemen Modal HTML
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     const subJudul = document.getElementById('modalEditSubJudul');
@@ -1349,7 +1341,14 @@ function bukaModalEdit(namaMurid) {
         return;
     }
 
-    // Simpan nomor indeks saat ini ke input hidden form modal untuk kebutuhan simpanPerubahanSiswa nanti
+    // D. ISI FORM & SIMPAN INDEKS / NAMA SEBAGAI ACUAN UTAMA
+    // Kita simpan NAMA MURID asli di atribut custom data form agar fungsi simpan nanti tinggal mencari berdasarkan nama ini
+    const formEl = document.getElementById('formEditSiswa');
+    if (formEl) {
+        formEl.setAttribute('data-nama-asal', murid.nama);
+    }
+    
+    // Tetap simpan indeks mutlak ke input hidden cadangan
     if (indexInput) indexInput.value = index;
     if (subJudul) subJudul.innerText = `${murid.nama} (Kelas ${murid.kelas || '-'})`;
 
@@ -1427,31 +1426,37 @@ function bukaModalEdit(namaMurid) {
         console.error("Gagal memetakan input nilai modal: ", e);
     }
 
-    // E. Munculkan Modal secara Visual dengan Efek Transisi Tailwind
+    // E. DOBRAK & MUNCULKAN VISUAL MODAL (Anti-Gagal CSS Tailwind)
+    modalEl.style.display = 'flex';
     modalEl.classList.remove('hidden');
-    modalEl.classList.add('flex');
+
     setTimeout(() => {
         modalEl.classList.remove('opacity-0');
+        modalEl.classList.add('opacity-100');
+        
         wrapperModal.classList.remove('scale-95', 'opacity-0');
         wrapperModal.classList.add('scale-100', 'opacity-100');
-    }, 20);
+    }, 10);
 }
+
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     
     if (!modalEl || !wrapperModal) return;
 
+    modalEl.classList.remove('opacity-100');
     modalEl.classList.add('opacity-0');
+    
     wrapperModal.classList.remove('scale-100', 'opacity-100');
     wrapperModal.classList.add('scale-95', 'opacity-0');
     
     setTimeout(() => {
-        modalEl.classList.remove('flex');
+        modalEl.style.display = 'none';
         modalEl.classList.add('hidden');
+        modalEl.classList.remove('flex');
     }, 200);
 }
-
 function initPetaSiswa(lat, lng) {
     let posisiLat = parseFloat(String(lat).replace(',', '.')) || -6.12;
     let posisiLng = parseFloat(String(lng).replace(',', '.')) || 106.15;
@@ -1491,50 +1496,43 @@ function initPetaSiswa(lat, lng) {
 function simpanPerubahanSiswa(event) {
     if (event) event.preventDefault(); 
     
-    // 1. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF
+    // 1. DETEKSI NAMA ASLI SEBELUM DIEDIT (Diambil dari titipan atribut Form)
+    const formEl = document.getElementById('formEditSiswa');
+    let namaAsli = formEl ? formEl.getAttribute('data-nama-asal') : '';
+    
+    // Jika atribut penanda kosong, ambil cadangan dari sub-judul modal
+    if (!namaAsli) {
+        const subJudulTeks = document.getElementById('modalEditSubJudul')?.innerText || '';
+        namaAsli = subJudulTeks.split('(')[0].trim(); 
+    }
+
+    // 2. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF
     let sumberData = [];
-    if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
+    if (typeof filteredData !== "undefined" && filteredData && filteredData.length > 0) {
+        sumberData = filteredData;
+    } else if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
         sumberData = dataFiltered;
     } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
         sumberData = dataSiswa;
-    } else if (typeof dataListYgAktif !== "undefined") { 
-        sumberData = dataListYgAktif;
+    } else if (typeof masterData !== "undefined") {
+        sumberData = masterData;
     }
 
-    // 2. AMBIL INDEX TARGET DARI INPUT FORM
-    let index = parseInt(document.getElementById('edit-index-input').value);
-    let sTarget = sumberData[index];
-
-    // JIKA INDEX MISMATCH, LAKUKAN BACKUP PENCARIAN BERDASARKAN NAMA PADA SUB-JUDUL MODAL
-    if (!sTarget) {
-        const subJudulTeks = document.getElementById('modalEditSubJudul').innerText;
-        const namaDariModal = subJudulTeks.split('(')[0].trim(); 
-        
-        index = sumberData.findIndex(item => String(item.nama).trim() === namaDariModal);
-        sTarget = sumberData[index];
-    }
-
-    // AMAN: Validasi sTarget dinaikkan sebelum mengambil properti .nama agar tidak crash
-    if (!sTarget || index === -1) {
-        alert("Gagal menyimpan. Data murid tidak dapat diidentifikasi pada sistem lokal.");
-        return;
-    }
-
-    // Kunci string nama asli (lama) sebelum objek diubah di memori
-    const namaAsli = String(sTarget.nama).trim();
-
-    // CARI INDEX DI MASTER DATA UTAMA
-    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === namaAsli);
+    // 3. CARI INDEX PADA DATABASE UTAMA (masterData) BERDASARKAN NAMA ASLI
+    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
 
     if (masterIndex === -1) {
-        alert("Gagal menyimpan. Data murid tidak ditemukan di database utama (masterData).");
+        alert(`Gagal menyimpan. Data murid bernama "${namaAsli}" tidak ditemukan di database utama (masterData).`);
         return;
     }
 
-    // Buat salinan objek mSiswa sementara agar perubahan nama tidak langsung merusak memori pencarian sekunder
+    // Cari juga index-nya di array tampilan yang sedang aktif saat ini
+    let indexAktif = sumberData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+
+    // Buat salinan objek sementara agar aman saat manipulasi data
     const mSiswa = { ...masterData[masterIndex] };
 
-    // Ambil data dari elemen DOM berdasarkan menu aktif
+    // 4. PROSES PENYERAPAN DATA DARI FORM INPUT HTML BAPAK
     switch (currentMenu) {
         case "siswa-pribadi":
             if (document.getElementById('edit-nama')) mSiswa.nama = document.getElementById('edit-nama').value.trim();
@@ -1605,7 +1603,6 @@ function simpanPerubahanSiswa(event) {
             if (document.getElementById('edit-cita_cita')) mSiswa.cita_cita = document.getElementById('edit-cita_cita').value.trim();
             break;
 
-        // SEKARANG AMAN: Ditambahkan penampung menu registrasi agar data tidak hilang saat disimpan
         case "siswa-registrasi":
             if (document.getElementById('edit-tgl_masuk')) mSiswa.tgl_masuk = document.getElementById('edit-tgl_masuk').value.trim();
             if (document.getElementById('edit-sekolah_asal')) mSiswa.sekolah_asal = document.getElementById('edit-sekolah_asal').value.trim();
@@ -1619,74 +1616,89 @@ function simpanPerubahanSiswa(event) {
             break;
     }
 
-    // 3. KEMBALIKAN DATA MODIFIKASI KE MASTER DATA UTAMA
+    // 5. INJEKSIKAN KEMBALI HASIL MODIFIKASI KE DATABASE UTAMA PUSAT
     masterData[masterIndex] = { ...mSiswa };
 
-    // 4. RE-SINKRONISASI INSTAN PADA ARRAY SINKRONISASI LAINNYA
-    sumberData[index] = { ...mSiswa };
+    // 6. SINKRONISASI INSTAN PADA ARRAY AKTIF LAINNYA AGAR TIDAK JADI TIMPANG
+    if (indexAktif !== -1) {
+        sumberData[indexAktif] = { ...mSiswa };
+    }
 
     if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
         let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
         if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
     }
 
-    // Render ulang visualisasi tabel secara realtime
-    if (typeof dataFilteredAndSorted === "function") {
+    // 7. SEGARKAN TABEL SECARA REALTIME (Mendukung filter data & render tabel terpisah)
+    if (typeof filterData === "function") {
+        filterData(); // Jika memakai sistem pagination, biarkan ini yang bekerja melahirkan ulang filteredData
+    } else if (typeof dataFilteredAndSorted === "function") {
         dataFilteredAndSorted(); 
-    } else if (typeof tampilkanTabelData === "function") {
+    } else {
         tampilkanTabelData(); 
     }
     
     tutupModalEdit();
-    console.log("Data murid '" + namaAsli + "' berhasil diperbarui di lokal.");
+    console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
 }
-    function tampilkanTabelData() {
+
+function tampilkanTabelData() {
     let html = "";
     
-    // Proteksi: Jika dataFiltered belum siap atau kosong, jangan biarkan crash
-    if (typeof dataFiltered === "undefined" || !dataFiltered || dataFiltered.length === 0) {
-        // Coba lempar ke dataSiswa atau masterData sebagai cadangan jika dataFiltered kosong
-        let dataCadangan = [];
-        if (typeof dataSiswa !== "undefined" && dataSiswa) dataCadangan = dataSiswa;
-        else if (typeof masterData !== "undefined" && masterData) dataCadangan = masterData;
-        
-        if (dataCadangan.length > 0) {
-            dataFiltered = [...dataCadangan]; // Pulihkan dataFiltered dari cadangan
-        } else {
-            // Jika benar-benar kosong di semua database pusat
-            const tbodyBox = document.getElementById("isiTabelSiswa");
-            if (tbodyBox) {
-                tbodyBox.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat...</td></tr>`;
-            }
-            return;
-        }
+    // Satukan pembacaan variabel dataFiltered atau filteredData milik Bapak
+    let targetData = [];
+    if (typeof filteredData !== "undefined" && filteredData) {
+        targetData = filteredData;
+    } else if (typeof dataFiltered !== "undefined" && dataFiltered) {
+        targetData = dataFiltered;
     }
 
-    dataFiltered.forEach((item, index) => {
-        // Amankan nama murid dari tanda petik tunggal (') agar tidak merusak sintaks HTML onclick
-        let namaAman = String(item.nama).replace(/'/g, "\\'");
+    // Proteksi: Jika penampung saring kosong, ambil cadangan master pusat
+    if (targetData.length === 0) {
+        if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
+        else if (typeof masterData !== "undefined" && masterData) targetData = masterData;
+        
+        // Kembalikan isi dataFiltered/filteredData global jika cadangan ditemukan
+        if (typeof filteredData !== "undefined") filteredData = [...targetData];
+        if (typeof dataFiltered !== "undefined") dataFiltered = [...targetData];
+    }
+
+    // Jika benar-benar mutlak kosong dari seluruh database lokal
+    if (targetData.length === 0) {
+        const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data");
+        if (tbodyBox) {
+            tbodyBox.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat...</td></tr>`;
+        }
+        return;
+    }
+
+    // Looping rendering baris HTML tabel
+    targetData.forEach((item, index) => {
+        let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
 
         html += `
-        <tr>
-            <td class="border px-4 py-2 text-center">${index + 1}</td>
-            <td class="border px-4 py-2">${item.nama || '-'}</td>
-            <td class="border px-4 py-2">${item.nisn || '-'}</td>
-            <td class="border px-4 py-2 text-center">
-                <button type="button" onclick="bukaModalEdit('${namaAman}')" class="text-gray-500 hover:text-blue-600 transition-colors">
+        <tr class="hover:bg-gray-50 transition text-sm text-gray-900 border-b">
+            <td class="px-4 py-3 text-center">${index + 1}</td>
+            <td class="px-4 py-3 font-medium">${item.nama || '-'}</td>
+            <td class="px-4 py-3">${item.nisn || '-'}</td>
+            <td class="px-4 py-3 text-center">
+                <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-400 hover:text-blue-600 transition">
                     <i class="fa-solid fa-gear"></i>
                 </button>
             </td>
         </tr>`;
     });
     
-    const tbodyBox = document.getElementById("isiTabelSiswa");
+    // Tembakkan html ke salah satu ID penampung tbody Bapak yang aktif
+    const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data") || document.querySelector("tbody");
     if (tbodyBox) {
         tbodyBox.innerHTML = html;
     }
     
-    // Update label info halaman jika elemennya ada di HTML Bapak
-    if (document.getElementById("infoHalaman")) {
-        document.getElementById("infoHalaman").innerText = `MENAMPILKAN 1 - ${dataFiltered.length} DARI ${dataFiltered.length} MURID`;
+    // Update label text "Menampilkan" jika elemennya terpasang di HTML Bapak
+    const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
+    if (infoHalaman) {
+        infoHalaman.innerText = `MENAMPILKAN 1 - ${targetData.length} DARI ${targetData.length} MURID`;
     }
 }
 </script>
