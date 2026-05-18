@@ -1324,8 +1324,23 @@ let penandaMap = null;
 
 function bukaModalEdit(index) {
     indeksSiswaDipilih = index;
-    const s = dataFiltered[index]; // Mengambil data murid berdasarkan urutan filter/pagination saat ini
-    if (!s) return;
+    
+    // DETEKSI SUMBER DATA: Gunakan dataFiltered jika ada, jika tidak gunakan dataSiswa (atau sesuaikan variabel global Bapak)
+    let sumberData = [];
+    if (typeof dataFiltered !== "undefined" && dataFiltered) {
+        sumberData = dataFiltered;
+    } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
+        sumberData = dataSiswa;
+    } else if (typeof dataListYgAktif !== "undefined") { // Alternatif cadangan
+        sumberData = dataListYgAktif;
+    }
+
+    const s = sumberData[index]; 
+    if (!s) {
+        console.error("Gagal membuka modal: Data murid pada indeks " + index + " tidak ditemukan di sumber data.");
+        alert("Sistem gagal memuat data murid. Silakan periksa Console (F12).");
+        return;
+    }
 
     // Set Judul Modal
     document.getElementById('modalEditSubJudul').innerText = `${s.nama || '-'} (${s.kelas || '-'})`;
@@ -1342,7 +1357,7 @@ function bukaModalEdit(index) {
     if (s.jk === 'L' || s.jk === 'Laki-laki') jkTeksLengkap = "Laki-laki";
     if (s.jk === 'P' || s.jk === 'Perempuan') jkTeksLengkap = "Perempuan";
 
-    // BANNER IDENTITAS READ-ONLY (Hanya disisipkan di menu SELAIN Identitas Pribadi)
+    // BANNER IDENTITAS READ-ONLY
     const komponenIdentitasReadOnly = `
         <div class="col-span-1 md:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-200 grid grid-cols-3 gap-4 mb-2 text-xs">
             <div>
@@ -1376,7 +1391,7 @@ function bukaModalEdit(index) {
                 </div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">NISN</label><input type="text" id="edit-nisn" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nisn || ''}"></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tempat Lahir</label><input type="text" id="edit-tmpt_lahir" class="w-full border p-2.5 rounded-lg text-sm" value="${s.tmpt_lahir || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Lahir</label><input type="text" id="edit-tgl_lahir" class="w-full border p-2.5 rounded-lg text-sm" placeholder="YYYY-MM-DD atau DD/MM/YYYY" value="${s.tgl_lahir || ''}"></div>
+                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Lahir</label><input type="text" id="edit-tgl_lahir" class="w-full border p-2.5 rounded-lg text-sm" placeholder="YYYY-MM-DD" value="${s.tgl_lahir || ''}"></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">NIK</label><input type="text" id="edit-nik" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nik || ''}"></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">Agama</label><input type="text" id="edit-agama" class="w-full border p-2.5 rounded-lg text-sm" value="${s.agama || ''}"></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">No. Akte Kelahiran</label><input type="text" id="edit-akte" class="w-full border p-2.5 rounded-lg text-sm" value="${s.akte || ''}"></div>
@@ -1408,7 +1423,6 @@ function bukaModalEdit(index) {
                     <div id="mapBoxEdit" class="w-full h-48 border rounded-lg bg-gray-100 shadow-inner"></div>
                 </div>
             `;
-            // Sediakan jeda render peta agar wadah HTML-nya siap secara dimensional
             setTimeout(() => { if (typeof initPetaSiswa === "function") initPetaSiswa(s.lintang, s.bujur); }, 250);
             break;
 
@@ -1432,8 +1446,7 @@ function bukaModalEdit(index) {
 
         case "siswa-ortu":
             document.getElementById('modalEditJudul').innerText = "Edit Data Orang Tua / Wali Murid";
-            wadahForm.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-full"; // Set 3 kolom khusus menu Ortu
-            
+            wadahForm.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-full"; 
             wadahForm.innerHTML = `<div class="col-span-1 md:col-span-3">${komponenIdentitasReadOnly}</div>` + `
                 <div class="space-y-3 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
                     <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider border-b pb-1"><i class="fa-solid fa-user-tie"></i> Data Ayah Kandung</h4>
@@ -1478,6 +1491,15 @@ function bukaModalEdit(index) {
             `;
             break;
 
+        case "siswa-registrasi": // TAMBAHAN KARENA ADA DI MENU TABEL
+            document.getElementById('modalEditJudul').innerText = "Edit Data Registrasi Masuk Murid";
+            wadahForm.innerHTML = komponenIdentitasReadOnly + `
+                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Masuk</label><input type="text" id="edit-tgl_masuk" class="w-full border p-2.5 rounded-lg text-sm" value="${s.tgl_masuk || ''}"></div>
+                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Sekolah Asal</label><input type="text" id="edit-sekolah_asal" class="w-full border p-2.5 rounded-lg text-sm" value="${s.sekolah_asal || ''}"></div>
+                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Keterangan Siswa</label><input type="text" id="edit-keterangan_siswa" class="w-full border p-2.5 rounded-lg text-sm" value="${s.keterangan_siswa || ''}"></div>
+            `;
+            break;
+
         case "siswa-kontak":
             document.getElementById('modalEditJudul').innerText = "Edit Kontak Hubung Murid / Orang Tua";
             wadahForm.innerHTML = komponenIdentitasReadOnly + `
@@ -1488,12 +1510,18 @@ function bukaModalEdit(index) {
             break;
             
         default:
+            console.warn("Menu tidak dikenal di switch case modal: " + currentMenu);
             return;
     }
 
-    // PENGATURAN DIMENSI DAN STRUKTUR ANIMASI MODAL (Dibersihkan dari Duplikasi Let/Const)
+    // PENGATURAN DIMENSI DAN ANIMASI
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
+
+    if (!modalEl || !wrapperModal) {
+        console.error("Elemen HTML modalEditSiswa atau modalEditWrapper tidak ditemukan di file HTML.");
+        return;
+    }
 
     if (currentMenu === "siswa-ortu") {
         wrapperModal.classList.remove('max-w-2xl');
@@ -1503,18 +1531,15 @@ function bukaModalEdit(index) {
         wrapperModal.classList.add('max-w-2xl');
     }
 
-    // Munculkan kontainer utama (Flexbox) terlebih dahulu
     modalEl.classList.remove('hidden');
     modalEl.classList.add('flex');
     
-    // Beri jeda micro-task agar transisi CSS Tailwind dirender sempurna oleh browser
     setTimeout(() => {
         modalEl.classList.remove('opacity-0');
         wrapperModal.classList.remove('scale-95', 'opacity-0');
         wrapperModal.classList.add('scale-100', 'opacity-100');
     }, 20);
 }
-
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
