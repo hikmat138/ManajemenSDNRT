@@ -1902,17 +1902,16 @@ function simpanPerubahanSiswa(event) {
         if (typeof google !== "undefined" && google.script && google.script.run) {
             let paketData = {
                 action: "EDIT_IDENTITAS",
-                rowIndex: masterIndex + 2, // Indeks baris sheet asli
+                rowIndex: masterIndex + 2, 
                 payload: mSiswa
             };
 
-            // PENTING: Ganti 'aksesBackendUtama' di bawah ini dengan nama fungsi penangkap utama 
-            // milik Bapak yang ada di Code.gs (fungsi yang di dalamnya ada if (action === ...))
+            // 🔥 SEKARANG MENEMBAK KE FUNGSI JEMBATAN TERBARU
             google.script.run
                 .withSuccessHandler(function(respons) {
                     console.log("Hasil sinkronisasi Sheets:", respons);
                     if (respons && respons.status === "success") {
-                        tampilkanToast(`Berhasil menyinkronkan data ${mSiswa.nama || namaAsli} ke Google Sheets! 🎉`, "success");
+                        tampilkanToast(respons.message, "success");
                     } else {
                         tampilkanToast(respons.message || "Gagal menyimpan ke Google Sheets.", "error");
                     }
@@ -1921,19 +1920,10 @@ function simpanPerubahanSiswa(event) {
                     console.error("Gagal sinkronisasi Sheets:", err);
                     tampilkanToast("Koneksi gagal: Perubahan tidak tersimpan di Google Sheets.", "error");
                 })
-                .aksesBackendUtama(paketData); // <--- SILAKAN GANTI 'aksesBackendUtama' DENGAN NAMA FUNGSI DI CODE.GS BAPAK
+                .jembatanEditSiswa(paketData); // <--- Tembak langsung ke fungsi jembatan baru kita, Pak!
         } else {
-            // Jika dijalankan di luar lingkungan Google Apps Script (misal localhost)
             tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Offline)!`, "success");
         }
-
-        console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
-
-    } catch (error) {
-        console.error("Terjadi error saat eksekusi simpan:", error);
-        tampilkanToast("Gagal menyimpan perubahan data murid.", "error");
-    }
-}
 function tampilkanTabelData() {
     let html = "";
     
