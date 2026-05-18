@@ -682,10 +682,6 @@ function renderTabelSiswa(dataList) {
     }
     
     // Jika benar-benar kosong di seluruh penjuru halaman menu data murid
-    if (!tbody) {
-        alert(`🚨 MASALAH HTML: Sistem gagal menemukan tag <tbody> untuk menu "${currentMenu}". \n\nPastikan di dalam <div id="section-${currentMenu}"> sudah ada tag <tbody>.`);
-        return; 
-    }
 
     tbody.innerHTML = ""; // Bersihkan baris lama dan lanjut render data murid...
 
