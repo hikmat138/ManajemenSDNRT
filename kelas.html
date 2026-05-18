@@ -15,37 +15,7 @@
         :root {
             --primary: #2563eb;
             --bg-main: #f8fafc;
-            --sidebar-bg: #ffffff;function bukaModalEdit(namaMurid) {
-    // 1. DETEKSI SUMBER DATA YANG SEDANG AKTIF
-    let sumberData = [];
-    if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
-        sumberData = dataFiltered;
-    } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
-        sumberData = dataSiswa;
-    } else if (typeof dataListYgAktif !== "undefined") { 
-        sumberData = dataListYgAktif;
-    }
-
-    // 2. CARI INDEKS BERDASARKAN NAMA
-    let index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
-    
-    // Jika di data filter aktif tidak ketemu, cari langsung ke masterData pusat sebagai cadangan
-    if (index === -1 && typeof masterData !== "undefined") {
-        index = masterData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
-        if (index !== -1) {
-            sumberData = masterData; // Alihkan sumber ke master data jika ketemu
-        }
-    }
-
-    const murid = sumberData[index];
-    if (!murid) {
-        console.error("Gagal membuka modal: Murid bernama '" + namaMurid + "' tidak ditemukan.");
-        alert("Data murid tidak ditemukan!");
-        return;
-    }
-
-    // 3. AMANKAN ELEMEN UTAMA MODAL SEBELUM MERENDER ISI
-    const modalEl = document.getElementById('modalEditSiswa');
+            --sidebar-bg: #ffffff;
             --text-slate: #64748b;
         }
 
