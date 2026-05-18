@@ -819,11 +819,12 @@ function renderTabelSiswa(dataList) {
                 break;
 
             case "siswa-registrasi":
+                let tglMasukIndo = formatTanggalIndo({ tgl_lahir: row.tgl_masuk || row.TGL_MASUK || row.Tgl_Masuk });
                 tr.innerHTML = `
                     <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${jkTeks}</td>
-                    <td class="p-3 whitespace-nowrap">${row.tgl_masuk || '-'}</td>
+                    <td class="p-3 whitespace-nowrap">${tglMasukIndo}</td>
                     <td class="p-3 whitespace-nowrap">${row.sekolah_asal || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
