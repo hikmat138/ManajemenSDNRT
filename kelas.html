@@ -1338,7 +1338,7 @@ let mapAplikasi = null;
 let penandaMap = null;
 
 function bukaModalEdit(namaMurid) {
-    // 1. DETEKSI SUMBER DATA YANG SEDANG AKTIF
+    // A. Deteksi sumber data yang sedang aktif digunakan di tabel
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
         sumberData = dataFiltered;
@@ -1348,10 +1348,10 @@ function bukaModalEdit(namaMurid) {
         sumberData = dataListYgAktif;
     }
 
-    // 2. CARI INDEKS BERDASARKAN NAMA
+    // B. Cari index berdasarkan NAMA MURID yang dikirim dari tombol gerigi
     let index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
     
-    // Jika di data filter aktif tidak ketemu, cari langsung ke masterData pusat sebagai cadangan
+    // C. Jika tidak ketemu di data filter, cari langsung di masterData pusat sebagai benteng pertahanan terakhir
     if (index === -1 && typeof masterData !== "undefined") {
         index = masterData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
         if (index !== -1) {
@@ -1360,29 +1360,30 @@ function bukaModalEdit(namaMurid) {
     }
 
     const murid = sumberData[index];
-    if (!murid) {
+    
+    // Jika benar-benar mutlak tidak ditemukan di sistem lokal
+    if (!murid || index === -1) {
         console.error("Gagal membuka modal: Murid bernama '" + namaMurid + "' tidak ditemukan.");
-        alert("Data murid tidak ditemukan!");
+        alert("Sistem Gagal Mendeteksi Data Murid bernama: " + namaMurid);
         return;
     }
 
-    // 3. AMANKAN ELEMEN UTAMA MODAL SEBELUM MERENDER ISI
+    // D. Mulai proses pengisian form modal
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     const subJudul = document.getElementById('modalEditSubJudul');
     const indexInput = document.getElementById('edit-index-input');
 
     if (!modalEl || !wrapperModal) {
-        console.error("Elemen modalEditSiswa atau modalEditWrapper tidak ditemukan di HTML Bapak.");
+        console.error("Elemen modalEditSiswa atau modalEditWrapper tidak ditemukan di HTML.");
         return;
     }
 
-    // Set nilai dasar penanda di form modal
+    // Simpan nomor indeks saat ini ke input hidden form modal untuk kebutuhan simpanPerubahanSiswa nanti
     if (indexInput) indexInput.value = index;
     if (subJudul) subJudul.innerText = `${murid.nama} (Kelas ${murid.kelas || '-'})`;
 
-    // 4. PROSES RENDER FORM BERDASARKAN MENU YANG SEDANG AKTIF (currentMenu)
-    // Jalankan pengisian value DOM secara aman dengan pengecekan elemen eksis
+    // Mapping nilai data objek ke elemen input form secara aman
     try {
         if (currentMenu === "siswa-pribadi") {
             if (document.getElementById('edit-nama')) document.getElementById('edit-nama').value = murid.nama || '';
@@ -1408,10 +1409,7 @@ function bukaModalEdit(namaMurid) {
             if (document.getElementById('edit-lintang')) document.getElementById('edit-lintang').value = murid.lintang || '';
             if (document.getElementById('edit-bujur')) document.getElementById('edit-bujur').value = murid.bujur || '';
             
-            // Inisialisasi Google Maps setelah koordinat masuk ke input form
-            setTimeout(() => {
-                initPetaSiswa(murid.lintang, murid.bujur);
-            }, 100);
+            setTimeout(() => { if (typeof initPetaSiswa === "function") initPetaSiswa(murid.lintang, murid.bujur); }, 100);
         }
         else if (currentMenu === "siswa-keadaan") {
             if (document.getElementById('edit-kk')) document.getElementById('edit-kk').value = murid.kk || '';
@@ -1455,15 +1453,13 @@ function bukaModalEdit(namaMurid) {
             if (document.getElementById('edit-telp')) document.getElementById('edit-telp').value = murid.telp || '';
             if (document.getElementById('edit-email')) document.getElementById('edit-email').value = murid.email || '';
         }
-    } catch (err) {
-        console.error("Terjadi error saat mapping data ke input form: ", err);
+    } catch (e) {
+        console.error("Gagal memetakan input nilai modal: ", e);
     }
 
-    // 5. MUNCULKAN MODAL SECARA VISUAL (Diletakkan di akhir agar animasi mulus)
+    // E. Munculkan Modal secara Visual dengan Efek Transisi Tailwind
     modalEl.classList.remove('hidden');
     modalEl.classList.add('flex');
-    
-    // Beri jeda mikro agar transisi opacity & scale Tailwind aktif sempurna
     setTimeout(() => {
         modalEl.classList.remove('opacity-0');
         wrapperModal.classList.remove('scale-95', 'opacity-0');
@@ -1677,22 +1673,51 @@ function simpanPerubahanSiswa(event) {
     function tampilkanTabelData() {
     let html = "";
     
-    // Pastikan menggunakan array yang sama dengan yang dideteksi di modal (misal: dataFiltered)
+    // Proteksi: Jika dataFiltered belum siap atau kosong, jangan biarkan crash
+    if (typeof dataFiltered === "undefined" || !dataFiltered || dataFiltered.length === 0) {
+        // Coba lempar ke dataSiswa atau masterData sebagai cadangan jika dataFiltered kosong
+        let dataCadangan = [];
+        if (typeof dataSiswa !== "undefined" && dataSiswa) dataCadangan = dataSiswa;
+        else if (typeof masterData !== "undefined" && masterData) dataCadangan = masterData;
+        
+        if (dataCadangan.length > 0) {
+            dataFiltered = [...dataCadangan]; // Pulihkan dataFiltered dari cadangan
+        } else {
+            // Jika benar-benar kosong di semua database pusat
+            const tbodyBox = document.getElementById("isiTabelSiswa");
+            if (tbodyBox) {
+                tbodyBox.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat...</td></tr>`;
+            }
+            return;
+        }
+    }
+
     dataFiltered.forEach((item, index) => {
+        // Amankan nama murid dari tanda petik tunggal (') agar tidak merusak sintaks HTML onclick
+        let namaAman = String(item.nama).replace(/'/g, "\\'");
+
         html += `
         <tr>
-            <td class="border px-4 py-2">${index + 1}</td>
-            <td class="border px-4 py-2">${item.nama}</td>
+            <td class="border px-4 py-2 text-center">${index + 1}</td>
+            <td class="border px-4 py-2">${item.nama || '-'}</td>
             <td class="border px-4 py-2">${item.nisn || '-'}</td>
             <td class="border px-4 py-2 text-center">
-                <button type="button" onclick="bukaModalEdit('${item.nama}')">
-    <i class="fa-solid fa-gear"></i>
-</button>
+                <button type="button" onclick="bukaModalEdit('${namaAman}')" class="text-gray-500 hover:text-blue-600 transition-colors">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
             </td>
         </tr>`;
     });
     
-    document.getElementById("isiTabelSiswa").innerHTML = html;
+    const tbodyBox = document.getElementById("isiTabelSiswa");
+    if (tbodyBox) {
+        tbodyBox.innerHTML = html;
+    }
+    
+    // Update label info halaman jika elemennya ada di HTML Bapak
+    if (document.getElementById("infoHalaman")) {
+        document.getElementById("infoHalaman").innerText = `MENAMPILKAN 1 - ${dataFiltered.length} DARI ${dataFiltered.length} MURID`;
+    }
 }
 </script>
 </body>
