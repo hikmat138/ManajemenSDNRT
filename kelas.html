@@ -859,51 +859,56 @@ function renderTabelSiswa(dataList) {
                 break;
 
             case "siswa-registrasi":
-    // Sesuaikan row menjadi item karena di fungsi utama Bapak menggunakan (item, index)
-    let tglMasukIndo = typeof formatTanggalIndo === "function" 
-        ? formatTanggalIndo({ tgl_lahir: (item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk) }) 
-        : (item.tgl_masuk || '-');
-    
-    // 1. DETEKSI TINGKAT KELAS MURID SECARA INDIVIDU
-    let kelasTeks = String(item.kelas || "").toUpperCase();
-    let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1; 
-    
-    // 2. KONDISIKAN TOMBOL AKSI INDIVIDU (Menggunakan sistem INDEX agar anti-error)
-    let tombolAksiIndividu = "";
-    if (cekKelas6Satuan) {
-        // Panggil fungsi modal lulus via INDEX
-        tombolAksiIndividu = `
-            <button type="button" onclick="bukaModalRegistrasiViaIndex('LULUS', ${index})" 
-                class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
-                <i class="fas fa-graduation-cap mr-1"></i> Lulus
-            </button>
-        `;
-    } else {
-        // Panggil fungsi modal naik kelas via INDEX
-        tombolAksiIndividu = `
-            <button type="button" onclick="bukaModalRegistrasiViaIndex('NAIK_KELAS', ${index})" 
-                class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
-                <i class="fas fa-level-up-alt mr-1"></i> Naik Kelas
-            </button>
-        `;
-    }
+                let tglRaw = row.tgl_masuk || row.TGL_MASUK || row.Tgl_Masuk || '-';
+                let tglMasukIndo = tglRaw;
+                
+                // Bumper Pengaman: Jika konversi fungsi tanggal bawaan error, tangkap biar tidak blank
+                if (typeof formatTanggalIndo === "function" && tglRaw !== '-') {
+                    try {
+                        tglMasukIndo = formatTanggalIndo({ tgl_lahir: tglRaw });
+                    } catch (e) {
+                        tglMasukIndo = tglRaw;
+                    }
+                }
+                
+                // 1. DETEKSI TINGKAT KELAS MURID SECARA INDIVIDU
+                let kelasTeks = String(row.kelas || "").toUpperCase();
+                let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1; 
+                
+                // 2. KONDISIKAN TOMBOL AKSI INDIVIDU (Menggunakan sistem INDEX sesuai pola utama)
+                let tombolAksiIndividu = "";
+                if (cekKelas6Satuan) {
+                    tombolAksiIndividu = `
+                        <button type="button" onclick="bukaModalRegistrasiViaIndex('LULUS', ${index})" 
+                            class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
+                            <i class="fas fa-graduation-cap mr-1"></i> Lulus
+                        </button>
+                    `;
+                } else {
+                    tombolAksiIndividu = `
+                        <button type="button" onclick="bukaModalRegistrasiViaIndex('NAIK_KELAS', ${index})" 
+                            class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
+                            <i class="fas fa-level-up-alt mr-1"></i> Naik Kelas
+                        </button>
+                    `;
+                }
 
-    // 3. MASUKKAN KE DALAM HTML STRING (Ganti tr.innerHTML menjadi penambahan string html)
-    html += `
-        <td class="border px-3 py-3 font-medium">${item.nama || '-'}</td>
-        <td class="border px-3 py-3 text-center font-bold text-gray-700"><span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-md font-bold">${item.kelas || '-'}</span></td>
-        <td class="border px-3 py-3 text-center">${item.jk || '-'}</td>
-        <td class="border px-3 py-3">${tglMasukIndo}</td>
-        <td class="border px-3 py-3">${item.sekolah_asal || '-'}</td>
-        <td class="border px-3 py-3 text-center">
-            <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-100 text-emerald-800">${item.status_aktif || 'Aktif'}</span>
-        </td>
-        <td class="border px-3 py-3 text-xs text-gray-500">${item.keterangan_siswa || '-'}</td>
-        <td class="border px-3 py-3 text-center whitespace-nowrap">
-            ${tombolAksiIndividu}
-        </td>
-    `;
-    break;
+                // 3. MASUKKAN KE DALAM INNERHTML TR (Serasi dengan gaya kode asli Bapak)
+                tr.innerHTML = `
+                    <td class="p-3 whitespace-nowrap font-medium">${row.nama || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center font-bold text-gray-700"><span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-md font-bold">${row.kelas || '-'}</span></td>
+                    <td class="p-3 whitespace-nowrap text-center">${jkTeks}</td>
+                    <td class="p-3 whitespace-nowrap">${tglMasukIndo}</td>
+                    <td class="p-3 whitespace-nowrap">${row.sekolah_asal || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">
+                        <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-100 text-emerald-800">${row.status_aktif || 'Aktif'}</span>
+                    </td>
+                    <td class="p-3 whitespace-nowrap text-xs text-gray-500">${row.keterangan_siswa || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${tombolAksiIndividu}
+                    </td>
+                `;
+                break;
 
             case "siswa-kontak":
                 tr.innerHTML = `
@@ -1953,9 +1958,7 @@ function tampilkanTabelData() {
         const btnLulusMassal = document.getElementById('btn-lulus-massal');
 
         if (btnNaikMassal && btnLulusMassal) {
-            // Cek apakah ada murid yang kelasnya mengandung angka 6
             let deteksiKelas6 = targetData.some(m => String(m.kelas || '').indexOf('6') !== -1);
-
             if (deteksiKelas6) {
                 btnNaikMassal.classList.add('hidden');
                 btnLulusMassal.classList.remove('hidden');
@@ -1977,13 +1980,17 @@ function tampilkanTabelData() {
     // Jika data kosong
     if (!targetData || targetData.length === 0) {
         tbodyBox.innerHTML = `<tr><td colspan="12" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat atau tidak cocok dengan filter...</td></tr>`;
+        
+        // Tetap update teks halaman meskipun 0 murid agar sinkron dengan gambar Bapak
+        const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
+        if (infoHalaman) infoHalaman.innerText = `MENAMPILKAN 0 - 0 DARI 0 MURID`;
         return;
     }
 
     // Looping data murid
     targetData.forEach((item, index) => {
         let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
-        let jkTeks = item.jk || item.JK || '-'; // <-- KUNCI PENGAMAN: Didefinisikan di sini agar semua menu bisa pakai tanpa crash
+        let jkTeks = item.jk || item.JK || '-';
         
         html += `<tr class="hover:bg-gray-50 transition text-xs text-gray-900 border-b">`;
         
@@ -2004,9 +2011,17 @@ function tampilkanTabelData() {
             `;
         } 
         else if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
-            let tglMasukIndo = typeof formatTanggalIndo === "function" 
-                ? formatTanggalIndo({ tgl_lahir: (item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk) }) 
-                : (item.tgl_masuk || '-');
+            let tglRaw = item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk || '-';
+            let tglMasukIndo = tglRaw;
+
+            // Bumper Pengaman: Jika fungsi format tanggal Bapak error, bungkus pakai try-catch agar tabel tidak hilang
+            if (typeof formatTanggalIndo === "function" && tglRaw !== '-') {
+                try {
+                    tglMasukIndo = formatTanggalIndo({ tgl_lahir: tglRaw });
+                } catch (e) {
+                    tglMasukIndo = tglRaw; // kembalikan ke teks mentah jika gagal konversi
+                }
+            }
 
             html += `
                 <td class="border px-3 py-3 font-medium">${item.nama || '-'}</td>
@@ -2019,7 +2034,6 @@ function tampilkanTabelData() {
             `;
         } 
         else {
-            // Default jika menu pribadi/menu utama terbuka
             html += `
                 <td class="border px-4 py-3 text-center">${index + 1}</td>
                 <td class="border px-4 py-3 font-medium">${item.nama || '-'}</td>
@@ -2027,28 +2041,27 @@ function tampilkanTabelData() {
             `;
         }
 
-        // 🛠️ 3. KOLOM AKSI DINAMIS (MENGGUNAKAN INDEKS YANG AMAN)
+        // 🛠️ 3. KOLOM AKSI DINAMIS (MENGGUNAKAN INDEKS)
         if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
             let kelasTeks = String(item.kelas || "").toUpperCase();
             let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1;
 
             if (cekKelas6Satuan) {
                 html += `
-                    <td class="border px-4 py-3 text-center">
+                    <td class="border px-4 py-3 text-center whitespace-nowrap">
                         <button type="button" onclick="bukaModalRegistrasiViaIndex('LULUS', ${index})" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-graduation-cap mr-1"></i> Lulus
                         </button>
                     </td>`;
             } else {
                 html += `
-                    <td class="border px-4 py-3 text-center">
+                    <td class="border px-4 py-3 text-center whitespace-nowrap">
                         <button type="button" onclick="bukaModalRegistrasiViaIndex('NAIK_KELAS', ${index})" class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-level-up-alt mr-1"></i> Naik Kelas
                         </button>
                     </td>`;
             }
         } else {
-            // Menu selain registrasi tetap pakai Tombol Gerigi bawaan Bapak
             html += `
                 <td class="border px-4 py-3 text-center">
                     <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-400 hover:text-blue-600 transition">
