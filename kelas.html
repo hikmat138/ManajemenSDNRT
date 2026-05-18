@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -1401,44 +1403,52 @@ function bukaModalEdit(namaMurid) {
             <div class="md:col-span-2 font-semibold text-sm text-blue-600 border-b pb-1 mb-2">Data Alamat & Domisili</div>
             <div class="md:col-span-2">
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Jalan</label>
-                <input type="text" id="edit-alamat" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-alamat" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">RT</label>
-                <input type="text" id="edit-rt" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-rt" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">RW</label>
-                <input type="text" id="edit-rw" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-rw" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Kelurahan / Desa</label>
-                <input type="text" id="edit-kelurahan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-kelurahan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Kecamatan</label>
-                <input type="text" id="edit-kecamatan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-kecamatan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Kode Pos</label>
-                <input type="text" id="edit-kodepos" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-kodepos" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Tempat Tinggal</label>
-                <input type="text" id="edit-jns_tinggal" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-jns_tinggal" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-700 mb-1">Jarak Rumah ke Sekolah (Km)</label>
-                <input type="text" id="edit-jarak" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <input type="text" id="edit-jarak" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+            </div>
+            
+            <div class="md:col-span-2 mt-2">
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Lokasi Rumah Murid (Geser Pin Peta)</label>
+                <div id="mapBoxSiswa" class="w-full h-52 bg-gray-100 rounded-lg border relative z-10"></div>
+                <p class="text-[10px] text-gray-400 mt-1">*Klik pada peta atau geser pin tepat di atap rumah murid.</p>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Lintang (Latitude)</label>
+                <input type="text" id="edit-lintang" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Lintang (Koordinat)</label>
-                <input type="text" id="edit-lintang" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Bujur (Longitude)</label>
+                <input type="text" id="edit-bujur" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Bujur (Koordinat)</label>
-                <input type="text" id="edit-bujur" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white">
-            </div>`;
+        `;
     }
     else if (currentMenu === "siswa-keadaan") {
         htmlInput = `
@@ -1637,7 +1647,12 @@ function bukaModalEdit(namaMurid) {
     } catch (e) {
         console.error("Gagal memetakan input nilai modal: ", e);
     }
-    
+    if (currentMenu === "siswa-alamat") {
+        // Beri jeda 200ms agar animasi modal Tailwind selesai terbuka, mencegah peta macet/blank hitam
+        setTimeout(() => {
+            initPetaModalSiswa(murid.lintang, murid.bujur);
+        }, 200);
+    }
     // E. EFEK TRANSISI MODAL (MUNCUL)
     modalEl.style.display = 'flex';
     modalEl.classList.remove('hidden');
@@ -1668,42 +1683,72 @@ function tutupModalEdit() {
         modalEl.classList.remove('flex');
     }, 200);
 }
-function initPetaSiswa(lat, lng) {
-    let posisiLat = parseFloat(String(lat).replace(',', '.')) || -6.12;
-    let posisiLng = parseFloat(String(lng).replace(',', '.')) || 106.15;
+let petaModalInstance = null;
+let penandaPetaInstance = null;
 
-    const mapCenter = { lat: posisiLat, lng: posisiLng };
-    const mapBox = document.getElementById("mapBoxEdit");
+function initPetaModalSiswa(lat, lng) {
+    // 1. Koordinat default jika data murid masih kosong (SDN Ranca Tales Serang Banten)
+    let defaultLat = -6.1305; 
+    let defaultLng = 106.1510;
 
-    if (!mapBox) return;
-
-    if (typeof google === 'object' && typeof google.maps === 'object') {
-        mapAplikasi = new google.maps.Map(mapBox, {
-            zoom: 15,
-            center: mapCenter,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
-
-        penandaMap = new google.maps.Marker({
-            position: mapCenter,
-            map: mapAplikasi,
-            draggable: true,
-            title: "Geser ke Rumah Murid"
-        });
-
-        google.maps.event.addListener(penandaMap, 'dragend', function() {
-            let koordinatBaru = penandaMap.getPosition();
-            document.getElementById('edit-lintang').value = koordinatBaru.lat().toFixed(6);
-            document.getElementById('edit-bujur').value = koordinatBaru.lng().toFixed(6);
-        });
-    } else {
-        mapBox.innerHTML = `
-            <div class="flex items-center justify-center h-full text-xs text-red-500 p-4 text-center bg-gray-50 rounded-lg border border-dashed">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Gagal memuat Peta. Pastikan API Key Google Maps Bapak aktif atau cek koneksi internet.
-            </div>`;
+    // Jika murid sudah punya koordinat lama, gunakan itu
+    if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        defaultLat = parseFloat(lat);
+        defaultLng = parseFloat(lng);
     }
-}
 
+    const mapContainer = document.getElementById('mapBoxSiswa');
+    if (!mapContainer) return;
+
+    // 2. Hancurkan instance peta lama jika sebelumnya sudah pernah terbuka agar tidak bentrok memori
+    if (petaModalInstance !== null) {
+        petaModalInstance.remove();
+        petaModalInstance = null;
+        penandaPetaInstance = null;
+    }
+
+    // 3. Bangun Peta Baru
+    petaModalInstance = L.map('mapBoxSiswa').setView([defaultLat, defaultLng], 15);
+
+    // 4. Pasang desain peta jalanan (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(petaModalInstance);
+
+    // 5. Buat Pin Penanda (Marker) yang bisa digeser-geser (draggable)
+    penandaPetaInstance = L.marker([defaultLat, defaultLng], {
+        draggable: true
+    }).addTo(petaModalInstance);
+
+    // 6. Fungsi Update Nilai Input Box otomatis saat pin digeser / peta diklik
+    function updateKoordinatInput(latTarget, lngTarget) {
+        if (document.getElementById('edit-lintang')) document.getElementById('edit-lintang').value = latTarget.toFixed(6);
+        if (document.getElementById('edit-bujur')) document.getElementById('edit-bujur').value = lngTarget.toFixed(6);
+    }
+
+    // Set nilai awal input saat pertama buka
+    updateKoordinatInput(defaultLat, defaultLng);
+
+    // Event saat Pin Selesai Digeser oleh user
+    penandaPetaInstance.on('dragend', function (e) {
+        let posisi = penandaPetaInstance.getLatLng();
+        updateKoordinatInput(posisi.lat, posisi.lng);
+        petaModalInstance.panTo(posisi);
+    });
+
+    // Event saat Permukaan Peta Diklik di area mana saja
+    petaModalInstance.on('click', function (e) {
+        let kordinatKlik = e.latlng;
+        penandaPetaInstance.setLatLng(kordinatKlik);
+        updateKoordinatInput(kordinatKlik.lat, kordinatKlik.lng);
+        petaModalInstance.panTo(kordinatKlik);
+    });
+
+    // Validasi ulang ukuran box agar rendering Leaflet presisi tidak pecah kotak-kotak
+    setTimeout(() => {
+        petaModalInstance.invalidateSize();
+    }, 50);
+}
 function simpanPerubahanSiswa(event) {
     if (event) event.preventDefault(); 
     
