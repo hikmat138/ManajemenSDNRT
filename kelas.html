@@ -140,21 +140,23 @@
             </button>
         </div>
         
-        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 blueprint-scroll">
-    <input type="hidden" id="edit-index-input">
-    
-    <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        </div>  
-</form>
+        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 flex flex-col overflow-hidden m-0">
+            <input type="hidden" id="edit-index-input">
+            
+            <div class="flex-1 overflow-y-auto p-6 blueprint-scroll">
+                <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>  
+            </div>
 
-        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-            <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition shadow-sm">
-                Batal
-            </button>
-            <button type="submit" form="formEditSiswa" id="btnSimpanEditSiswa" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-md transition flex items-center gap-2">
-                <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
-            </button>
-        </div>
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+                <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition shadow-sm">
+                    Batal
+                </button>
+                <button type="submit" id="btnSimpanEditSiswa" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-md transition flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+                </button>
+            </div>
+        </form>
         
     </div>
 </div>
@@ -1872,33 +1874,10 @@ function simpanPerubahanSiswa(event) {
                 break;
         }
 
-        // 5. INJEKSIKAN KEMBALI HASIL MODIFIKASI KE DATABASE UTAMA PUSAT
-        masterData[masterIndex] = { ...mSiswa };
+        // Tampilkan indikasi loading ke user bahwa pengiriman data sedang diproses
+        tampilkanToast("Sedang mengirim data ke Google Sheets, harap tunggu...", "info");
 
-        // 6. SINKRONISASI INSTAN PADA ARRAY AKTIF LAINNYA
-        if (indexAktif !== -1) {
-            sumberData[indexAktif] = { ...mSiswa };
-        }
-
-        if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
-            let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
-            if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
-        }
-
-        // 7. SEGARKAN TABEL SECARA REALTIME (Web lokal langsung berubah saat itu juga)
-        if (typeof filterData === "function") {
-            filterData(); 
-        } else if (typeof dataFilteredAndSorted === "function") {
-            dataFilteredAndSorted(); 
-        } else if (typeof tampilkanTabelData === "function") {
-            tampilkanTabelData(); 
-        }
-
-        // Tutup modal edit & beri indikasi loading ke user biar tahu proses sedang berjalan
-        tutupModalEdit();
-        tampilkanToast("Sedang menyimpan ke Google Sheets, mohon tunggu...", "success");
-
-        // --- 🌐 8. INTEGRASI SINKRONISASI REALTIME KE GOOGLE SHEETS ---
+        // --- 🌐 INTEGRASI SINKRONISASI REALTIME KE GOOGLE SHEETS ---
         if (typeof google !== "undefined" && google.script && google.script.run) {
             let paketData = {
                 action: "EDIT_IDENTITAS",
@@ -1906,29 +1885,49 @@ function simpanPerubahanSiswa(event) {
                 payload: mSiswa
             };
 
-            // Menembak ke fungsi jembatan di Code.gs
             google.script.run
                 .withSuccessHandler(function(respons) {
-                    console.log("Hasil sinkronisasi Sheets:", respons);
+                    console.log("Respons dari server:", respons);
                     if (respons && respons.status === "success") {
-                        tampilkanToast(respons.message, "success");
+                        // 🔥 MODAL BARU BOLEH TUTUP & TABEL DIREFRESH JIKA SERVER BERHASIL MENYIMPAN DATA
+                        masterData[masterIndex] = { ...mSiswa };
+                        if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
+                        
+                        if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
+                            let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
+                            if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
+                        }
+
+                        if (typeof filterData === "function") filterData();
+                        else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
+
+                        tutupModalEdit(); // Jalankan fungsi penutupan modal bawaan web Bapak
+                        tampilkanToast(respons.message || "Data berhasil diperbarui!", "success");
                     } else {
-                        tampilkanToast(respons.message || "Gagal menyimpan ke Google Sheets.", "error");
+                        // Jika respons gagal (misal murid tidak ditemukan di Sheet)
+                        alert("Gagal Backend: " + (respons.message || "Pesan error kosong"));
+                        tampilkanToast(respons.message || "Gagal menyimpan.", "error");
                     }
                 })
                 .withFailureHandler(function(err) {
-                    console.error("Gagal sinkronisasi Sheets:", err);
-                    tampilkanToast("Koneksi gagal: Perubahan tidak tersimpan di Google Sheets.", "error");
+                    console.error("Koneksi gagal/Error Apps Script:", err);
+                    alert("Koneksi Error: " + err.toString());
+                    tampilkanToast("Koneksi gagal, silakan coba lagi.", "error");
                 })
                 .jembatanEditSiswa(paketData); 
         } else {
-            tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Offline)!`, "success");
+            // Mode offline / localhost
+            masterData[masterIndex] = { ...mSiswa };
+            if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
+            if (typeof filterData === "function") filterData();
+            tutupModalEdit();
+            tampilkanToast(`Berhasil menyimpan data ${mSiswa.nama} (Offline/Lokal)!`, "success");
         }
 
     } catch (error) {
-        // 🔥 FIX: Blok Catch yang sebelumnya terpotong sudah dikembalikan di sini
-        console.error("Terjadi error saat eksekusi simpan:", error);
-        tampilkanToast("Gagal menyimpan perubahan data murid.", "error");
+        console.error("Terjadi error runtime pada javascript web:", error);
+        alert("Runtime HTML Error: " + error.toString());
+        tampilkanToast("Gagal memproses data formulir.", "error");
     }
 }
 function tampilkanTabelData() {
