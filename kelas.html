@@ -122,14 +122,15 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 duration-200">
+<div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 items-center justify-center p-4 transition-opacity duration-200">
+    <div id="modalEditWrapper" class="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 duration-200">
+        
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div>
                 <h3 id="modalEditJudul" class="text-lg font-bold text-gray-900">Edit Data Murid</h3>
                 <p id="modalEditSubJudul" class="text-xs text-gray-500 mt-0.5">Nama Murid - Kelas</p>
             </div>
-            <button onclick="tutupModalEdit()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-lg hover:bg-gray-100">
+            <button type="button" onclick="tutupModalEdit()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-lg hover:bg-gray-100">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
@@ -957,22 +958,16 @@ function toggleUserMenu() {
 }
 
 function bukaModalAksi(index, nama, kelas) {
-    // 1. Set info nama dan kelas murid di header modal
+    // 1. Masukkan teks nama dan kelas ke header modal
     document.getElementById('m-nama').innerText = nama;
     document.getElementById('m-kelas').innerText = kelas;
     
-    // 2. Amankan indeks murid ke dalam input hidden di modal aksi
-    // Pastikan di HTML modalAction Bapak ada: <input type="hidden" id="action-index-input">
-    const inputIndex = document.getElementById('action-index-input');
-    if (inputIndex) {
-        inputIndex.value = index;
-    } else {
-        // Alternatif jika tidak mau buat input baru, simpan di attribute dataset modal
-        document.getElementById('modalAction').dataset.indexSiswa = index;
-    }
+    // 2. Amankan nilai index ke dalam atribut 'data-index' milik modalAction
+    const modalAksi = document.getElementById('modalAction');
+    modalAksi.dataset.indexMurid = index;
     
-    // 3. Tampilkan Modal Aksi
-    document.getElementById('modalAction').classList.remove('hidden');
+    // 3. Tampilkan modal ke layar
+    modalAksi.classList.remove('hidden');
 }
 
 function tutupModalAksi() {
@@ -1500,12 +1495,43 @@ function bukaModalEdit(index) {
             return; // Jika menu registrasi atau menu lain yang tidak butuh edit bawaan
     }
 
+    const wrapperModal = document.getElementById('modalEditWrapper');
+    if (currentMenu === "siswa-ortu") {
+        wrapperModal.classList.remove('max-w-2xl');
+        wrapperModal.classList.add('max-w-5xl');
+    } else {
+        wrapperModal.classList.remove('max-w-5xl');
+        wrapperModal.classList.add('max-w-2xl');
+    }
+
+    // Tampilkan Modal dengan animasi yang benar
+    const modalEl = document.getElementById('modalEditSiswa');
+    modalEl.classList.remove('hidden');
+    modalEl.classList.add('flex');
+    
+    // Efek transisi halus saat muncul
+    setTimeout(() => {
+        wrapperModal.classList.remove('scale-95', 'opacity-0');
+        wrapperModal.classList.add('scale-100', 'opacity-100');
+    }, 50);
+}
     // Tampilkan Modal ke Layar
     document.getElementById('modalEditSiswa').classList.remove('hidden');
 }
 
 function tutupModalEdit() {
-    document.getElementById('modalEditSiswa').classList.add('hidden');
+    const modalEl = document.getElementById('modalEditSiswa');
+    const wrapperModal = document.getElementById('modalEditWrapper');
+    
+    // Kembalikan ke animasi mengecil
+    wrapperModal.classList.remove('scale-100', 'opacity-100');
+    wrapperModal.classList.add('scale-95', 'opacity-0');
+    
+    // Beri jeda 150ms agar animasi selesai baru hilangkan dari layar
+    setTimeout(() => {
+        modalEl.classList.remove('flex');
+        modalEl.classList.add('hidden');
+    }, 150);
 }
     function initPetaSiswa(lat, lng) {
     // Parsing titik koordinat, jika rusak arahkan default ke area Banten sekitar Serang
@@ -1652,22 +1678,18 @@ function tutupModalEdit() {
     tutupModalEdit();
     console.log("Data berhasil diupdate lokal.");
 }
-    function tanganiTombolEditDariModalAksi() {
-    // Ambil indeks yang disimpan tadi
-    const inputIndex = document.getElementById('action-index-input');
-    let index;
+    function tanganiEditDariModalAksi() {
+    // Ambil kembali index murid yang tadi disimpan di atribut modalAction
+    const modalAksi = document.getElementById('modalAction');
+    const index = parseInt(modalAksi.dataset.indexMurid);
     
-    if (inputIndex) {
-        index = parseInt(inputIndex.value);
+    // Pastikan index-nya valid (berupa angka)
+    if (!isNaN(index)) {
+        modalAksi.classList.add('hidden'); // Tutup modal aksi gerigi
+        bukaModalEdit(index); // Buka modal form edit per menu yang sudah kita perbaiki
     } else {
-        index = parseInt(document.getElementById('modalAction').dataset.indexSiswa);
+        console.error("Gagal mengambil indeks murid dari modal aksi.");
     }
-    
-    // 1. Tutup dulu modal aksi
-    tutupModalAksi();
-    
-    // 2. Buka modal edit spesifik sesuai menu aktif dengan indeks murid yang benar
-    bukaModalEdit(index);
 }
 </script>
 </body>
