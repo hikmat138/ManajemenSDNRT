@@ -122,36 +122,38 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-<div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 items-center justify-center p-4 transition-opacity duration-200">
-    <div id="modalEditWrapper" class="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 duration-200">
+<div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-950 bg-opacity-50 items-center justify-center p-4 opacity-0 transition-opacity duration-200">
+    
+    <div id="modalEditWrapper" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 opacity-0 duration-200">
         
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div>
-                <h3 id="modalEditJudul" class="text-lg font-bold text-gray-900">Edit Data Murid</h3>
+                <h3 id="modalEditJudul" class="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-blue-600"></i> Edit Data Murid
+                </h3>
                 <p id="modalEditSubJudul" class="text-xs text-gray-500 mt-0.5">Nama Murid - Kelas</p>
             </div>
-            <button type="button" onclick="tutupModalEdit()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-lg hover:bg-gray-100">
+            <button type="button" onclick="tutupModalEdit()" class="text-gray-400 hover:text-gray-600 transition p-2 rounded-lg hover:bg-gray-100" title="Tutup">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
 
-        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <form id="formEditSiswa" onsubmit="simpanPerubahanSiswa(event)" class="flex-1 overflow-y-auto p-6 space-y-4 blueprint-scroll">
             <input type="hidden" id="edit-index-input">
             
             <div id="formEditKonten" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </form>
 
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-            <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition">
+            <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition shadow-sm">
                 Batal
             </button>
-            <button type="submit" form="formEditSiswa" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow transition flex items-center gap-2">
+            <button type="submit" form="formEditSiswa" id="btnSimpanEditSiswa" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-md transition flex items-center gap-2">
                 <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
             </button>
         </div>
     </div>
 </div>
-
 <div class="flex h-screen">
     <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col overflow-y-auto transition-all duration-300">
     <div class="p-6">
@@ -1523,32 +1525,34 @@ function bukaModalEdit(index) {
 
     // Tampilkan Modal dengan animasi yang benar
     const modalEl = document.getElementById('modalEditSiswa');
+    const wrapperModal = document.getElementById('modalEditWrapper');
+
+    // Munculkan kontainer utama terlebih dahulu
     modalEl.classList.remove('hidden');
     modalEl.classList.add('flex');
     
-    // Efek transisi halus saat muncul
+    // Beri jeda micro-task agar browser sempat merender transisi CSS opacity & scale
     setTimeout(() => {
+        modalEl.classList.remove('opacity-0');
         wrapperModal.classList.remove('scale-95', 'opacity-0');
         wrapperModal.classList.add('scale-100', 'opacity-100');
-    }, 50);
+    }, 20);
 }
-    // Tampilkan Modal ke Layar
-    document.getElementById('modalEditSiswa').classList.remove('hidden');
 
-    
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     
-    // Kembalikan ke animasi mengecil
+    // Kembalikan ke posisi mengecil dan transparan
+    modalEl.classList.add('opacity-0');
     wrapperModal.classList.remove('scale-100', 'opacity-100');
     wrapperModal.classList.add('scale-95', 'opacity-0');
     
-    // Beri jeda 150ms agar animasi selesai baru hilangkan dari layar
+    // Sembunyikan total setelah durasi animasi selesai (200ms sesuai durasi-200 Tailwind)
     setTimeout(() => {
         modalEl.classList.remove('flex');
         modalEl.classList.add('hidden');
-    }, 150);
+    }, 200);
 }
     function initPetaSiswa(lat, lng) {
     // Parsing titik koordinat, jika rusak arahkan default ke area Banten sekitar Serang
