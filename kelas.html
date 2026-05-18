@@ -850,7 +850,7 @@ function renderTabelSiswa(dataList) {
                 break;
 
             case "siswa-registrasi":
-                let tglMasukIndo = formatTanggalIndo({ tgl_lahir: row.tgl_masuk || row.TGL_MASUK || row.Tgl_Masuk });
+                let tglMasukIndo = formatTanggalIndo({ tgl_lahir: (row.tgl_masuk || row.TGL_MASUK || row.Tgl_Masuk) });
                 tr.innerHTML = `
                     <td class="p-3 whitespace-nowrap">${row.nama || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.kelas || '-'}</td>
@@ -1088,7 +1088,6 @@ function initCharts() {
     // 2. Buat Cetakan Penampung Distribusi Frekuensi Data (RENTANG UMUR BARU)
     let dataDashboard = {
         gender: { L: 0, P: 0 },
-        // CETAKAN SEBARAN UMUR BARU SESUAI REQUEST BAPAK
         umur: { 
             'under6': 0, 
             '6_7': 0, 
@@ -1119,11 +1118,8 @@ function initCharts() {
         if (s.jk === 'L' || s.jk === 'Laki-laki') dataDashboard.gender.L++;
         if (s.jk === 'P' || s.jk === 'Perempuan') dataDashboard.gender.P++;
 
-        // ========================================================
-        // LOGIKA PENYARINGAN RENTANG UMUR BARU (DESIMAL & VALID)
-        // ========================================================
+        // Logika Penyaringan Rentang Umur (Desimal & Valid)
         let umurMentah = s.umur || s.UMUR || s.Umur || "0";
-        // Antisipasi koma desimal dari format Excel/Spreadsheet Indonesia
         let nUmur = parseFloat(umurMentah.toString().replace(',', '.')); 
 
         if (!isNaN(nUmur) && nUmur > 0) {
@@ -1145,7 +1141,6 @@ function initCharts() {
                 dataDashboard.umur['over12']++;
             }
         }
-        // ========================================================
 
         // PIP
         if (String(s.layak_pip).toLowerCase() === 'ya') dataDashboard.pip.Ya++;
@@ -1189,8 +1184,7 @@ function initCharts() {
         let tgl = String(s.tgl_lahir || '').trim();
         let blnKey = '';
         if (tgl.includes('-')) {
-            let p = tgl.split('-');
-            blnKey = p[0].length === 4 ? p[1] : p[1]; // Mengambil posisi bulan
+            blnKey = tgl.split('-')[1]; // Langsung ambil posisi indeks ke-1
         } else if (tgl.includes('/')) {
             blnKey = tgl.split('/')[1];
         }
@@ -1202,7 +1196,7 @@ function initCharts() {
         }
     });
 
-    // 4. Jalankan Pengisian Fungsi Rendering Semua Grafik Terpilih secara Utuh
+    // 4. Jalankan Pengisian Fungsi Rendering Semua Grafik
     inisialisasiSemuaChart(dataDashboard);
 }
 
@@ -1210,16 +1204,13 @@ function inisialisasiSemuaChart(dataDashboard) {
     // 1. Chart Gender
     buatChartLingkaran('chartGender', 'Grafik Gender Murid', ['Laki-laki', 'Perempuan'], [dataDashboard.gender.L, dataDashboard.gender.P], ['#3b82f6', '#ec4899']);
 
-    // ========================================================
-    // 2. CHART UMUR MENGGUNAKAN LABEL RENTANG BARU (ESTETIK)
-    // ========================================================
+    // 2. Chart Umur
     buatChartLingkaran(
         'chartUmur', 
         'Sebaran Umur Murid', 
         ['<6 Tahun', '6-7 Tahun', '7-8 Tahun', '8-9 Tahun', '9-10 Tahun', '10-11 Tahun', '11-12 Tahun', '12> Tahun'], 
-        Object.values(dataDashboard.umur) // Berurutan mengambil nilai dari under6 sampai over12
+        Object.values(dataDashboard.umur)
     );
-    // ========================================================
 
     // 3. Chart PIP
     buatChartLingkaran('chartPIP', 'Penerima Layak PIP', ['Layak PIP', 'Tidak Layak'], [dataDashboard.pip.Ya, dataDashboard.pip.Tidak], ['#10b981', '#ef4444']);
@@ -1248,6 +1239,7 @@ function inisialisasiSemuaChart(dataDashboard) {
     // 11. Chart Bulan Lahir (Batang)
     buatChartBatang('chartBulanLahir', 'Tren Bulan Kelahiran Murid', ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], Object.values(dataDashboard.bulanLahir), '#6366f1');
 }
+
 function updateSidebarUI(activeId) {
     const allLinks = document.querySelectorAll('.sidebar-link, .submenu-link, nav a');
     allLinks.forEach(link => link.classList.remove('active', 'bg-blue-50', 'text-blue-600', 'font-bold'));
@@ -1266,31 +1258,26 @@ function updateSidebarUI(activeId) {
     }
 }
 function formatTanggalIndo(row) {
-    // Jika baris data kosong, langsung kembalikan strip
     if (!row) return '-';
     
-    // Ambil data tanggal lahir dengan toleransi Huruf Besar / Huruf Kecil pada properti objek
     let tglMentah = row.tgl_lahir || row.TGL_LAHIR || row.Tgl_Lahir || row.tglLahir || "";
-    
     let stringTgl = String(tglMentah).trim();
     if (!stringTgl || stringTgl === "undefined" || stringTgl === "-") return '-';
     
     let tahun = '', bulan = '', tanggal = '';
 
-    // Cek jika format YYYY-MM-DD atau DD-MM-YYYY (Menggunakan strip)
     if (stringTgl.includes('-')) {
         let parts = stringTgl.split('-');
-        if (parts[0].length === 4) { // YYYY-MM-DD (Contoh: 2016-05-09)
+        if (parts[0].length === 4) { // YYYY-MM-DD
             tahun = parts[0];
             bulan = parts[1];
             tanggal = parts[2];
-        } else { // DD-MM-YYYY (Contoh: 09-05-2016)
+        } else { // DD-MM-YYYY
             tanggal = parts[0];
             bulan = parts[1];
             tahun = parts[2];
         }
     } 
-    // Cek jika format DD/MM/YYYY (Menggunakan garis miring)
     else if (stringTgl.includes('/')) {
         let parts = stringTgl.split('/');
         tanggal = parts[0];
@@ -1298,33 +1285,30 @@ function formatTanggalIndo(row) {
         tahun = parts[2];
     } 
     else {
-        // Jika formatnya sudah berupa teks atau format lain, kembalikan apa adanya
         return stringTgl; 
     }
 
-    // Pemetaan nama bulan standar Indonesia
     const namaBulanIndo = {
         '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
         '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
         '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
     };
 
-    // Bersihkan angka nol di depan tanggal (misal "09" menjadi "9") dan pastikan bulan 2 digit
     let tglClean = parseInt(tanggal, 10);
     let blnClean = namaBulanIndo[bulan.padStart(2, '0')] || bulan;
 
-    // Jika hasil parsing gagal, kembalikan data asli penampung agar tidak merusak tampilan
     if (isNaN(tglClean) || !tahun) return stringTgl;
 
     return `${tglClean} ${blnClean} ${tahun}`;
 }
-    // Variabel global untuk menampung indeks murid yang sedang diedit
+
+// Variabel global
 let indeksSiswaDipilih = null;
 let mapAplikasi = null;
 let penandaMap = null;
 
 function bukaModalEdit(namaMurid) {
-    // 1. DETEKSI SUMBER DATA UTAMA (Secara Hierarki dan Adaptif)
+    // 1. DETEKSI SUMBER DATA UTAMA
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
         sumberData = dataFiltered;
@@ -1334,16 +1318,18 @@ function bukaModalEdit(namaMurid) {
         sumberData = dataListYgAktif;
     }
 
-    // 2. CARI DATA MURID DAN INDEX ASLINYA BERDASARKAN NAMA
+    // 2. CARI DATA MURID DAN INDEX ASLINYA
     const index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
-    indeksSiswaDipilih = index; 
     
-    const s = sumberData[index]; 
-    if (!s) {
-        console.error("Gagal membuka modal: Data murid dengan nama '" + namaMurid + "' tidak ditemukan di sumber data.");
+    // AMAN: Validasi dipindahkan ke atas sebelum menyentuh manipulasi DOM string `${s.nama}`
+    if (index === -1 || !sumberData[index]) {
+        console.error("Gagal membuka modal: Data murid dengan nama '" + namaMurid + "' tidak ditemukan.");
         alert("Sistem gagal memuat data murid. Silakan periksa Console (F12).");
         return;
     }
+
+    indeksSiswaDipilih = index; 
+    const s = sumberData[index]; 
 
     // Set Judul Modal & Ambil Elemen Wadah
     document.getElementById('modalEditSubJudul').innerText = `${s.nama || '-'} (${s.kelas || '-'})`;
@@ -1351,11 +1337,9 @@ function bukaModalEdit(namaMurid) {
 
     const wadahForm = document.getElementById('formEditKonten');
     wadahForm.innerHTML = ""; // Bersihkan form sebelumnya
-
-    // Kembalikan ke layout grid standar 2 kolom
     wadahForm.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
 
-    // Standardisasi Teks Jenis Kelamin untuk tampilan Read-Only
+    // Standardisasi Teks Jenis Kelamin
     let jkTeksLengkap = "-";
     if (s.jk === 'L' || s.jk === 'Laki-laki') jkTeksLengkap = "Laki-laki";
     if (s.jk === 'P' || s.jk === 'Perempuan') jkTeksLengkap = "Perempuan";
@@ -1543,7 +1527,6 @@ function bukaModalEdit(namaMurid) {
         wrapperModal.classList.add('scale-100', 'opacity-100');
     }, 20);
 }
-
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
@@ -1561,7 +1544,6 @@ function tutupModalEdit() {
 }
 
 function initPetaSiswa(lat, lng) {
-    // Standardisasi koma ke titik untuk koordinat latitude/longitude
     let posisiLat = parseFloat(String(lat).replace(',', '.')) || -6.12;
     let posisiLng = parseFloat(String(lng).replace(',', '.')) || 106.15;
 
@@ -1570,7 +1552,6 @@ function initPetaSiswa(lat, lng) {
 
     if (!mapBox) return;
 
-    // Validasi apakah Google Maps API sudah termuat sempurna
     if (typeof google === 'object' && typeof google.maps === 'object') {
         mapAplikasi = new google.maps.Map(mapBox, {
             zoom: 15,
@@ -1578,7 +1559,6 @@ function initPetaSiswa(lat, lng) {
             mapTypeId: google.maps.MapTypeId.ROADMAP
         });
 
-        // Buat pin penanda yang bisa digeser (draggable)
         penandaMap = new google.maps.Marker({
             position: mapCenter,
             map: mapAplikasi,
@@ -1586,7 +1566,6 @@ function initPetaSiswa(lat, lng) {
             title: "Geser ke Rumah Murid"
         });
 
-        // Event listener saat pin selesai digeser user
         google.maps.event.addListener(penandaMap, 'dragend', function() {
             let koordinatBaru = penandaMap.getPosition();
             document.getElementById('edit-lintang').value = koordinatBaru.lat().toFixed(6);
@@ -1599,10 +1578,11 @@ function initPetaSiswa(lat, lng) {
             </div>`;
     }
 }
-    function simpanPerubahanSiswa(event) {
-    if (event) event.preventDefault(); // Stop reload halaman form
+
+function simpanPerubahanSiswa(event) {
+    if (event) event.preventDefault(); 
     
-    // 1. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF (Hierarki Adaptif)
+    // 1. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
         sumberData = dataFiltered;
@@ -1618,34 +1598,34 @@ function initPetaSiswa(lat, lng) {
 
     // JIKA INDEX MISMATCH, LAKUKAN BACKUP PENCARIAN BERDASARKAN NAMA PADA SUB-JUDUL MODAL
     if (!sTarget) {
-        const subJudul Teks = document.getElementById('modalEditSubJudul').innerText;
-        // Ambil nama sebelum tanda kurung kelas, contoh: "Ahmad Dani (Kelas 4)" -> "Ahmad Dani"
+        const subJudulTeks = document.getElementById('modalEditSubJudul').innerText;
         const namaDariModal = subJudulTeks.split('(')[0].trim(); 
         
         index = sumberData.findIndex(item => String(item.nama).trim() === namaDariModal);
         sTarget = sumberData[index];
     }
 
-    if (!sTarget) {
+    // AMAN: Validasi sTarget dinaikkan sebelum mengambil properti .nama agar tidak crash
+    if (!sTarget || index === -1) {
         alert("Gagal menyimpan. Data murid tidak dapat diidentifikasi pada sistem lokal.");
         return;
     }
 
-    // AMANKAN KUNCI PENCARIAN SEBELUM DATA DI FORM DIUBAH
-    const namaAsli = sTarget.nama;
+    // Kunci string nama asli (lama) sebelum objek diubah di memori
+    const namaAsli = String(sTarget.nama).trim();
 
     // CARI INDEX DI MASTER DATA UTAMA
-    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === namaAsli);
 
     if (masterIndex === -1) {
         alert("Gagal menyimpan. Data murid tidak ditemukan di database utama (masterData).");
         return;
     }
 
-    // Gunakan objek referensi singkat untuk memperbarui database utama
-    const mSiswa = masterData[masterIndex];
+    // Buat salinan objek mSiswa sementara agar perubahan nama tidak langsung merusak memori pencarian sekunder
+    const mSiswa = { ...masterData[masterIndex] };
 
-    // Ambil data yang diketik user sesuai menu yang sedang aktif
+    // Ambil data dari elemen DOM berdasarkan menu aktif
     switch (currentMenu) {
         case "siswa-pribadi":
             if (document.getElementById('edit-nama')) mSiswa.nama = document.getElementById('edit-nama').value.trim();
@@ -1684,7 +1664,6 @@ function initPetaSiswa(lat, lng) {
             break;
 
         case "siswa-ortu":
-            // Simpan Data Ayah
             if (document.getElementById('edit-ayah_nama')) mSiswa.ayah_nama = document.getElementById('edit-ayah_nama').value.trim();
             if (document.getElementById('edit-ayah_nik')) mSiswa.ayah_nik = document.getElementById('edit-ayah_nik').value.trim();
             if (document.getElementById('edit-ayah_pendidikan')) mSiswa.ayah_pendidikan = document.getElementById('edit-ayah_pendidikan').value.trim();
@@ -1692,7 +1671,7 @@ function initPetaSiswa(lat, lng) {
             if (document.getElementById('edit-ayah_penghasilan')) mSiswa.ayah_penghasilan = document.getElementById('edit-ayah_penghasilan').value.trim();
             if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
             if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
-            // Simpan Data Ibu
+            
             if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
             if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
             if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
@@ -1700,7 +1679,7 @@ function initPetaSiswa(lat, lng) {
             if (document.getElementById('edit-ibu_penghasilan')) mSiswa.ibu_penghasilan = document.getElementById('edit-ibu_penghasilan').value.trim();
             if (document.getElementById('edit-ibu_disabilitas')) mSiswa.ibu_disabilitas = document.getElementById('edit-ibu_disabilitas').value.trim();
             if (document.getElementById('edit-ibu_thn_lahir')) mSiswa.ibu_thn_lahir = document.getElementById('edit-ibu_thn_lahir').value.trim();
-            // Simpan Data Wali
+            
             if (document.getElementById('edit-wali_nama')) mSiswa.wali_nama = document.getElementById('edit-wali_nama').value.trim();
             if (document.getElementById('edit-wali_nik')) mSiswa.wali_nik = document.getElementById('edit-wali_nik').value.trim();
             if (document.getElementById('edit-wali_pendidikan')) mSiswa.wali_pendidikan = document.getElementById('edit-wali_pendidikan').value.trim();
@@ -1717,6 +1696,13 @@ function initPetaSiswa(lat, lng) {
             if (document.getElementById('edit-cita_cita')) mSiswa.cita_cita = document.getElementById('edit-cita_cita').value.trim();
             break;
 
+        // SEKARANG AMAN: Ditambahkan penampung menu registrasi agar data tidak hilang saat disimpan
+        case "siswa-registrasi":
+            if (document.getElementById('edit-tgl_masuk')) mSiswa.tgl_masuk = document.getElementById('edit-tgl_masuk').value.trim();
+            if (document.getElementById('edit-sekolah_asal')) mSiswa.sekolah_asal = document.getElementById('edit-sekolah_asal').value.trim();
+            if (document.getElementById('edit-keterangan_siswa')) mSiswa.keterangan_siswa = document.getElementById('edit-keterangan_siswa').value.trim();
+            break;
+
         case "siswa-kontak":
             if (document.getElementById('edit-hp')) mSiswa.hp = document.getElementById('edit-hp').value.trim();
             if (document.getElementById('edit-telp')) mSiswa.telp = document.getElementById('edit-telp').value.trim();
@@ -1724,16 +1710,18 @@ function initPetaSiswa(lat, lng) {
             break;
     }
 
-    // 3. RE-SINKRONISASI INSTAN: Perbarui isi array di sumber data yang sedang aktif
+    // 3. KEMBALIKAN DATA MODIFIKASI KE MASTER DATA UTAMA
+    masterData[masterIndex] = { ...mSiswa };
+
+    // 4. RE-SINKRONISASI INSTAN PADA ARRAY SINKRONISASI LAINNYA
     sumberData[index] = { ...mSiswa };
 
-    // Jika dataSiswa terpisah dari masterData, sinkronkan juga nilainya
     if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
-        let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+        let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
         if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
     }
 
-    // Refresh visualisasi render tabel secara realtime
+    // Render ulang visualisasi tabel secara realtime
     if (typeof dataFilteredAndSorted === "function") {
         dataFilteredAndSorted(); 
     } else if (typeof tampilkanTabelData === "function") {
