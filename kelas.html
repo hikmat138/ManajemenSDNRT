@@ -745,9 +745,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -769,9 +769,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -790,9 +790,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -824,9 +824,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
                     <td class="p-3 text-center border-l whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -842,9 +842,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -860,9 +860,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;
@@ -876,9 +876,9 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksiPilihan('${namaAman}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition" title="Pilihan Aksi">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+    <i class="fa-solid fa-gear"></i>
+</button>
                     </td>
                 `;
                 break;   
@@ -1307,8 +1307,8 @@ let indeksSiswaDipilih = null;
 let mapAplikasi = null;
 let penandaMap = null;
 
-function bukaModalEdit(namaMurid) {
-    // 1. DETEKSI SUMBER DATA UTAMA
+function bukaModalEdit(index) {
+    // 1. DETEKSI SUMBER DATA YANG SEDANG AKTIF
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
         sumberData = dataFiltered;
@@ -1318,209 +1318,112 @@ function bukaModalEdit(namaMurid) {
         sumberData = dataListYgAktif;
     }
 
-    // 2. CARI DATA MURID DAN INDEX ASLINYA
-    const index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
-    
-    // AMAN: Validasi dipindahkan ke atas sebelum menyentuh manipulasi DOM string `${s.nama}`
-    if (index === -1 || !sumberData[index]) {
-        console.error("Gagal membuka modal: Data murid dengan nama '" + namaMurid + "' tidak ditemukan.");
-        alert("Sistem gagal memuat data murid. Silakan periksa Console (F12).");
+    // 2. AMBIL DATA MURID BERDASARKAN INDEKS
+    const murid = sumberData[index];
+    if (!murid) {
+        console.error("Gagal membuka modal: Data murid pada indeks " + index + " tidak ditemukan.");
+        alert("Data murid tidak ditemukan!");
         return;
     }
 
-    indeksSiswaDipilih = index; 
-    const s = sumberData[index]; 
-
-    // Set Judul Modal & Ambil Elemen Wadah
-    document.getElementById('modalEditSubJudul').innerText = `${s.nama || '-'} (${s.kelas || '-'})`;
-    document.getElementById('edit-index-input').value = index;
-
-    const wadahForm = document.getElementById('formEditKonten');
-    wadahForm.innerHTML = ""; // Bersihkan form sebelumnya
-    wadahForm.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
-
-    // Standardisasi Teks Jenis Kelamin
-    let jkTeksLengkap = "-";
-    if (s.jk === 'L' || s.jk === 'Laki-laki') jkTeksLengkap = "Laki-laki";
-    if (s.jk === 'P' || s.jk === 'Perempuan') jkTeksLengkap = "Perempuan";
-
-    // BANNER IDENTITAS READ-ONLY
-    const komponenIdentitasReadOnly = `
-        <div class="col-span-1 md:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-200 grid grid-cols-3 gap-4 mb-2 text-xs">
-            <div>
-                <span class="block font-medium text-gray-500 mb-0.5">Nama Murid</span>
-                <span class="font-bold text-gray-800 break-words">${s.nama || '-'}</span>
-            </div>
-            <div>
-                <span class="block font-medium text-gray-500 mb-0.5">Kelas</span>
-                <span class="font-bold text-gray-800">${s.kelas || '-'}</span>
-            </div>
-            <div>
-                <span class="block font-medium text-gray-500 mb-0.5">Jenis Kelamin</span>
-                <span class="font-bold text-gray-800">${jkTeksLengkap}</span>
-            </div>
-        </div>
-    `;
-
-    // GENERATE KONTEN FORM BERDASARKAN MENU YANG SEDANG AKTIF
-    switch (currentMenu) {
-        case "siswa-pribadi":
-            document.getElementById('modalEditJudul').innerText = "Edit Identitas Pribadi Murid";
-            wadahForm.innerHTML = `
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="edit-nama" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nama || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Kelas</label><input type="text" id="edit-kelas" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50" value="${s.kelas || ''}" readonly></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">NIS</label><input type="text" id="edit-nis" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nis || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Kelamin</label>
-                    <select id="edit-jk" class="w-full border p-2.5 rounded-lg text-sm">
-                        <option value="L" ${s.jk === 'L' || s.jk === 'Laki-laki' ? 'selected' : ''}>Laki-laki</option>
-                        <option value="P" ${s.jk === 'P' || s.jk === 'Perempuan' ? 'selected' : ''}>Perempuan</option>
-                    </select>
-                </div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">NISN</label><input type="text" id="edit-nisn" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nisn || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tempat Lahir</label><input type="text" id="edit-tmpt_lahir" class="w-full border p-2.5 rounded-lg text-sm" value="${s.tmpt_lahir || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Lahir</label><input type="text" id="edit-tgl_lahir" class="w-full border p-2.5 rounded-lg text-sm" placeholder="YYYY-MM-DD" value="${s.tgl_lahir || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">NIK</label><input type="text" id="edit-nik" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nik || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Agama</label><input type="text" id="edit-agama" class="w-full border p-2.5 rounded-lg text-sm" value="${s.agama || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">No. Akte Kelahiran</label><input type="text" id="edit-akte" class="w-full border p-2.5 rounded-lg text-sm" value="${s.akte || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Anak Ke-</label><input type="number" id="edit-anak_ke" class="w-full border p-2.5 rounded-lg text-sm" value="${s.anak_ke || ''}"></div>
-            `;
-            break;
-
-        case "siswa-alamat":
-            document.getElementById('modalEditJudul').innerText = "Edit Data Alamat & Koordinat Tempat Tinggal";
-            wadahForm.innerHTML = komponenIdentitasReadOnly + `
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Rumah</label><textarea id="edit-alamat" rows="2" class="w-full border p-2.5 rounded-lg text-sm">${s.alamat || ''}</textarea></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">RT</label><input type="text" id="edit-rt" class="w-full border p-2.5 rounded-lg text-sm" value="${s.rt || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">RW</label><input type="text" id="edit-rw" class="w-full border p-2.5 rounded-lg text-sm" value="${s.rw || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Kelurahan</label><input type="text" id="edit-kelurahan" class="w-full border p-2.5 rounded-lg text-sm" value="${s.kelurahan || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Kecamatan</label><input type="text" id="edit-kecamatan" class="w-full border p-2.5 rounded-lg text-sm" value="${s.kecamatan || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Kode Pos</label><input type="text" id="edit-kodepos" class="w-full border p-2.5 rounded-lg text-sm" value="${s.kodepos || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Tempat Tinggal</label><input type="text" id="edit-jns_tinggal" class="w-full border p-2.5 rounded-lg text-sm" value="${s.jns_tinggal || ''}"></div>
-                <div class="col-span-2">
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Jarak ke Sekolah</label>
-                    <select id="edit-jarak" class="w-full border p-2.5 rounded-lg text-sm">
-                        <option value="Kurang dari 1 km" ${String(s.jarak).toLowerCase().includes('kurang') || String(s.jarak).includes('<') ? 'selected' : ''}>Kurang dari 1 km</option>
-                        <option value="Lebih dari 1 km" ${String(s.jarak).toLowerCase().includes('lebih') || String(s.jarak).includes('>') ? 'selected' : ''}>Lebih dari 1 km</option>
-                    </select>
-                </div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Lintang (Latitude)</label><input type="text" id="edit-lintang" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50" value="${s.lintang || '-6.12'}" readonly></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Bujur (Longitude)</label><input type="text" id="edit-bujur" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50" value="${s.bujur || '106.15'}" readonly></div>
-                <div class="col-span-2">
-                    <label class="block text-xs font-semibold text-blue-700 mb-1"><i class="fa-solid fa-map-location-dot"></i> Geser Pin Maps untuk Menentukan Posisi Rumah</label>
-                    <div id="mapBoxEdit" class="w-full h-48 border rounded-lg bg-gray-100 shadow-inner"></div>
-                </div>
-            `;
-            setTimeout(() => { if (typeof initPetaSiswa === "function") initPetaSiswa(s.lintang, s.bujur); }, 250);
-            break;
-
-        case "siswa-keadaan":
-            document.getElementById('modalEditJudul').innerText = "Edit Data Keadaan & PIP Murid";
-            wadahForm.innerHTML = komponenIdentitasReadOnly + `
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">No. Kartu Keluarga (KK)</label><input type="text" id="edit-kk" class="w-full border p-2.5 rounded-lg text-sm" value="${s.kk || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Jumlah Saudara Kandung</label><input type="number" id="edit-saudara" class="w-full border p-2.5 rounded-lg text-sm" value="${s.saudara || '0'}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Transportasi ke Sekolah</label><input type="text" id="edit-transportasi" class="w-full border p-2.5 rounded-lg text-sm" value="${s.transportasi || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">No. KIP (Jika Ada)</label><input type="text" id="edit-kip" class="w-full border p-2.5 rounded-lg text-sm" value="${s.kip || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Layak PIP</label>
-                    <select id="edit-layak_pip" class="w-full border p-2.5 rounded-lg text-sm">
-                        <option value="Ya" ${String(s.layak_pip).toLowerCase() === 'ya' ? 'selected' : ''}>Ya</option>
-                        <option value="Tidak" ${String(s.layak_pip).toLowerCase() !== 'ya' ? 'selected' : ''}>Tidak</option>
-                    </select>
-                </div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Alasan Layak PIP</label><input type="text" id="edit-alasan_pip" class="w-full border p-2.5 rounded-lg text-sm" value="${s.alasan_pip || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Kebutuhan Khusus / Disabilitas</label><input type="text" id="edit-disabilitas" class="w-full border p-2.5 rounded-lg text-sm" value="${s.disabilitas || 'Tidak'}"></div>
-            `;
-            break;
-
-        case "siswa-ortu":
-            document.getElementById('modalEditJudul').innerText = "Edit Data Orang Tua / Wali Murid";
-            wadahForm.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-full"; 
-            wadahForm.innerHTML = `<div class="col-span-1 md:col-span-3">${komponenIdentitasReadOnly}</div>` + `
-                <div class="space-y-3 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                    <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider border-b pb-1"><i class="fa-solid fa-user-tie"></i> Data Ayah Kandung</h4>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Ayah</label><input type="text" id="edit-ayah_nama" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_nama || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">NIK Ayah</label><input type="text" id="edit-ayah_nik" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_nik || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pendidikan Ayah</label><input type="text" id="edit-ayah_pendidikan" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_pendidikan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pekerjaan Ayah</label><input type="text" id="edit-ayah_pekerjaan" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_pekerjaan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Penghasilan Ayah</label><input type="text" id="edit-ayah_penghasilan" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_penghasilan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Disabilitas Ayah</label><input type="text" id="edit-ayah_disabilitas" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_disabilitas || '-'}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Tahun Lahir Ayah</label><input type="text" id="edit-ayah_thn_lahir" class="w-full border p-2 rounded-lg text-xs" value="${s.ayah_thn_lahir || ''}"></div>
-                </div>
-                <div class="space-y-3 bg-pink-50/50 p-3 rounded-xl border border-pink-100">
-                    <h4 class="text-xs font-bold text-pink-800 uppercase tracking-wider border-b pb-1"><i class="fa-solid fa-user-astronaut"></i> Data Ibu Kandung</h4>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Ibu</label><input type="text" id="edit-ibu_nama" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_nama || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">NIK Ibu</label><input type="text" id="edit-ibu_nik" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_nik || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pendidikan Ibu</label><input type="text" id="edit-ibu_pendidikan" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_pendidikan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pekerjaan Ibu</label><input type="text" id="edit-ibu_pekerjaan" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_pekerjaan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Penghasilan Ibu</label><input type="text" id="edit-ibu_penghasilan" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_penghasilan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Disabilitas Ibu</label><input type="text" id="edit-ibu_disabilitas" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_disabilitas || '-'}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Tahun Lahir Ibu</label><input type="text" id="edit-ibu_thn_lahir" class="w-full border p-2 rounded-lg text-xs" value="${s.ibu_thn_lahir || ''}"></div>
-                </div>
-                <div class="space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                    <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wider border-b pb-1"><i class="fa-solid fa-users"></i> Data Wali (Opsional)</h4>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Nama Wali</label><input type="text" id="edit-wali_nama" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_nama || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">NIK Wali</label><input type="text" id="edit-wali_nik" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_nik || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pendidikan Wali</label><input type="text" id="edit-wali_pendidikan" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_pendidikan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Pekerjaan Wali</label><input type="text" id="edit-wali_pekerjaan" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_pekerjaan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Penghasilan Wali</label><input type="text" id="edit-wali_penghasilan" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_penghasilan || ''}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Disabilitas Wali</label><input type="text" id="edit-wali_disabilitas" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_disabilitas || '-'}"></div>
-                    <div><label class="block text-[11px] font-semibold text-gray-600 mb-0.5">Tahun Lahir Wali</label><input type="text" id="edit-wali_thn_lahir" class="w-full border p-2 rounded-lg text-xs" value="${s.wali_thn_lahir || ''}"></div>
-                </div>
-            `;
-            break;
-
-        case "siswa-periodik":
-            document.getElementById('modalEditJudul').innerText = "Edit Data Fisik & Periodik Murid";
-            wadahForm.innerHTML = komponenIdentitasReadOnly + `
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Berat Badan (Kg)</label><input type="number" id="edit-bb" class="w-full border p-2.5 rounded-lg text-sm" value="${parseInt(s.bb) || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tinggi Badan (Cm)</label><input type="number" id="edit-tb" class="w-full border p-2.5 rounded-lg text-sm" value="${parseInt(s.tb) || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Hobi</label><input type="text" id="edit-hobi" class="w-full border p-2.5 rounded-lg text-sm" value="${s.hobi || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Cita-cita</label><input type="text" id="edit-cita_cita" class="w-full border p-2.5 rounded-lg text-sm" value="${s.cita_cita || ''}"></div>
-            `;
-            break;
-
-        case "siswa-registrasi": 
-            document.getElementById('modalEditJudul').innerText = "Edit Data Registrasi Masuk Murid";
-            wadahForm.innerHTML = komponenIdentitasReadOnly + `
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Tanggal Masuk</label><input type="text" id="edit-tgl_masuk" class="w-full border p-2.5 rounded-lg text-sm" value="${s.tgl_masuk || ''}"></div>
-                <div><label class="block text-xs font-semibold text-gray-700 mb-1">Sekolah Asal</label><input type="text" id="edit-sekolah_asal" class="w-full border p-2.5 rounded-lg text-sm" value="${s.sekolah_asal || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Keterangan Siswa</label><input type="text" id="edit-keterangan_siswa" class="w-full border p-2.5 rounded-lg text-sm" value="${s.keterangan_siswa || ''}"></div>
-            `;
-            break;
-
-        case "siswa-kontak":
-            document.getElementById('modalEditJudul').innerText = "Edit Kontak Hubung Murid / Orang Tua";
-            wadahForm.innerHTML = komponenIdentitasReadOnly + `
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Nomor HP/WhatsApp</label><input type="text" id="edit-hp" class="w-full border p-2.5 rounded-lg text-sm" value="${s.hp || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Nomor Telepon Rumah</label><input type="text" id="edit-telp" class="w-full border p-2.5 rounded-lg text-sm" value="${s.telp || ''}"></div>
-                <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Email Aktif</label><input type="email" id="edit-email" class="w-full border p-2.5 rounded-lg text-sm" value="${s.email || ''}"></div>
-            `;
-            break;
-            
-        default:
-            console.warn("Menu tidak dikenal di switch case modal: " + currentMenu);
-            return;
-    }
-
-    // PENGATURAN DIMENSI DAN ANIMASI
+    // 3. AMANKAN ELEMEN UTAMA MODAL SEBELUM MERENDER ISI
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
+    const subJudul = document.getElementById('modalEditSubJudul');
+    const indexInput = document.getElementById('edit-index-input');
 
     if (!modalEl || !wrapperModal) {
-        console.error("Elemen HTML modalEditSiswa atau modalEditWrapper tidak ditemukan.");
+        console.error("Elemen modalEditSiswa atau modalEditWrapper tidak ditemukan di HTML Bapak.");
         return;
     }
 
-    if (currentMenu === "siswa-ortu") {
-        wrapperModal.classList.remove('max-w-2xl');
-        wrapperModal.classList.add('max-w-5xl');
-    } else {
-        wrapperModal.classList.remove('max-w-5xl');
-        wrapperModal.classList.add('max-w-2xl');
+    // Set nilai dasar penanda di form modal
+    if (indexInput) indexInput.value = index;
+    if (subJudul) subJudul.innerText = `${murid.nama} (Kelas ${murid.kelas || '-'})`;
+
+    // 4. PROSES RENDER FORM BERDASARKAN MENU YANG SEDANG AKTIF (currentMenu)
+    // Jalankan pengisian value DOM secara aman dengan pengecekan elemen eksis
+    try {
+        if (currentMenu === "siswa-pribadi") {
+            if (document.getElementById('edit-nama')) document.getElementById('edit-nama').value = murid.nama || '';
+            if (document.getElementById('edit-nis')) document.getElementById('edit-nis').value = murid.nis || '';
+            if (document.getElementById('edit-jk')) document.getElementById('edit-jk').value = murid.jk || '';
+            if (document.getElementById('edit-nisn')) document.getElementById('edit-nisn').value = murid.nisn || '';
+            if (document.getElementById('edit-tmpt_lahir')) document.getElementById('edit-tmpt_lahir').value = murid.tmpt_lahir || '';
+            if (document.getElementById('edit-tgl_lahir')) document.getElementById('edit-tgl_lahir').value = murid.tgl_lahir || '';
+            if (document.getElementById('edit-nik')) document.getElementById('edit-nik').value = murid.nik || '';
+            if (document.getElementById('edit-agama')) document.getElementById('edit-agama').value = murid.agama || '';
+            if (document.getElementById('edit-akte')) document.getElementById('edit-akte').value = murid.akte || '';
+            if (document.getElementById('edit-anak_ke')) document.getElementById('edit-anak_ke').value = murid.anak_ke || '';
+        } 
+        else if (currentMenu === "siswa-alamat") {
+            if (document.getElementById('edit-alamat')) document.getElementById('edit-alamat').value = murid.alamat || '';
+            if (document.getElementById('edit-rt')) document.getElementById('edit-rt').value = murid.rt || '';
+            if (document.getElementById('edit-rw')) document.getElementById('edit-rw').value = murid.rw || '';
+            if (document.getElementById('edit-kelurahan')) document.getElementById('edit-kelurahan').value = murid.kelurahan || '';
+            if (document.getElementById('edit-kecamatan')) document.getElementById('edit-kecamatan').value = murid.kecamatan || '';
+            if (document.getElementById('edit-kodepos')) document.getElementById('edit-kodepos').value = murid.kodepos || '';
+            if (document.getElementById('edit-jns_tinggal')) document.getElementById('edit-jns_tinggal').value = murid.jns_tinggal || '';
+            if (document.getElementById('edit-jarak')) document.getElementById('edit-jarak').value = murid.jarak || '';
+            if (document.getElementById('edit-lintang')) document.getElementById('edit-lintang').value = murid.lintang || '';
+            if (document.getElementById('edit-bujur')) document.getElementById('edit-bujur').value = murid.bujur || '';
+            
+            // Inisialisasi Google Maps setelah koordinat masuk ke input form
+            setTimeout(() => {
+                initPetaSiswa(murid.lintang, murid.bujur);
+            }, 100);
+        }
+        else if (currentMenu === "siswa-keadaan") {
+            if (document.getElementById('edit-kk')) document.getElementById('edit-kk').value = murid.kk || '';
+            if (document.getElementById('edit-saudara')) document.getElementById('edit-saudara').value = murid.saudara || '';
+            if (document.getElementById('edit-transportasi')) document.getElementById('edit-transportasi').value = murid.transportasi || '';
+            if (document.getElementById('edit-kip')) document.getElementById('edit-kip').value = murid.kip || '';
+            if (document.getElementById('edit-layak_pip')) document.getElementById('edit-layak_pip').value = murid.layak_pip || '';
+            if (document.getElementById('edit-alasan_pip')) document.getElementById('edit-alasan_pip').value = murid.alasan_pip || '';
+            if (document.getElementById('edit-disabilitas')) document.getElementById('edit-disabilitas').value = murid.disabilitas || '';
+        }
+        else if (currentMenu === "siswa-ortu") {
+            if (document.getElementById('edit-ayah_nama')) document.getElementById('edit-ayah_nama').value = murid.ayah_nama || '';
+            if (document.getElementById('edit-ayah_nik')) document.getElementById('edit-ayah_nik').value = murid.ayah_nik || '';
+            if (document.getElementById('edit-ayah_pendidikan')) document.getElementById('edit-ayah_pendidikan').value = murid.ayah_pendidikan || '';
+            if (document.getElementById('edit-ayah_pekerjaan')) document.getElementById('edit-ayah_pekerjaan').value = murid.ayah_pekerjaan || '';
+            if (document.getElementById('edit-ayah_penghasilan')) document.getElementById('edit-ayah_penghasilan').value = murid.ayah_penghasilan || '';
+            if (document.getElementById('edit-ayah_disabilitas')) document.getElementById('edit-ayah_disabilitas').value = murid.ayah_disabilitas || '';
+            if (document.getElementById('edit-ayah_thn_lahir')) document.getElementById('edit-ayah_thn_lahir').value = murid.ayah_thn_lahir || '';
+            
+            if (document.getElementById('edit-ibu_nama')) document.getElementById('edit-ibu_nama').value = murid.ibu_nama || '';
+            if (document.getElementById('edit-ibu_nik')) document.getElementById('edit-ibu_nik').value = murid.ibu_nik || '';
+            if (document.getElementById('edit-ibu_pendidikan')) document.getElementById('edit-ibu_pendidikan').value = murid.ibu_pendidikan || '';
+            if (document.getElementById('edit-ibu_pekerjaan')) document.getElementById('edit-ibu_pekerjaan').value = murid.ibu_pekerjaan || '';
+            if (document.getElementById('edit-ibu_penghasilan')) document.getElementById('edit-ibu_penghasilan').value = murid.ibu_penghasilan || '';
+            if (document.getElementById('edit-ibu_disabilitas')) document.getElementById('edit-ibu_disabilitas').value = murid.ibu_disabilitas || '';
+            if (document.getElementById('edit-ibu_thn_lahir')) document.getElementById('edit-ibu_thn_lahir').value = murid.ibu_thn_lahir || '';
+        }
+        else if (currentMenu === "siswa-periodik") {
+            if (document.getElementById('edit-bb')) document.getElementById('edit-bb').value = murid.bb || '';
+            if (document.getElementById('edit-tb')) document.getElementById('edit-tb').value = murid.tb || '';
+            if (document.getElementById('edit-hobi')) document.getElementById('edit-hobi').value = murid.hobi || '';
+            if (document.getElementById('edit-cita_cita')) document.getElementById('edit-cita_cita').value = murid.cita_cita || '';
+        }
+        else if (currentMenu === "siswa-registrasi") {
+            if (document.getElementById('edit-tgl_masuk')) document.getElementById('edit-tgl_masuk').value = murid.tgl_masuk || '';
+            if (document.getElementById('edit-sekolah_asal')) document.getElementById('edit-sekolah_asal').value = murid.sekolah_asal || '';
+            if (document.getElementById('edit-keterangan_siswa')) document.getElementById('edit-keterangan_siswa').value = murid.keterangan_siswa || '';
+        }
+        else if (currentMenu === "siswa-kontak") {
+            if (document.getElementById('edit-hp')) document.getElementById('edit-hp').value = murid.hp || '';
+            if (document.getElementById('edit-telp')) document.getElementById('edit-telp').value = murid.telp || '';
+            if (document.getElementById('edit-email')) document.getElementById('edit-email').value = murid.email || '';
+        }
+    } catch (err) {
+        console.error("Terjadi error saat mapping data ke input form: ", err);
     }
 
+    // 5. MUNCULKAN MODAL SECARA VISUAL (Diletakkan di akhir agar animasi mulus)
     modalEl.classList.remove('hidden');
     modalEl.classList.add('flex');
     
+    // Beri jeda mikro agar transisi opacity & scale Tailwind aktif sempurna
     setTimeout(() => {
         modalEl.classList.remove('opacity-0');
         wrapperModal.classList.remove('scale-95', 'opacity-0');
