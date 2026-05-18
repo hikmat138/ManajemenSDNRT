@@ -1906,7 +1906,7 @@ function simpanPerubahanSiswa(event) {
                 payload: mSiswa
             };
 
-            // 🔥 SEKARANG MENEMBAK KE FUNGSI JEMBATAN TERBARU
+            // Menembak ke fungsi jembatan di Code.gs
             google.script.run
                 .withSuccessHandler(function(respons) {
                     console.log("Hasil sinkronisasi Sheets:", respons);
@@ -1920,10 +1920,15 @@ function simpanPerubahanSiswa(event) {
                     console.error("Gagal sinkronisasi Sheets:", err);
                     tampilkanToast("Koneksi gagal: Perubahan tidak tersimpan di Google Sheets.", "error");
                 })
-                .jembatanEditSiswa(paketData); // <--- Tembak langsung ke fungsi jembatan baru kita, Pak!
+                .jembatanEditSiswa(paketData); 
         } else {
             tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Offline)!`, "success");
         }
+
+    } catch (error) {
+        // 🔥 FIX: Blok Catch yang sebelumnya terpotong sudah dikembalikan di sini
+        console.error("Terjadi error saat eksekusi simpan:", error);
+        tampilkanToast("Gagal menyimpan perubahan data murid.", "error");
     }
 }
 function tampilkanTabelData() {
