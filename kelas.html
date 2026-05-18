@@ -1634,6 +1634,26 @@ function simpanPerubahanSiswa(event) {
     tutupModalEdit();
     console.log("Data murid '" + namaAsli + "' berhasil diperbarui di lokal.");
 }
+    function tampilkanTabelData() {
+    let html = "";
+    
+    // Pastikan menggunakan array yang sama dengan yang dideteksi di modal (misal: dataFiltered)
+    dataFiltered.forEach((item, index) => {
+        html += `
+        <tr>
+            <td class="border px-4 py-2">${index + 1}</td>
+            <td class="border px-4 py-2">${item.nama}</td>
+            <td class="border px-4 py-2">${item.nisn || '-'}</td>
+            <td class="border px-4 py-2 text-center">
+                <button type="button" onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700 mx-1">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    
+    document.getElementById("isiTabelSiswa").innerHTML = html;
+}
 </script>
 </body>
 </html>
