@@ -722,6 +722,9 @@ function renderTabelSiswa(dataList) {
         // Format Jenis Kelamin standar tanpa badge
         let jkTeks = row.jk || row.JK || '-';
 
+        // Escape tanda petik satu pada nama murid agar tidak merusak HTML atribut onclick
+        let namaAman = String(row.nama || '-').replace(/'/g, "\\'");
+
         switch (currentMenu) {
             case "siswa-pribadi":
                 // Konversi tanggal lahir ke format Indonesia lewat helper aman kita
@@ -740,7 +743,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.akte || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition"><i class="fa-solid fa-gear"></i></button></td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </td>
                 `;
                 break;
 
@@ -760,9 +767,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.lintang || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
-    <i class="fa-solid fa-gear"></i> Aksi
-</button></td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
+                        </button>
+                    </td>
                 `;
                 break;
 
@@ -779,9 +788,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.alasan_pip || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
-    <i class="fa-solid fa-gear"></i> Aksi
-</button></td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
+                        </button>
+                    </td>
                 `;
                 break;
 
@@ -811,9 +822,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_penghasilan || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
-                    <td class="p-3 text-center border-l whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
-    <i class="fa-solid fa-gear"></i> Aksi
-</button></td>
+                    <td class="p-3 text-center border-l whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
+                        </button>
+                    </td>
                 `;
                 break;
 
@@ -827,9 +840,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 text-center whitespace-nowrap">${row.lingkar_kepala || '-'} Cm</td>
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
-    <i class="fa-solid fa-gear"></i> Aksi
-</button></td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
+                        </button>
+                    </td>
                 `;
                 break;
 
@@ -844,8 +859,8 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalAksi('${row.nama}', '${row.kelas}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
-                            <i class="fa-solid fa-arrows-up-down"></i> Proses
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
                         </button>
                     </td>
                 `;
@@ -859,9 +874,11 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
-                    <td class="p-3 text-center whitespace-nowrap"><button onclick="bukaModalAksi(${index}, '${s.nama}', '${s.kelas}')" class="...">
-    <i class="fa-solid fa-gear"></i> Aksi
-</button></td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button onclick="bukaModalAksi(${index}, '${namaAman}', '${row.kelas}')" class="bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-gear"></i> Aksi
+                        </button>
+                    </td>
                 `;
                 break;   
         }
@@ -1517,8 +1534,8 @@ function bukaModalEdit(index) {
 }
     // Tampilkan Modal ke Layar
     document.getElementById('modalEditSiswa').classList.remove('hidden');
-}
 
+    
 function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
@@ -1570,14 +1587,13 @@ function tutupModalEdit() {
     }
 }
     function simpanPerubahanSiswa(event) {
-    event.preventDefault(); // Stop reload halaman form
+    if (event) event.preventDefault(); // Stop reload halaman form
     
     let index = parseInt(document.getElementById('edit-index-input').value);
     let sTarget = dataFiltered[index];
     if (!sTarget) return;
 
     // AMANKAN KUNCI PENCARIAN SEBELUM DATA DI FORM DIUBAH
-    // Ini mencegah findIndex gagal akibat efek pass-by-reference pada objek
     const namaAsli = sTarget.nama;
     const kelasAsli = sTarget.kelas;
 
@@ -1588,105 +1604,109 @@ function tutupModalEdit() {
         return;
     }
 
-    // Ambil data yang diketik murid/user sesuai menu yang sedang aktif
+    // Gunakan objek referensi singkat untuk mempersingkat kode dan performa
+    const mSiswa = masterData[masterIndex];
+
+    // Ambil data yang diketik user sesuai menu yang sedang aktif
     switch (currentMenu) {
         case "siswa-pribadi":
-            // Pastikan elemen-elemen ini ada sebelum mengambil nilainya
-            if (document.getElementById('edit-nama')) masterData[masterIndex].nama = document.getElementById('edit-nama').value;
-            if (document.getElementById('edit-nis')) masterData[masterIndex].nis = document.getElementById('edit-nis').value;
-            if (document.getElementById('edit-jk')) masterData[masterIndex].jk = document.getElementById('edit-jk').value;
-            if (document.getElementById('edit-nisn')) masterData[masterIndex].nisn = document.getElementById('edit-nisn').value;
-            if (document.getElementById('edit-tmpt_lahir')) masterData[masterIndex].tmpt_lahir = document.getElementById('edit-tmpt_lahir').value;
-            if (document.getElementById('edit-tgl_lahir')) masterData[masterIndex].tgl_lahir = document.getElementById('edit-tgl_lahir').value;
-            if (document.getElementById('edit-nik')) masterData[masterIndex].nik = document.getElementById('edit-nik').value;
-            if (document.getElementById('edit-agama')) masterData[masterIndex].agama = document.getElementById('edit-agama').value;
-            if (document.getElementById('edit-akte')) masterData[masterIndex].akte = document.getElementById('edit-akte').value;
-            if (document.getElementById('edit-anak_ke')) masterData[masterIndex].anak_ke = document.getElementById('edit-anak_ke').value;
+            if (document.getElementById('edit-nama')) mSiswa.nama = document.getElementById('edit-nama').value.trim();
+            if (document.getElementById('edit-nis')) mSiswa.nis = document.getElementById('edit-nis').value.trim();
+            if (document.getElementById('edit-jk')) mSiswa.jk = document.getElementById('edit-jk').value;
+            if (document.getElementById('edit-nisn')) mSiswa.nisn = document.getElementById('edit-nisn').value.trim();
+            if (document.getElementById('edit-tmpt_lahir')) mSiswa.tmpt_lahir = document.getElementById('edit-tmpt_lahir').value.trim();
+            if (document.getElementById('edit-tgl_lahir')) mSiswa.tgl_lahir = document.getElementById('edit-tgl_lahir').value.trim();
+            if (document.getElementById('edit-nik')) mSiswa.nik = document.getElementById('edit-nik').value.trim();
+            if (document.getElementById('edit-agama')) mSiswa.agama = document.getElementById('edit-agama').value.trim();
+            if (document.getElementById('edit-akte')) mSiswa.akte = document.getElementById('edit-akte').value.trim();
+            if (document.getElementById('edit-anak_ke')) mSiswa.anak_ke = document.getElementById('edit-anak_ke').value;
             break;
 
         case "siswa-alamat":
-            masterData[masterIndex].alamat = document.getElementById('edit-alamat').value;
-            masterData[masterIndex].rt = document.getElementById('edit-rt').value;
-            masterData[masterIndex].rw = document.getElementById('edit-rw').value;
-            masterData[masterIndex].kelurahan = document.getElementById('edit-kelurahan').value;
-            masterData[masterIndex].kecamatan = document.getElementById('edit-kecamatan').value;
-            masterData[masterIndex].kodepos = document.getElementById('edit-kodepos').value;
-            masterData[masterIndex].jns_tinggal = document.getElementById('edit-jns_tinggal').value;
-            masterData[masterIndex].jarak = document.getElementById('edit-jarak').value;
-            masterData[masterIndex].lintang = document.getElementById('edit-lintang').value;
-            masterData[masterIndex].bujur = document.getElementById('edit-bujur').value;
+            if (document.getElementById('edit-alamat')) mSiswa.alamat = document.getElementById('edit-alamat').value.trim();
+            if (document.getElementById('edit-rt')) mSiswa.rt = document.getElementById('edit-rt').value.trim();
+            if (document.getElementById('edit-rw')) mSiswa.rw = document.getElementById('edit-rw').value.trim();
+            if (document.getElementById('edit-kelurahan')) mSiswa.kelurahan = document.getElementById('edit-kelurahan').value.trim();
+            if (document.getElementById('edit-kecamatan')) mSiswa.kecamatan = document.getElementById('edit-kecamatan').value.trim();
+            if (document.getElementById('edit-kodepos')) mSiswa.kodepos = document.getElementById('edit-kodepos').value.trim();
+            if (document.getElementById('edit-jns_tinggal')) mSiswa.jns_tinggal = document.getElementById('edit-jns_tinggal').value.trim();
+            if (document.getElementById('edit-jarak')) mSiswa.jarak = document.getElementById('edit-jarak').value;
+            if (document.getElementById('edit-lintang')) mSiswa.lintang = document.getElementById('edit-lintang').value;
+            if (document.getElementById('edit-bujur')) mSiswa.bujur = document.getElementById('edit-bujur').value;
             break;
 
         case "siswa-keadaan":
-            masterData[masterIndex].kk = document.getElementById('edit-kk').value;
-            masterData[masterIndex].saudara = document.getElementById('edit-saudara').value;
-            masterData[masterIndex].transportasi = document.getElementById('edit-transportasi').value;
-            masterData[masterIndex].kip = document.getElementById('edit-kip').value;
-            masterData[masterIndex].layak_pip = document.getElementById('edit-layak_pip').value;
-            masterData[masterIndex].alasan_pip = document.getElementById('edit-alasan_pip').value;
-            masterData[masterIndex].disabilitas = document.getElementById('edit-disabilitas').value;
+            if (document.getElementById('edit-kk')) mSiswa.kk = document.getElementById('edit-kk').value.trim();
+            if (document.getElementById('edit-saudara')) mSiswa.saudara = document.getElementById('edit-saudara').value;
+            if (document.getElementById('edit-transportasi')) mSiswa.transportasi = document.getElementById('edit-transportasi').value.trim();
+            if (document.getElementById('edit-kip')) mSiswa.kip = document.getElementById('edit-kip').value.trim();
+            if (document.getElementById('edit-layak_pip')) mSiswa.layak_pip = document.getElementById('edit-layak_pip').value;
+            if (document.getElementById('edit-alasan_pip')) mSiswa.alasan_pip = document.getElementById('edit-alasan_pip').value.trim();
+            if (document.getElementById('edit-disabilitas')) mSiswa.disabilitas = document.getElementById('edit-disabilitas').value.trim();
             break;
 
         case "siswa-ortu":
             // Simpan Data Ayah
-            masterData[masterIndex].ayah_nama = document.getElementById('edit-ayah_nama').value;
-            masterData[masterIndex].ayah_nik = document.getElementById('edit-ayah_nik').value;
-            masterData[masterIndex].ayah_pendidikan = document.getElementById('edit-ayah_pendidikan').value;
-            masterData[masterIndex].ayah_pekerjaan = document.getElementById('edit-ayah_pekerjaan').value;
-            masterData[masterIndex].ayah_penghasilan = document.getElementById('edit-ayah_penghasilan').value;
-            masterData[masterIndex].ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value;
-            masterData[masterIndex].ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value;
+            if (document.getElementById('edit-ayah_nama')) mSiswa.ayah_nama = document.getElementById('edit-ayah_nama').value.trim();
+            if (document.getElementById('edit-ayah_nik')) mSiswa.ayah_nik = document.getElementById('edit-ayah_nik').value.trim();
+            if (document.getElementById('edit-ayah_pendidikan')) mSiswa.ayah_pendidikan = document.getElementById('edit-ayah_pendidikan').value.trim();
+            if (document.getElementById('edit-ayah_pekerjaan')) mSiswa.ayah_pekerjaan = document.getElementById('edit-ayah_pekerjaan').value.trim();
+            if (document.getElementById('edit-ayah_penghasilan')) mSiswa.ayah_penghasilan = document.getElementById('edit-ayah_penghasilan').value.trim();
+            if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
+            if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
             // Simpan Data Ibu
-            masterData[masterIndex].ibu_nama = document.getElementById('edit-ibu_nama').value;
-            masterData[masterIndex].ibu_nik = document.getElementById('edit-ibu_nik').value;
-            masterData[masterIndex].ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value;
-            masterData[masterIndex].ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value;
-            masterData[masterIndex].ibu_penghasilan = document.getElementById('edit-ibu_penghasilan').value;
-            masterData[masterIndex].ibu_disabilitas = document.getElementById('edit-ibu_disabilitas').value;
-            masterData[masterIndex].ibu_thn_lahir = document.getElementById('edit-ibu_thn_lahir').value;
+            if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
+            if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
+            if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
+            if (document.getElementById('edit-ibu_pekerjaan')) mSiswa.ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value.trim();
+            if (document.getElementById('edit-ibu_penghasilan')) mSiswa.ibu_penghasilan = document.getElementById('edit-ibu_penghasilan').value.trim();
+            if (document.getElementById('edit-ibu_disabilitas')) mSiswa.ibu_disabilitas = document.getElementById('edit-ibu_disabilitas').value.trim();
+            if (document.getElementById('edit-ibu_thn_lahir')) mSiswa.ibu_thn_lahir = document.getElementById('edit-ibu_thn_lahir').value.trim();
             // Simpan Data Wali
-            masterData[masterIndex].wali_nama = document.getElementById('edit-wali_nama').value;
-            masterData[masterIndex].wali_nik = document.getElementById('edit-wali_nik').value;
-            masterData[masterIndex].wali_pendidikan = document.getElementById('edit-wali_pendidikan').value;
-            masterData[masterIndex].wali_pekerjaan = document.getElementById('edit-wali_pekerjaan').value;
-            masterData[masterIndex].wali_penghasilan = document.getElementById('edit-wali_penghasilan').value;
-            masterData[masterIndex].wali_disabilitas = document.getElementById('edit-wali_disabilitas').value;
-            masterData[masterIndex].wali_thn_lahir = document.getElementById('edit-wali_thn_lahir').value;
+            if (document.getElementById('edit-wali_nama')) mSiswa.wali_nama = document.getElementById('edit-wali_nama').value.trim();
+            if (document.getElementById('edit-wali_nik')) mSiswa.wali_nik = document.getElementById('edit-wali_nik').value.trim();
+            if (document.getElementById('edit-wali_pendidikan')) mSiswa.wali_pendidikan = document.getElementById('edit-wali_pendidikan').value.trim();
+            if (document.getElementById('edit-wali_pekerjaan')) mSiswa.wali_pekerjaan = document.getElementById('edit-wali_pekerjaan').value.trim();
+            if (document.getElementById('edit-wali_penghasilan')) mSiswa.wali_penghasilan = document.getElementById('edit-wali_penghasilan').value.trim();
+            if (document.getElementById('edit-wali_disabilitas')) mSiswa.wali_disabilitas = document.getElementById('edit-wali_disabilitas').value.trim();
+            if (document.getElementById('edit-wali_thn_lahir')) mSiswa.wali_thn_lahir = document.getElementById('edit-wali_thn_lahir').value.trim();
             break;
 
         case "siswa-periodik":
-            masterData[masterIndex].bb = document.getElementById('edit-bb').value;
-            masterData[masterIndex].tb = document.getElementById('edit-tb').value;
-            masterData[masterIndex].hobi = document.getElementById('edit-hobi').value;
-            masterData[masterIndex].cita_cita = document.getElementById('edit-cita_cita').value;
+            if (document.getElementById('edit-bb')) mSiswa.bb = document.getElementById('edit-bb').value;
+            if (document.getElementById('edit-tb')) mSiswa.tb = document.getElementById('edit-tb').value;
+            if (document.getElementById('edit-hobi')) mSiswa.hobi = document.getElementById('edit-hobi').value.trim();
+            if (document.getElementById('edit-cita_cita')) mSiswa.cita_cita = document.getElementById('edit-cita_cita').value.trim();
             break;
 
         case "siswa-kontak":
-            masterData[masterIndex].hp = document.getElementById('edit-hp').value;
-            masterData[masterIndex].telp = document.getElementById('edit-telp').value;
-            masterData[masterIndex].email = document.getElementById('edit-email').value;
+            if (document.getElementById('edit-hp')) mSiswa.hp = document.getElementById('edit-hp').value.trim();
+            if (document.getElementById('edit-telp')) mSiswa.telp = document.getElementById('edit-telp').value.trim();
+            if (document.getElementById('edit-email')) mSiswa.email = document.getElementById('edit-email').value.trim();
             break;
     }
 
+    // SINKRONISASI INSTAN: Pastikan dataFiltered ikut terupdate secara lokal
+    dataFiltered[index] = { ...mSiswa };
+
     // Refresh data array terfilter dan visualisasi tabel secara realtime
     if (typeof dataFilteredAndSorted === "function") {
-        dataFilteredAndSorted(); // Panggil fungsi re-filter jika ada di sistem Bapak
-    } else {
+        dataFilteredAndSorted(); 
+    } else if (typeof tampilkanTabelData === "function") {
         tampilkanTabelData(); 
     }
     
     tutupModalEdit();
     console.log("Data berhasil diupdate lokal.");
 }
-    function tanganiEditDariModalAksi() {
-    // Ambil kembali index murid yang tadi disimpan di atribut modalAction
+
+function tanganiEditDariModalAksi() {
     const modalAksi = document.getElementById('modalAction');
     const index = parseInt(modalAksi.dataset.indexMurid);
     
-    // Pastikan index-nya valid (berupa angka)
     if (!isNaN(index)) {
         modalAksi.classList.add('hidden'); // Tutup modal aksi gerigi
-        bukaModalEdit(index); // Buka modal form edit per menu yang sudah kita perbaiki
+        bukaModalEdit(index); // Jalankan modal edit utama
     } else {
         console.error("Gagal mengambil indeks murid dari modal aksi.");
     }
