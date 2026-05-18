@@ -1878,8 +1878,8 @@ function simpanPerubahanSiswa(event) {
                 break;
         }
 
-        // Tampilkan indikasi loading ke user bahwa pengiriman data sedang diproses
-        tampilkanToast("Sedang mengirim data ke Google Sheets, harap tunggu...", "info");
+        // 5. TAMPILKAN INDIKASI PROSES (Modal sengaja ditahan biar user tidak melakukan klik ganda)
+        tampilkanToast("Sedang menyimpan ke Google Sheets, mohon tunggu...", "info");
 
         // --- 🌐 INTEGRASI SINKRONISASI REALTIME KE GOOGLE SHEETS ---
         if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -1893,7 +1893,7 @@ function simpanPerubahanSiswa(event) {
                 .withSuccessHandler(function(respons) {
                     console.log("Respons dari server:", respons);
                     if (respons && respons.status === "success") {
-                        // 🔥 MODAL BARU BOLEH TUTUP & TABEL DIREFRESH JIKA SERVER BERHASIL MENYIMPAN DATA
+                        // Jalankan sinkronisasi data lokal web apabila server sudah sukses menulis ke Sheets
                         masterData[masterIndex] = { ...mSiswa };
                         if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
                         
@@ -1902,35 +1902,35 @@ function simpanPerubahanSiswa(event) {
                             if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
                         }
 
+                        // Refresh UI Tabel Panel Guru Bapak
                         if (typeof filterData === "function") filterData();
                         else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
 
-                        tutupModalEdit(); // Jalankan fungsi penutupan modal bawaan web Bapak
-                        tampilkanToast(respons.message || "Data berhasil diperbarui!", "success");
+                        // 🔥 MODAL KITA TUTUP DENGAN ANIMASI TRANSISI BAWAAN BAPAK SEKARANG
+                        tutupModalEdit(); 
+                        tampilkanToast(respons.message || "Data murid berhasil diperbarui!", "success");
                     } else {
-                        // Jika respons gagal (misal murid tidak ditemukan di Sheet)
-                        alert("Gagal Backend: " + (respons.message || "Pesan error kosong"));
-                        tampilkanToast(respons.message || "Gagal menyimpan.", "error");
+                        // Jika server mengembalikan status gagal (contoh baris out of bounds)
+                        tampilkanToast(respons.message || "Gagal menyimpan perubahan ke spreadsheet.", "error");
                     }
                 })
                 .withFailureHandler(function(err) {
-                    console.error("Koneksi gagal/Error Apps Script:", err);
-                    alert("Koneksi Error: " + err.toString());
-                    tampilkanToast("Koneksi gagal, silakan coba lagi.", "error");
+                    console.error("Koneksi gagal atau Error Apps Script:", err);
+                    tampilkanToast("Koneksi server terputus, silakan coba beberapa saat lagi.", "error");
                 })
                 .jembatanEditSiswa(paketData); 
         } else {
-            // Mode offline / localhost
+            // Mode fallback lokal apabila dijalankan di luar ekosistem Web App resmi Google (.exec)
             masterData[masterIndex] = { ...mSiswa };
             if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
             if (typeof filterData === "function") filterData();
+            
             tutupModalEdit();
-            tampilkanToast(`Berhasil menyimpan data ${mSiswa.nama} (Offline/Lokal)!`, "success");
+            tampilkanToast(`[Lokal] Perubahan data ${mSiswa.nama} berhasil diterapkan sementara.`, "warning");
         }
 
     } catch (error) {
         console.error("Terjadi error runtime pada javascript web:", error);
-        alert("Runtime HTML Error: " + error.toString());
         tampilkanToast("Gagal memproses data formulir.", "error");
     }
 }
