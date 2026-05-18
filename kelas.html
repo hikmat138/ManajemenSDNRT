@@ -1425,7 +1425,7 @@ function bukaModalEdit(namaMurid) {
     } catch (e) {
         console.error("Gagal memetakan input nilai modal: ", e);
     }
-
+    
     // E. DOBRAK & MUNCULKAN VISUAL MODAL (Anti-Gagal CSS Tailwind)
     modalEl.style.display = 'flex';
     modalEl.classList.remove('hidden');
@@ -1437,6 +1437,19 @@ function bukaModalEdit(namaMurid) {
         wrapperModal.classList.remove('scale-95', 'opacity-0');
         wrapperModal.classList.add('scale-100', 'opacity-100');
     }, 10);
+
+    const modalContentWrapper = document.getElementById('modalEditWrapper') || document.getElementById('modalEditContent');
+    if (modalContentWrapper) {
+        modalContentWrapper.style.display = 'block';
+        modalContentWrapper.classList.remove('hidden');
+    }
+
+    // Tampilkan juga form induknya
+    const formInduk = document.getElementById('formEditSiswa');
+    if (formInduk) {
+        formInduk.style.display = 'block';
+        formInduk.classList.remove('hidden');
+    }
 }
 
 function tutupModalEdit() {
@@ -1645,43 +1658,60 @@ function simpanPerubahanSiswa(event) {
 function tampilkanTabelData() {
     let html = "";
     
-    // Satukan pembacaan variabel dataFiltered atau filteredData milik Bapak
+    // Satukan pembacaan data aktif
     let targetData = [];
-    if (typeof filteredData !== "undefined" && filteredData) {
-        targetData = filteredData;
-    } else if (typeof dataFiltered !== "undefined" && dataFiltered) {
-        targetData = dataFiltered;
-    }
+    if (typeof filteredData !== "undefined" && filteredData) targetData = filteredData;
+    else if (typeof dataFiltered !== "undefined" && dataFiltered) targetData = dataFiltered;
+    else if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
+    else if (typeof masterData !== "undefined") targetData = masterData;
 
-    // Proteksi: Jika penampung saring kosong, ambil cadangan master pusat
-    if (targetData.length === 0) {
-        if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
-        else if (typeof masterData !== "undefined" && masterData) targetData = masterData;
-        
-        // Kembalikan isi dataFiltered/filteredData global jika cadangan ditemukan
-        if (typeof filteredData !== "undefined") filteredData = [...targetData];
-        if (typeof dataFiltered !== "undefined") dataFiltered = [...targetData];
-    }
-
-    // Jika benar-benar mutlak kosong dari seluruh database lokal
-    if (targetData.length === 0) {
-        const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data");
-        if (tbodyBox) {
-            tbodyBox.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat...</td></tr>`;
-        }
+    const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data") || document.querySelector("tbody");
+    
+    if (!tbodyBox) {
+        console.error("Elemen penampung body tabel tidak ditemukan.");
         return;
     }
 
-    // Looping rendering baris HTML tabel
+    // Jika data kosong
+    if (!targetData || targetData.length === 0) {
+        tbodyBox.innerHTML = `<tr><td colspan="12" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat atau tidak cocok dengan filter...</td></tr>`;
+        return;
+    }
+
+    // Looping data murid
     targetData.forEach((item, index) => {
         let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
+        
+        html += `<tr class="hover:bg-gray-50 transition text-xs text-gray-900 border-b">`;
+        
+        // Kondisional Kolom Berdasarkan Menu yang Sedang Aktif (currentMenu)
+        if (typeof currentMenu !== "undefined" && currentMenu === "siswa-keadaan") {
+            // Sesuai dengan tampilan urutan Kolom di Gambar 1 Bapak:
+            html += `
+                <td class="border px-2 py-3 text-center font-medium">${item.nama || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.kelas || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.jk || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.kk || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.saudara || '0'}</td>
+                <td class="border px-2 py-3 text-center">${item.transportasi || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.kip || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.layak_pip || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.alasan_pip || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.disabilitas || '-'}</td>
+                <td class="border px-2 py-3 text-center">${item.umur || '-'}</td>
+            `;
+        } else {
+            // Default jika menu pribadi/menu utama terbuka
+            html += `
+                <td class="border px-4 py-3 text-center">${index + 1}</td>
+                <td class="border px-4 py-3 font-medium">${item.nama || '-'}</td>
+                <td class="border px-4 py-3 text-center">${item.nisn || '-'}</td>
+            `;
+        }
 
+        // Kolom Aksi Tombol Gerigi (Selalu di Paling Kanan)
         html += `
-        <tr class="hover:bg-gray-50 transition text-sm text-gray-900 border-b">
-            <td class="px-4 py-3 text-center">${index + 1}</td>
-            <td class="px-4 py-3 font-medium">${item.nama || '-'}</td>
-            <td class="px-4 py-3">${item.nisn || '-'}</td>
-            <td class="px-4 py-3 text-center">
+            <td class="border px-4 py-3 text-center">
                 <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-400 hover:text-blue-600 transition">
                     <i class="fa-solid fa-gear"></i>
                 </button>
@@ -1689,13 +1719,9 @@ function tampilkanTabelData() {
         </tr>`;
     });
     
-    // Tembakkan html ke salah satu ID penampung tbody Bapak yang aktif
-    const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data") || document.querySelector("tbody");
-    if (tbodyBox) {
-        tbodyBox.innerHTML = html;
-    }
+    tbodyBox.innerHTML = html;
     
-    // Update label text "Menampilkan" jika elemennya terpasang di HTML Bapak
+    // Update info teks halaman
     const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
     if (infoHalaman) {
         infoHalaman.innerText = `MENAMPILKAN 1 - ${targetData.length} DARI ${targetData.length} MURID`;
