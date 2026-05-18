@@ -1941,17 +1941,57 @@ function simpanPerubahanSiswa(event) {
     }
 }
 function tampilkanTabelData() {
-    let html = "";
-    
-    // Satukan pembacaan data aktif
+    // ========================================================
+    // GERBANG PENGAMAN UTAMA: JIKA DASHBOARD, JANGAN RENDER TABEL
+    // ========================================================
+    if (typeof currentMenu !== "undefined" && currentMenu === "dashboard") {
+        return; 
+    }
+
+    // 1. Satukan pembacaan data aktif secara otomatis sesuai variabel sistem Bapak
     let targetData = [];
     if (typeof filteredData !== "undefined" && filteredData) targetData = filteredData;
     else if (typeof dataFiltered !== "undefined" && dataFiltered) targetData = dataFiltered;
     else if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
     else if (typeof masterData !== "undefined") targetData = masterData;
 
+    // 2. Logika Deteksi ID tbody HTML yang Dinamis Berdasarkan Menu Aktif
+    let targetTbodyId = 'tbody-data'; 
+    if (typeof currentMenu !== "undefined" && currentMenu.startsWith("siswa-")) {
+        targetTbodyId = `tbody-${currentMenu}`;
+    }
+
+    let tbodyBox = document.getElementById(targetTbodyId) || 
+                   document.getElementById("isiTabelSiswa") || 
+                   document.getElementById(currentMenu) || 
+                   document.querySelector("tbody");
+    
+    if (!tbodyBox) {
+        console.warn("Elemen penampung tbody tidak ditemukan untuk menu: " + currentMenu);
+        return;
+    }
+
+    tbodyBox.innerHTML = ""; // Bersihkan baris lama sebelum render rombel baru
+
+    // 3. Jika Data Kosong
+    if (!targetData || targetData.length === 0) {
+        const tableElement = tbodyBox.closest('table');
+        const totalKolom = tableElement ? tableElement.querySelectorAll('thead th').length : 12;
+        
+        tbodyBox.innerHTML = `<tr>
+            <td colspan="${totalKolom}" class="px-6 py-12 text-center text-gray-900 whitespace-nowrap">
+                <i class="fa-regular fa-folder-open text-2xl mb-2 block text-gray-400"></i>
+                Belum ada data murid yang termuat atau tidak cocok dengan kriteria filter...
+            </td>
+        </tr>`;
+        
+        const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
+        if (infoHalaman) infoHalaman.innerText = `MENAMPILKAN 0 - 0 DARI 0 MURID`;
+        return;
+    }
+
     // -----------------------------------------------------------------
-    // 🔥 1. LOGIKA DETEKSI TOMBOL MASSAL (MENGGUNAKAN ID & AMAN DARI CRASH)
+    // 🔥 LOGIKA DETEKSI TOMBOL MASSAL (Hanya Aktif di Menu Registrasi)
     // -----------------------------------------------------------------
     if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
         const btnNaikMassal = document.getElementById('btn-naik-massal');
@@ -1968,114 +2008,104 @@ function tampilkanTabelData() {
             }
         }
     }
-    // -----------------------------------------------------------------
 
-    const tbodyBox = document.getElementById("isiTabelSiswa") || document.getElementById("tbody-data") || document.querySelector("tbody") || document.getElementById("tbody-siswa-registrasi");
-    
-    if (!tbodyBox) {
-        console.error("Elemen penampung body tabel tidak ditemukan.");
-        return;
-    }
-
-    // Jika data kosong
-    if (!targetData || targetData.length === 0) {
-        tbodyBox.innerHTML = `<tr><td colspan="12" class="text-center p-4 text-gray-500">Belum ada data murid yang termuat atau tidak cocok dengan filter...</td></tr>`;
-        
-        // Tetap update teks halaman meskipun 0 murid agar sinkron dengan gambar Bapak
-        const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
-        if (infoHalaman) infoHalaman.innerText = `MENAMPILKAN 0 - 0 DARI 0 MURID`;
-        return;
-    }
-
-    // Looping data murid
+    // 4. Looping Pembuatan Baris Baru Menggunakan Elemen Objek (Bukan Teks String html +=)
     targetData.forEach((item, index) => {
-        let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
+        let tr = document.createElement('tr');
+        tr.className = "hover:bg-gray-50 transition border-b border-gray-100 text-gray-950 text-sm";
+
         let jkTeks = item.jk || item.JK || '-';
-        
-        html += `<tr class="hover:bg-gray-50 transition text-xs text-gray-900 border-b">`;
-        
-        // 🛠️ 2. KONDISIONAL KOLOM BERDASARKAN MENU YANG AKTIF
-        if (typeof currentMenu !== "undefined" && currentMenu === "siswa-keadaan") {
-            html += `
-                <td class="border px-2 py-3 text-center font-medium">${item.nama || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.kelas || '-'}</td>
-                <td class="border px-2 py-3 text-center">${jkTeks}</td>
-                <td class="border px-2 py-3 text-center">${item.kk || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.saudara || '0'}</td>
-                <td class="border px-2 py-3 text-center">${item.transportasi || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.kip || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.layak_pip || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.alasan_pip || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.disabilitas || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.umur || '-'}</td>
-            `;
-        } 
-        else if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
-            let tglRaw = item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk || '-';
-            let tglMasukIndo = tglRaw;
+        let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
 
-            // Bumper Pengaman: Jika fungsi format tanggal Bapak error, bungkus pakai try-catch agar tabel tidak hilang
-            if (typeof formatTanggalIndo === "function" && tglRaw !== '-') {
-                try {
-                    tglMasukIndo = formatTanggalIndo({ tgl_lahir: tglRaw });
-                } catch (e) {
-                    tglMasukIndo = tglRaw; // kembalikan ke teks mentah jika gagal konversi
+        // Percabangan Tampilan Kolom Berdasarkan Menu Aktif
+        switch (currentMenu) {
+            case "siswa-keadaan":
+                tr.innerHTML = `
+                    <td class="p-3 whitespace-nowrap font-medium">${item.nama || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">${item.kelas || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">${jkTeks}</td>
+                    <td class="p-3 whitespace-nowrap">${item.kk || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">${item.saudara || '0'}</td>
+                    <td class="p-3 whitespace-nowrap">${item.transportasi || '-'}</td>
+                    <td class="p-3 whitespace-nowrap">${item.kip || '-'}</td>
+                    <td class="p-3 whitespace-nowrap">${item.layak_pip || 'Tidak'}</td>
+                    <td class="p-3 whitespace-nowrap">${item.alasan_pip || '-'}</td>
+                    <td class="p-3 whitespace-nowrap">${item.disabilitas || 'Tidak'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">${item.umur || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-500 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </td>
+                `;
+                break;
+
+            case "siswa-registrasi":
+                let tglRaw = item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk || '-';
+                let tglMasukIndo = tglRaw;
+
+                // Proteksi konversi format penanggalan dari Google Sheets
+                if (typeof formatTanggalIndo === "function" && tglRaw !== '-') {
+                    try {
+                        tglMasukIndo = formatTanggalIndo({ tgl_lahir: tglRaw });
+                    } catch (e) {
+                        tglMasukIndo = tglRaw;
+                    }
                 }
-            }
 
-            html += `
-                <td class="border px-3 py-3 font-medium">${item.nama || '-'}</td>
-                <td class="border px-3 py-3 text-center font-bold text-gray-700">${item.kelas || '-'}</td>
-                <td class="border px-3 py-3 text-center">${jkTeks}</td>
-                <td class="border px-3 py-3">${tglMasukIndo}</td>
-                <td class="border px-3 py-3">${item.sekolah_asal || '-'}</td>
-                <td class="border px-3 py-3 text-center"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">${item.status_aktif || 'Aktif'}</span></td>
-                <td class="border px-3 py-3 text-xs text-gray-500">${item.keterangan_siswa || '-'}</td>
-            `;
-        } 
-        else {
-            html += `
-                <td class="border px-4 py-3 text-center">${index + 1}</td>
-                <td class="border px-4 py-3 font-medium">${item.nama || '-'}</td>
-                <td class="border px-4 py-3 text-center">${item.nisn || '-'}</td>
-            `;
-        }
+                let kelasTeks = String(item.kelas || "").toUpperCase();
+                let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1;
+                let tombolAksiIndividu = "";
 
-        // 🛠️ 3. KOLOM AKSI DINAMIS (MENGGUNAKAN INDEKS)
-        if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
-            let kelasTeks = String(item.kelas || "").toUpperCase();
-            let cekKelas6Satuan = kelasTeks.indexOf("6") !== -1;
-
-            if (cekKelas6Satuan) {
-                html += `
-                    <td class="border px-4 py-3 text-center whitespace-nowrap">
+                if (cekKelas6Satuan) {
+                    tombolAksiIndividu = `
                         <button type="button" onclick="bukaModalRegistrasiViaIndex('LULUS', ${index})" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-graduation-cap mr-1"></i> Lulus
                         </button>
-                    </td>`;
-            } else {
-                html += `
-                    <td class="border px-4 py-3 text-center whitespace-nowrap">
+                    `;
+                } else {
+                    tombolAksiIndividu = `
                         <button type="button" onclick="bukaModalRegistrasiViaIndex('NAIK_KELAS', ${index})" class="bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">
                             <i class="fas fa-level-up-alt mr-1"></i> Naik Kelas
                         </button>
-                    </td>`;
-            }
-        } else {
-            html += `
-                <td class="border px-4 py-3 text-center">
-                    <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-400 hover:text-blue-600 transition">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-                </td>`;
+                    `;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3 whitespace-nowrap font-medium">${item.nama || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center font-bold text-gray-700"><span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-md font-bold">${item.kelas || '-'}</span></td>
+                    <td class="p-3 whitespace-nowrap text-center">${jkTeks}</td>
+                    <td class="p-3 whitespace-nowrap">${tglMasukIndo}</td>
+                    <td class="p-3 whitespace-nowrap">${item.sekolah_asal || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">
+                        <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-100 text-emerald-800">${item.status_aktif || 'Aktif'}</span>
+                    </td>
+                    <td class="p-3 whitespace-nowrap text-xs text-gray-500">${item.keterangan_siswa || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        ${tombolAksiIndividu}
+                    </td>
+                `;
+                break;
+
+            default:
+                // Tampilan fallback default untuk menu dasar/pencarian standar
+                tr.innerHTML = `
+                    <td class="p-3 text-center whitespace-nowrap">${index + 1}</td>
+                    <td class="p-3 whitespace-nowrap font-medium">${item.nama || '-'}</td>
+                    <td class="p-3 whitespace-nowrap text-center">${item.nisn || '-'}</td>
+                    <td class="p-3 text-center whitespace-nowrap">
+                        <button type="button" onclick="bukaModalEdit('${namaAman}')" class="p-1 text-gray-400 hover:text-blue-600 transition">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </td>
+                `;
+                break;
         }
 
-        html += `</tr>`;
+        tbodyBox.appendChild(tr);
     });
     
-    tbodyBox.innerHTML = html;
-    
-    // Update info teks halaman
+    // Update label informasi jumlah halaman di footer tabel
     const infoHalaman = document.getElementById("infoHalaman") || document.getElementById("pagination-info");
     if (infoHalaman) {
         infoHalaman.innerText = `MENAMPILKAN 1 - ${targetData.length} DARI ${targetData.length} MURID`;
@@ -2104,103 +2134,127 @@ function tampilkanToast(pesan, tipe = "success") {
     }
 }
     // Variabel penampung data sementara untuk modal registrasi aktif
+// =========================================================================
+// 1. VARIABEL GLOBAL PENAMPUNG DATA REGISTRASI MUTASI SATUAN
+// =========================================================================
 let muridTerpilih = null;
 let jenisProsesTerpilih = "";
 
-// A. FUNGSI AWAL SAAT TOMBOL DI TABEL DIKLIK (Menerima INDEX dan memunculkan konfirmasi)
+// =========================================================================
+// 2. FUNGSI AWAL SAAT TOMBOL DI TABEL DIKLIK (Menerima INDEX Rombel)
+// =========================================================================
 function bukaModalRegistrasiViaIndex(jenisAksi, index) {
-    // 1. Cari sumber array data yang sedang aktif di tabel Bapak
+    // Cari sumber array data yang sedang aktif dan termuat di tabel Bapak
     let targetData = [];
     if (typeof filteredData !== "undefined" && filteredData) targetData = filteredData;
     else if (typeof dataFiltered !== "undefined" && dataFiltered) targetData = dataFiltered;
     else if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
     else if (typeof masterData !== "undefined") targetData = masterData;
 
-    // Ambil data murid berdasarkan index baris tabel
+    // Ambil data objek murid berdasarkan index baris tabel
     let dataMurid = targetData[index];
     if (!dataMurid) {
-        console.error("Data murid pada index ini tidak ditemukan.");
+        console.error("Data murid pada index " + index + " tidak ditemukan.");
         return;
     }
 
+    // Tampilkan notifikasi konfirmasi awal bawaan browser
     let pesanKonfirmasi = jenisAksi === "LULUS" 
         ? `Apakah Anda yakin ingin memproses kelulusan murid bernama ${dataMurid.nama}?` 
         : `Apakah Anda yakin ingin memproses kenaikan kelas murid bernama ${dataMurid.nama}?`;
 
-    // 2. Tampilkan pertanyaan konfirmasi awal bawaan browser
-    if (!confirm(pesanKonfirmasi)) return; // Jika klik Batal/Cancel, fungsi langsung berhenti di sini
+    if (!confirm(pesanKonfirmasi)) return; // Berhenti jika user membatalkan (Klik Cancel)
 
-    // 3. Jika klik OK, simpan data ke penampung global sementara Bapak
+    // Kunci data murid terpilih ke penampung global sementara
     muridTerpilih = dataMurid;
     jenisProsesTerpilih = jenisAksi;
 
-    // 4. Reset sembunyikan semua kontainer form modal bawaan admin.html agar tidak tumpang tindih
-    document.getElementById("form-lulus").classList.add("hidden");
-    document.getElementById("form-naik-kelas").classList.add("hidden");
+    // Bersihkan/Sembunyikan semua kontainer form di dalam modal agar tidak tumpang tindih
+    if (document.getElementById("form-lulus")) document.getElementById("form-lulus").classList.add("hidden");
+    if (document.getElementById("form-naik-kelas")) document.getElementById("form-naik-kelas").classList.add("hidden");
 
-    // Tarik elemen pembungkus modal utama Bapak
+    // Tarik elemen pembungkus modal utama admin.html Bapak
     const modalKontainerUtama = document.getElementById("modalEdit") || document.getElementById("modal-utama");
 
+    // Pasang Nama Murid Terpilih pada Judul Modal biar informatif
+    const labelNamaSiswaModal = document.getElementById("modalEditTitle") || document.getElementById("modal-title");
+    if (labelNamaSiswaModal) {
+        labelNamaSiswaModal.innerText = `${jenisAksi === 'LULUS' ? 'Proses Kelulusan' : 'Proses Kenaikan Kelas'} : ${dataMurid.nama}`;
+    }
+
+    // -----------------------------------------------------------------
+    // CABANG OPSI A: KELULUSAN SATUAN
+    // -----------------------------------------------------------------
     if (jenisAksi === "LULUS") {
-        // Suntikkan data murid ke elemen teks ID p bawaan komponen Bapak
         if (document.getElementById("m-nis")) document.getElementById("m-nis").innerText = dataMurid.nis || dataMurid.id || "-";
         if (document.getElementById("m-nisn")) document.getElementById("m-nisn").innerText = dataMurid.nisn || "-";
         
         let ttlTeks = `${dataMurid.tempat_lahir || '-'}, ${dataMurid.tgl_lahir || '-'}`;
         if (document.getElementById("m-ttl")) document.getElementById("m-ttl").innerText = ttlTeks;
 
-        // Berikan nilai default siap pakai pada kolom input kelulusan
+        // Berikan nilai default siap pakai pada kolom input modal kelulusan
         if (document.getElementById("m-tapel")) document.getElementById("m-tapel").value = "2025/2026";
         if (document.getElementById("m-tgl-lulus")) document.getElementById("m-tgl-lulus").value = new Date().toISOString().split('T')[0];
         if (document.getElementById("m-sk-lulus")) document.getElementById("m-sk-lulus").value = "";
         if (document.getElementById("m-ijazah")) document.getElementById("m-ijazah").value = "";
 
         // Buka form kelulusan
-        document.getElementById("form-lulus").classList.remove("hidden");
+        if (document.getElementById("form-lulus")) document.getElementById("form-lulus").classList.remove("hidden");
     } 
+    // -----------------------------------------------------------------
+    // CABANG OPSI B: KENAIKAN KELAS SATUAN
+    // -----------------------------------------------------------------
     else if (jenisAksi === "NAIK_KELAS") {
-        // Kalkulasi target kelas secara otomatis (Angka kelas sekarang + 1)
-        let angkaKelas = parseInt(dataMurid.kelas) || 0;
-        let targetKelasTeks = angkaKelas > 0 ? `KELAS ${angkaKelas + 1}` : "TINGKAT LANJUT";
+        // Otomatisasi teks kalkulasi target tingkatan kelas berikutnya
+        let klsLama = String(dataMurid.kelas || "").trim();
+        let angkaKelas = parseInt(klsLama) || 0;
+        let hurufKelas = klsLama.replace(/[0-9]/g, ''); // Ambil pararelnya (Misal: "A", "B", atau "")
+        
+        let targetKelasTeks = angkaKelas > 0 ? `KELAS ${(angkaKelas + 1) + hurufKelas}` : "TINGKAT LANJUT";
 
         if (document.getElementById("m-target-kelas")) {
             document.getElementById("m-target-kelas").innerText = targetKelasTeks;
         }
 
         // Buka form kenaikan kelas
-        document.getElementById("form-naik-kelas").classList.remove("hidden");
+        if (document.getElementById("form-naik-kelas")) document.getElementById("form-naik-kelas").classList.remove("hidden");
     }
 
-    // 5. Munculkan modal utama ke layar monitor
+    // Munculkan jendela modal utama ke monitor
     if (modalKontainerUtama) modalKontainerUtama.classList.remove("hidden");
 }
 
-// B. FUNGSI AKHIR SAAT TOMBOL "KONFIRMASI" DI DALAM MODAL DIKLIK USER
+// =========================================================================
+// 3. FUNGSI AKHIR SAAT TOMBOL "SIMPAN / KONFIRMASI" DI MODAL DIKLIK USER
+// =========================================================================
 function konfirmasiProses() {
     if (!muridTerpilih) return;
 
-    // Siapkan struktur paket kiriman data (Payload)
+    // Susun struktur awal paket kiriman data (Payload)
     let paketData = {
         action: jenisProsesTerpilih,
-        nis: muridTerpilih.nis || muridTerpilih.id || ""
+        nis: muridTerpilih.id || muridTerpilih.nis || "" // Prioritaskan ID unik murid di kolom A
     };
 
-    // Jika memproses kelulusan, kumpulkan data ketikan dari inputan di admin.html
+    // Jika aksinya kelulusan, rampas isian teks dari form input modal
     if (jenisProsesTerpilih === "LULUS") {
-        paketData.tapel = document.getElementById("m-tapel").value;
-        paketData.tglLulus = document.getElementById("m-tgl-lulus").value;
-        paketData.skLulus = document.getElementById("m-sk-lulus").value || "-";
-        paketData.noIjazah = document.getElementById("m-ijazah").value || "-";
+        paketData.tapel = document.getElementById("m-tapel") ? document.getElementById("m-tapel").value : "2025/2026";
+        paketData.tglLulus = document.getElementById("m-tgl-lulus") ? document.getElementById("m-tgl-lulus").value : "";
+        paketData.skLulus = (document.getElementById("m-sk-lulus") && document.getElementById("m-sk-lulus").value) ? document.getElementById("m-sk-lulus").value : "-";
+        paketData.noIjazah = (document.getElementById("m-ijazah") && document.getElementById("m-ijazah").value) ? document.getElementById("m-ijazah").value : "-";
 
         if (!paketData.tapel || !paketData.tglLulus) {
-            alert("Tahun Ajaran dan Tanggal Lulus tidak boleh kosong!");
+            alert("Tahun Ajaran Kelulusan dan Tanggal Lulus tidak boleh dikosongkan!");
             return;
         }
     }
 
-    if (typeof tampilkanToast === "function") tampilkanToast("Sedang memproses perubahan data...", "info");
+    // Tampilkan notifikasi loading/proses jika fungsi toast tersedia
+    if (typeof tampilkanToast === "function") {
+        tampilkanToast("Sedang memperbarui database Sekolah...", "info");
+    }
 
-    // Kirim paket data menuju URL Apps Script Google Sheets Bapak
+    // Kirim paket data ke URL Gerbang API Google Apps Script (doPost)
     fetch(API_URL, {
         method: "POST",
         mode: "cors",
@@ -2210,16 +2264,18 @@ function konfirmasiProses() {
         body: JSON.stringify(paketData)
     })
     .then(res => {
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error("Koneksi internet bermasalah atau API internal server sibuk.");
         return res.json();
     })
     .then(respons => {
         if (respons && respons.status === "success") {
             if (typeof tampilkanToast === "function") {
-                tampilkanToast(respons.message || "Spreadsheet berhasil diperbarui!", "success");
+                tampilkanToast(respons.message || "Data murid berhasil diproses!", "success");
+            } else {
+                alert(respons.message || "Sukses memperbarui data!");
             }
 
-            // Tutup jendela modal secara otomatis
+            // Jalankan fungsi penutup modal bawaan aplikasi web admin Bapak
             if (typeof closeModal === "function") closeModal();
             else if (typeof tutupModal === "function") tutupModal();
             else {
@@ -2227,7 +2283,11 @@ function konfirmasiProses() {
                 if (modalKontainerUtama) modalKontainerUtama.classList.add("hidden");
             }
 
-            // Muat ulang atau sinkronisasi tampilan tabel web biar datanya ter-update
+            // Bersihkan variabel memori global setelah berhasil
+            muridTerpilih = null;
+            jenisProsesTerpilih = "";
+
+            // Tarik ulang database Sheets dan render tabel agar perubahan rombel langsung kelihatan
             if (typeof ambilDataDariSheets === "function") ambilDataDariSheets();
             else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
         } else {
@@ -2236,7 +2296,7 @@ function konfirmasiProses() {
     })
     .catch(err => {
         console.error(err);
-        alert("Gagal terhubung ke Google Sheets. Silakan periksa jaringan internet.");
+        alert("Gagal terhubung ke server cloud Google. Silakan periksa jaringan internet sekolah.");
     });
 }
 </script>
