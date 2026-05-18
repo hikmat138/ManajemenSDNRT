@@ -1835,7 +1835,7 @@ function simpanPerubahanSiswa(event) {
                 if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
                 if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
                 
-                if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
+                if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('ibu_nama').value.trim();
                 if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
                 if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
                 if (document.getElementById('edit-ibu_pekerjaan')) mSiswa.ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value.trim();
@@ -1885,13 +1885,7 @@ function simpanPerubahanSiswa(event) {
             if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
         }
 
-        // --- 🌐 JIKA MAU DIKIRIM KE GOOGLE SHEETS / BACKEND (OPSIONAL) ---
-        // Anda bisa menyisipkan baris pemanggilan backend di sini jika diperlukan, contoh:
-        // if (typeof google !== "undefined") {
-        //     google.script.run.withSuccessHandler().simpanKeSpreadsheet(mSiswa);
-        // }
-
-        // 7. SEGARKAN TABEL SECARA REALTIME
+        // 7. SEGARKAN TABEL SECARA REALTIME (Agar langsung berubah di web lokal)
         if (typeof filterData === "function") {
             filterData(); 
         } else if (typeof dataFilteredAndSorted === "function") {
@@ -1899,10 +1893,35 @@ function simpanPerubahanSiswa(event) {
         } else if (typeof tampilkanTabelData === "function") {
             tampilkanTabelData(); 
         }
-        
-        // 8. TUTUP MODAL & BERIKAN NOTIFIKASI BERHASIL 🎉
+
+        // Tutup modal edit terlebih dahulu biar tidak menumpuk di layar
         tutupModalEdit();
-        tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli}!`, "success");
+        tampilkanToast("Menyimpan data, mohon tunggu...", "success");
+
+        // --- 🌐 8. KIRIM KE BACKEND GOOGLE SHEETS VIA GOOGLE.SCRIPT.RUN ---
+        if (typeof google !== "undefined" && google.script && google.script.run) {
+            let paketData = {
+                action: "EDIT_SISWA",
+                rowIndex: masterIndex + 2, // Indeks baris excel/sheet (ditambah 2 karena offset header & index 0)
+                payload: mSiswa
+            };
+
+            // GANTI 'namaFungsiPusatBackendBapak' dengan nama fungsi router di Code.gs (misal: kelolaRequest)
+            google.script.run
+                .withSuccessHandler(function(respons) {
+                    console.log("Hasil sinkronisasi:", respons);
+                    tampilkanToast(`Berhasil menyinkronkan data ${mSiswa.nama || namaAsli} ke Google Sheets! 🎉`, "success");
+                })
+                .withFailureHandler(function(err) {
+                    console.error("Gagal sinkronisasi:", err);
+                    tampilkanToast("Gagal menyinkronkan data ke Google Sheets.", "error");
+                })
+                .namaFungsiPusatBackendBapak(paketData); // <--- Silakan sesuaikan nama fungsinya di sini, Pak!
+        } else {
+            // Jika dijalankan di luar lingkungan GAS (misal localhost)
+            tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli} (Lokal)!`, "success");
+        }
+
         console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
 
     } catch (error) {
@@ -1910,40 +1929,6 @@ function simpanPerubahanSiswa(event) {
         tampilkanToast("Gagal menyimpan perubahan data murid.", "error");
     }
 }
-
-// =========================================================================
-// ENGINE NOTIFIKASI TOAST (Sematkan di bawah fungsi jika belum ada)
-// =========================================================================
-function tampilkanToast(pesan, tipe = "success") {
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'fixed bottom-5 right-5 z-[100] flex flex-col gap-2';
-        document.body.appendChild(toastContainer);
-    }
-
-    const toast = document.createElement('div');
-    if (tipe === "success") {
-        toast.className = "bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 text-xs font-semibold transform translate-y-5 opacity-0 transition-all duration-300 border border-emerald-500";
-        toast.innerHTML = `<i class="fa-solid fa-circle-check text-sm"></i> <span>${pesan}</span>`;
-    } else {
-        toast.className = "bg-rose-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 text-xs font-semibold transform translate-y-5 opacity-0 transition-all duration-300 border border-rose-500";
-        toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-sm"></i> <span>${pesan}</span>`;
-    }
-
-    toastContainer.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.remove('translate-y-5', 'opacity-0');
-    }, 10);
-
-    setTimeout(() => {
-        toast.classList.add('translate-y-5', 'opacity-0');
-        setTimeout(() => { toast.remove(); }, 300);
-    }, 3500);
-}
-
 function tampilkanTabelData() {
     let html = "";
     
