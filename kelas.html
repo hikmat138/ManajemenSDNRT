@@ -1952,7 +1952,6 @@ function tampilkanTabelData() {
         const btnNaikMassal = document.getElementById('btn-naik-massal');
         const btnLulusMassal = document.getElementById('btn-lulus-massal');
 
-        // Pastikan kedua tombol terdeteksi dulu di HTML agar tidak memicu fatal error (.classList null)
         if (btnNaikMassal && btnLulusMassal) {
             // Cek apakah ada murid yang kelasnya mengandung angka 6
             let deteksiKelas6 = targetData.some(m => String(m.kelas || '').indexOf('6') !== -1);
@@ -1984,6 +1983,7 @@ function tampilkanTabelData() {
     // Looping data murid
     targetData.forEach((item, index) => {
         let namaAman = String(item.nama || '-').replace(/'/g, "\\'");
+        let jkTeks = item.jk || item.JK || '-'; // <-- KUNCI PENGAMAN: Didefinisikan di sini agar semua menu bisa pakai tanpa crash
         
         html += `<tr class="hover:bg-gray-50 transition text-xs text-gray-900 border-b">`;
         
@@ -1992,7 +1992,7 @@ function tampilkanTabelData() {
             html += `
                 <td class="border px-2 py-3 text-center font-medium">${item.nama || '-'}</td>
                 <td class="border px-2 py-3 text-center">${item.kelas || '-'}</td>
-                <td class="border px-2 py-3 text-center">${item.jk || '-'}</td>
+                <td class="border px-2 py-3 text-center">${jkTeks}</td>
                 <td class="border px-2 py-3 text-center">${item.kk || '-'}</td>
                 <td class="border px-2 py-3 text-center">${item.saudara || '0'}</td>
                 <td class="border px-2 py-3 text-center">${item.transportasi || '-'}</td>
@@ -2004,7 +2004,6 @@ function tampilkanTabelData() {
             `;
         } 
         else if (typeof currentMenu !== "undefined" && currentMenu === "siswa-registrasi") {
-            let jkTeks = item.jk || '-';
             let tglMasukIndo = typeof formatTanggalIndo === "function" 
                 ? formatTanggalIndo({ tgl_lahir: (item.tgl_masuk || item.TGL_MASUK || item.Tgl_Masuk) }) 
                 : (item.tgl_masuk || '-');
