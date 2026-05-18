@@ -123,9 +123,7 @@
 <body class="bg-gray-50 text-gray-800">
 
 <div id="modalEditSiswa" class="fixed inset-0 z-50 hidden bg-gray-950 bg-opacity-50 items-center justify-center p-4 opacity-0 transition-opacity duration-200">
-    
     <div id="modalEditWrapper" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 opacity-0 duration-200">
-        
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <div>
                 <h3 id="modalEditJudul" class="text-base font-bold text-gray-900 flex items-center gap-2">
@@ -1362,7 +1360,7 @@ function bukaModalEdit(index) {
     if (s.jk === 'L' || s.jk === 'Laki-laki') jkTeksLengkap = "Laki-laki";
     if (s.jk === 'P' || s.jk === 'Perempuan') jkTeksLengkap = "Perempuan";
 
-    // BANNER IDENTITAS READ-ONLY (Hanya disisipkan di menu SEAIN Identitas Pribadi)
+    // BANNER IDENTITAS READ-ONLY (Hanya disisipkan di menu SELAIN Identitas Pribadi)
     const komponenIdentitasReadOnly = `
         <div class="col-span-1 md:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-200 grid grid-cols-3 gap-4 mb-2 text-xs">
             <div>
@@ -1384,7 +1382,6 @@ function bukaModalEdit(index) {
     switch (currentMenu) {
         case "siswa-pribadi":
             document.getElementById('modalEditJudul').innerText = "Edit Identitas Pribadi Murid";
-            // Di sini Nama, Kelas (Readonly bawaan), dan Jenis Kelamin BISA DIEDIT secara penuh
             wadahForm.innerHTML = `
                 <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap</label><input type="text" id="edit-nama" class="w-full border p-2.5 rounded-lg text-sm" value="${s.nama || ''}"></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">Kelas</label><input type="text" id="edit-kelas" class="w-full border p-2.5 rounded-lg text-sm bg-gray-50" value="${s.kelas || ''}" readonly></div>
@@ -1407,7 +1404,6 @@ function bukaModalEdit(index) {
 
         case "siswa-alamat":
             document.getElementById('modalEditJudul').innerText = "Edit Data Alamat & Koordinat Tempat Tinggal";
-            // Menyisipkan informasi murid di atas, lalu dilanjutkan form alamat tanpa input nama/jk
             wadahForm.innerHTML = komponenIdentitasReadOnly + `
                 <div class="col-span-2"><label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Rumah</label><textarea id="edit-alamat" rows="2" class="w-full border p-2.5 rounded-lg text-sm">${s.alamat || ''}</textarea></div>
                 <div><label class="block text-xs font-semibold text-gray-700 mb-1">RT</label><input type="text" id="edit-rt" class="w-full border p-2.5 rounded-lg text-sm" value="${s.rt || ''}"></div>
@@ -1430,8 +1426,8 @@ function bukaModalEdit(index) {
                     <div id="mapBoxEdit" class="w-full h-48 border rounded-lg bg-gray-100 shadow-inner"></div>
                 </div>
             `;
-            // Eksekusi peta setelah elemen HTML dirender penuh
-            setTimeout(() => { initPetaSiswa(s.lintang, s.bujur); }, 200);
+            // Sediakan jeda render peta agar wadah HTML-nya siap secara dimensional
+            setTimeout(() => { if (typeof initPetaSiswa === "function") initPetaSiswa(s.lintang, s.bujur); }, 250);
             break;
 
         case "siswa-keadaan":
@@ -1456,7 +1452,6 @@ function bukaModalEdit(index) {
             document.getElementById('modalEditJudul').innerText = "Edit Data Orang Tua / Wali Murid";
             wadahForm.className = "grid grid-cols-1 md:grid-cols-3 gap-4 max-w-full"; // Set 3 kolom khusus menu Ortu
             
-            // Bentangkan informasi identitas read-only memenuhi 3 kolom teratas
             wadahForm.innerHTML = `<div class="col-span-1 md:col-span-3">${komponenIdentitasReadOnly}</div>` + `
                 <div class="space-y-3 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
                     <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider border-b pb-1"><i class="fa-solid fa-user-tie"></i> Data Ayah Kandung</h4>
@@ -1511,10 +1506,13 @@ function bukaModalEdit(index) {
             break;
             
         default:
-            return; // Jika menu registrasi atau menu lain yang tidak butuh edit bawaan
+            return;
     }
 
+    // PENGATURAN DIMENSI DAN STRUKTUR ANIMASI MODAL (Dibersihkan dari Duplikasi Let/Const)
+    const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
+
     if (currentMenu === "siswa-ortu") {
         wrapperModal.classList.remove('max-w-2xl');
         wrapperModal.classList.add('max-w-5xl');
@@ -1523,15 +1521,11 @@ function bukaModalEdit(index) {
         wrapperModal.classList.add('max-w-2xl');
     }
 
-    // Tampilkan Modal dengan animasi yang benar
-    const modalEl = document.getElementById('modalEditSiswa');
-    const wrapperModal = document.getElementById('modalEditWrapper');
-
-    // Munculkan kontainer utama terlebih dahulu
+    // Munculkan kontainer utama (Flexbox) terlebih dahulu
     modalEl.classList.remove('hidden');
     modalEl.classList.add('flex');
     
-    // Beri jeda micro-task agar browser sempat merender transisi CSS opacity & scale
+    // Beri jeda micro-task agar transisi CSS Tailwind dirender sempurna oleh browser
     setTimeout(() => {
         modalEl.classList.remove('opacity-0');
         wrapperModal.classList.remove('scale-95', 'opacity-0');
@@ -1543,12 +1537,12 @@ function tutupModalEdit() {
     const modalEl = document.getElementById('modalEditSiswa');
     const wrapperModal = document.getElementById('modalEditWrapper');
     
-    // Kembalikan ke posisi mengecil dan transparan
+    // Kembalikan ke posisi mengecil (scale-95) dan transparan
     modalEl.classList.add('opacity-0');
     wrapperModal.classList.remove('scale-100', 'opacity-100');
     wrapperModal.classList.add('scale-95', 'opacity-0');
     
-    // Sembunyikan total setelah durasi animasi selesai (200ms sesuai durasi-200 Tailwind)
+    // Sembunyikan total setelah durasi animasi css selesai (200ms)
     setTimeout(() => {
         modalEl.classList.remove('flex');
         modalEl.classList.add('hidden');
