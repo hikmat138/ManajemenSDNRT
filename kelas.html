@@ -1752,150 +1752,196 @@ function initPetaModalSiswa(lat, lng) {
 function simpanPerubahanSiswa(event) {
     if (event) event.preventDefault(); 
     
-    // 1. DETEKSI NAMA ASLI SEBELUM DIEDIT (Diambil dari titipan atribut Form)
+    // 1. DETEKSI NAMA ASLI SEBELUM DIEDIT
     const formEl = document.getElementById('formEditSiswa');
     let namaAsli = formEl ? formEl.getAttribute('data-nama-asal') : '';
     
-    // Jika atribut penanda kosong, ambil cadangan dari sub-judul modal
     if (!namaAsli) {
         const subJudulTeks = document.getElementById('modalEditSubJudul')?.innerText || '';
         namaAsli = subJudulTeks.split('(')[0].trim(); 
     }
 
-    // 2. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF
-    let sumberData = [];
-    if (typeof filteredData !== "undefined" && filteredData && filteredData.length > 0) {
-        sumberData = filteredData;
-    } else if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
-        sumberData = dataFiltered;
-    } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
-        sumberData = dataSiswa;
-    } else if (typeof masterData !== "undefined") {
-        sumberData = masterData;
+    try {
+        // 2. DETEKSI SUMBER DATA UTAMA YANG SEDANG AKTIF
+        let sumberData = [];
+        if (typeof filteredData !== "undefined" && filteredData && filteredData.length > 0) {
+            sumberData = filteredData;
+        } else if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
+            sumberData = dataFiltered;
+        } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
+            sumberData = dataSiswa;
+        } else if (typeof masterData !== "undefined") {
+            sumberData = masterData;
+        }
+
+        // 3. CARI INDEX PADA DATABASE UTAMA (masterData) BERDASARKAN NAMA ASLI
+        let masterIndex = masterData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+
+        if (masterIndex === -1) {
+            tampilkanToast(`Gagal: Data murid "${namaAsli}" tidak ditemukan di database utama.`, "error");
+            return;
+        }
+
+        // Cari juga index-nya di array tampilan yang sedang aktif saat ini
+        let indexAktif = sumberData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
+
+        // Buat salinan objek sementara agar aman saat manipulasi data
+        const mSiswa = { ...masterData[masterIndex] };
+
+        // 4. PROSES PENYERAPAN DATA DARI FORM INPUT HTML
+        switch (currentMenu) {
+            case "siswa-pribadi":
+                if (document.getElementById('edit-nama')) mSiswa.nama = document.getElementById('edit-nama').value.trim();
+                if (document.getElementById('edit-nis')) mSiswa.nis = document.getElementById('edit-nis').value.trim();
+                if (document.getElementById('edit-jk')) mSiswa.jk = document.getElementById('edit-jk').value;
+                if (document.getElementById('edit-nisn')) mSiswa.nisn = document.getElementById('edit-nisn').value.trim();
+                if (document.getElementById('edit-tmpt_lahir')) mSiswa.tmpt_lahir = document.getElementById('edit-tmpt_lahir').value.trim();
+                if (document.getElementById('edit-tgl_lahir')) mSiswa.tgl_lahir = document.getElementById('edit-tgl_lahir').value.trim();
+                if (document.getElementById('edit-nik')) mSiswa.nik = document.getElementById('edit-nik').value.trim();
+                if (document.getElementById('edit-agama')) mSiswa.agama = document.getElementById('edit-agama').value.trim();
+                if (document.getElementById('edit-akte')) mSiswa.akte = document.getElementById('edit-akte').value.trim();
+                if (document.getElementById('edit-anak_ke')) mSiswa.anak_ke = document.getElementById('edit-anak_ke').value;
+                break;
+
+            case "siswa-alamat":
+                if (document.getElementById('edit-alamat')) mSiswa.alamat = document.getElementById('edit-alamat').value.trim();
+                if (document.getElementById('edit-rt')) mSiswa.rt = document.getElementById('edit-rt').value.trim();
+                if (document.getElementById('edit-rw')) mSiswa.rw = document.getElementById('edit-rw').value.trim();
+                if (document.getElementById('edit-kelurahan')) mSiswa.kelurahan = document.getElementById('edit-kelurahan').value.trim();
+                if (document.getElementById('edit-kecamatan')) mSiswa.kecamatan = document.getElementById('edit-kecamatan').value.trim();
+                if (document.getElementById('edit-kodepos')) mSiswa.kodepos = document.getElementById('edit-kodepos').value.trim();
+                if (document.getElementById('edit-jns_tinggal')) mSiswa.jns_tinggal = document.getElementById('edit-jns_tinggal').value.trim();
+                if (document.getElementById('edit-jarak')) mSiswa.jarak = document.getElementById('edit-jarak').value;
+                if (document.getElementById('edit-lintang')) mSiswa.lintang = document.getElementById('edit-lintang').value;
+                if (document.getElementById('edit-bujur')) mSiswa.bujur = document.getElementById('edit-bujur').value;
+                break;
+
+            case "siswa-keadaan":
+                if (document.getElementById('edit-kk')) mSiswa.kk = document.getElementById('edit-kk').value.trim();
+                if (document.getElementById('edit-saudara')) mSiswa.saudara = document.getElementById('edit-saudara').value;
+                if (document.getElementById('edit-transportasi')) mSiswa.transportasi = document.getElementById('edit-transportasi').value.trim();
+                if (document.getElementById('edit-kip')) mSiswa.kip = document.getElementById('edit-kip').value.trim();
+                if (document.getElementById('edit-layak_pip')) mSiswa.layak_pip = document.getElementById('edit-layak_pip').value;
+                if (document.getElementById('edit-alasan_pip')) mSiswa.alasan_pip = document.getElementById('edit-alasan_pip').value.trim();
+                if (document.getElementById('edit-disabilitas')) mSiswa.disabilitas = document.getElementById('edit-disabilitas').value.trim();
+                break;
+
+            case "siswa-ortu":
+                if (document.getElementById('edit-ayah_nama')) mSiswa.ayah_nama = document.getElementById('edit-ayah_nama').value.trim();
+                if (document.getElementById('edit-ayah_nik')) mSiswa.ayah_nik = document.getElementById('edit-ayah_nik').value.trim();
+                if (document.getElementById('edit-ayah_pendidikan')) mSiswa.ayah_pendidikan = document.getElementById('edit-ayah_pendidikan').value.trim();
+                if (document.getElementById('edit-ayah_pekerjaan')) mSiswa.ayah_pekerjaan = document.getElementById('edit-ayah_pekerjaan').value.trim();
+                if (document.getElementById('edit-ayah_penghasilan')) mSiswa.ayah_penghasilan = document.getElementById('edit-ayah_penghasilan').value.trim();
+                if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
+                if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
+                
+                if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
+                if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
+                if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
+                if (document.getElementById('edit-ibu_pekerjaan')) mSiswa.ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value.trim();
+                if (document.getElementById('edit-ibu_penghasilan')) mSiswa.ibu_penghasilan = document.getElementById('edit-ibu_penghasilan').value.trim();
+                if (document.getElementById('edit-ibu_disabilitas')) mSiswa.ibu_disabilitas = document.getElementById('edit-ibu_disabilitas').value.trim();
+                if (document.getElementById('edit-ibu_thn_lahir')) mSiswa.ibu_thn_lahir = document.getElementById('edit-ibu_thn_lahir').value.trim();
+                
+                if (document.getElementById('edit-wali_nama')) mSiswa.wali_nama = document.getElementById('edit-wali_nama').value.trim();
+                if (document.getElementById('edit-wali_nik')) mSiswa.wali_nik = document.getElementById('edit-wali_nik').value.trim();
+                if (document.getElementById('edit-wali_pendidikan')) mSiswa.wali_pendidikan = document.getElementById('edit-wali_pendidikan').value.trim();
+                if (document.getElementById('edit-wali_pekerjaan')) mSiswa.wali_pekerjaan = document.getElementById('edit-wali_pekerjaan').value.trim();
+                if (document.getElementById('edit-wali_penghasilan')) mSiswa.wali_penghasilan = document.getElementById('edit-wali_penghasilan').value.trim();
+                if (document.getElementById('edit-wali_disabilitas')) mSiswa.wali_disabilitas = document.getElementById('edit-wali_disabilitas').value.trim();
+                if (document.getElementById('edit-wali_thn_lahir')) mSiswa.wali_thn_lahir = document.getElementById('edit-wali_thn_lahir').value.trim();
+                break;
+
+            case "siswa-periodik":
+                if (document.getElementById('edit-bb')) mSiswa.bb = document.getElementById('edit-bb').value;
+                if (document.getElementById('edit-tb')) mSiswa.tb = document.getElementById('edit-tb').value;
+                if (document.getElementById('edit-hobi')) mSiswa.hobi = document.getElementById('edit-hobi').value.trim();
+                if (document.getElementById('edit-cita_cita')) mSiswa.cita_cita = document.getElementById('edit-cita_cita').value.trim();
+                break;
+
+            case "siswa-registrasi":
+                if (document.getElementById('edit-tgl_masuk')) mSiswa.tgl_masuk = document.getElementById('edit-tgl_masuk').value.trim();
+                if (document.getElementById('edit-sekolah_asal')) mSiswa.sekolah_asal = document.getElementById('edit-sekolah_asal').value.trim();
+                if (document.getElementById('edit-keterangan_siswa')) mSiswa.keterangan_siswa = document.getElementById('edit-keterangan_siswa').value.trim();
+                break;
+
+            case "siswa-kontak":
+                if (document.getElementById('edit-hp')) mSiswa.hp = document.getElementById('edit-hp').value.trim();
+                if (document.getElementById('edit-telp')) mSiswa.telp = document.getElementById('edit-telp').value.trim();
+                if (document.getElementById('edit-email')) mSiswa.email = document.getElementById('edit-email').value.trim();
+                break;
+        }
+
+        // 5. INJEKSIKAN KEMBALI HASIL MODIFIKASI KE DATABASE UTAMA PUSAT
+        masterData[masterIndex] = { ...mSiswa };
+
+        // 6. SINKRONISASI INSTAN PADA ARRAY AKTIF LAINNYA
+        if (indexAktif !== -1) {
+            sumberData[indexAktif] = { ...mSiswa };
+        }
+
+        if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
+            let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
+            if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
+        }
+
+        // --- 🌐 JIKA MAU DIKIRIM KE GOOGLE SHEETS / BACKEND (OPSIONAL) ---
+        // Anda bisa menyisipkan baris pemanggilan backend di sini jika diperlukan, contoh:
+        // if (typeof google !== "undefined") {
+        //     google.script.run.withSuccessHandler().simpanKeSpreadsheet(mSiswa);
+        // }
+
+        // 7. SEGARKAN TABEL SECARA REALTIME
+        if (typeof filterData === "function") {
+            filterData(); 
+        } else if (typeof dataFilteredAndSorted === "function") {
+            dataFilteredAndSorted(); 
+        } else if (typeof tampilkanTabelData === "function") {
+            tampilkanTabelData(); 
+        }
+        
+        // 8. TUTUP MODAL & BERIKAN NOTIFIKASI BERHASIL 🎉
+        tutupModalEdit();
+        tampilkanToast(`Berhasil menyimpan perubahan data ${mSiswa.nama || namaAsli}!`, "success");
+        console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
+
+    } catch (error) {
+        console.error("Terjadi error saat eksekusi simpan:", error);
+        tampilkanToast("Gagal menyimpan perubahan data murid.", "error");
+    }
+}
+
+// =========================================================================
+// ENGINE NOTIFIKASI TOAST (Sematkan di bawah fungsi jika belum ada)
+// =========================================================================
+function tampilkanToast(pesan, tipe = "success") {
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'fixed bottom-5 right-5 z-[100] flex flex-col gap-2';
+        document.body.appendChild(toastContainer);
     }
 
-    // 3. CARI INDEX PADA DATABASE UTAMA (masterData) BERDASARKAN NAMA ASLI
-    let masterIndex = masterData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
-
-    if (masterIndex === -1) {
-        alert(`Gagal menyimpan. Data murid bernama "${namaAsli}" tidak ditemukan di database utama (masterData).`);
-        return;
-    }
-
-    // Cari juga index-nya di array tampilan yang sedang aktif saat ini
-    let indexAktif = sumberData.findIndex(item => String(item.nama).trim() === String(namaAsli).trim());
-
-    // Buat salinan objek sementara agar aman saat manipulasi data
-    const mSiswa = { ...masterData[masterIndex] };
-
-    // 4. PROSES PENYERAPAN DATA DARI FORM INPUT HTML BAPAK
-    switch (currentMenu) {
-        case "siswa-pribadi":
-            if (document.getElementById('edit-nama')) mSiswa.nama = document.getElementById('edit-nama').value.trim();
-            if (document.getElementById('edit-nis')) mSiswa.nis = document.getElementById('edit-nis').value.trim();
-            if (document.getElementById('edit-jk')) mSiswa.jk = document.getElementById('edit-jk').value;
-            if (document.getElementById('edit-nisn')) mSiswa.nisn = document.getElementById('edit-nisn').value.trim();
-            if (document.getElementById('edit-tmpt_lahir')) mSiswa.tmpt_lahir = document.getElementById('edit-tmpt_lahir').value.trim();
-            if (document.getElementById('edit-tgl_lahir')) mSiswa.tgl_lahir = document.getElementById('edit-tgl_lahir').value.trim();
-            if (document.getElementById('edit-nik')) mSiswa.nik = document.getElementById('edit-nik').value.trim();
-            if (document.getElementById('edit-agama')) mSiswa.agama = document.getElementById('edit-agama').value.trim();
-            if (document.getElementById('edit-akte')) mSiswa.akte = document.getElementById('edit-akte').value.trim();
-            if (document.getElementById('edit-anak_ke')) mSiswa.anak_ke = document.getElementById('edit-anak_ke').value;
-            break;
-
-        case "siswa-alamat":
-            if (document.getElementById('edit-alamat')) mSiswa.alamat = document.getElementById('edit-alamat').value.trim();
-            if (document.getElementById('edit-rt')) mSiswa.rt = document.getElementById('edit-rt').value.trim();
-            if (document.getElementById('edit-rw')) mSiswa.rw = document.getElementById('edit-rw').value.trim();
-            if (document.getElementById('edit-kelurahan')) mSiswa.kelurahan = document.getElementById('edit-kelurahan').value.trim();
-            if (document.getElementById('edit-kecamatan')) mSiswa.kecamatan = document.getElementById('edit-kecamatan').value.trim();
-            if (document.getElementById('edit-kodepos')) mSiswa.kodepos = document.getElementById('edit-kodepos').value.trim();
-            if (document.getElementById('edit-jns_tinggal')) mSiswa.jns_tinggal = document.getElementById('edit-jns_tinggal').value.trim();
-            if (document.getElementById('edit-jarak')) mSiswa.jarak = document.getElementById('edit-jarak').value;
-            if (document.getElementById('edit-lintang')) mSiswa.lintang = document.getElementById('edit-lintang').value;
-            if (document.getElementById('edit-bujur')) mSiswa.bujur = document.getElementById('edit-bujur').value;
-            break;
-
-        case "siswa-keadaan":
-            if (document.getElementById('edit-kk')) mSiswa.kk = document.getElementById('edit-kk').value.trim();
-            if (document.getElementById('edit-saudara')) mSiswa.saudara = document.getElementById('edit-saudara').value;
-            if (document.getElementById('edit-transportasi')) mSiswa.transportasi = document.getElementById('edit-transportasi').value.trim();
-            if (document.getElementById('edit-kip')) mSiswa.kip = document.getElementById('edit-kip').value.trim();
-            if (document.getElementById('edit-layak_pip')) mSiswa.layak_pip = document.getElementById('edit-layak_pip').value;
-            if (document.getElementById('edit-alasan_pip')) mSiswa.alasan_pip = document.getElementById('edit-alasan_pip').value.trim();
-            if (document.getElementById('edit-disabilitas')) mSiswa.disabilitas = document.getElementById('edit-disabilitas').value.trim();
-            break;
-
-        case "siswa-ortu":
-            if (document.getElementById('edit-ayah_nama')) mSiswa.ayah_nama = document.getElementById('edit-ayah_nama').value.trim();
-            if (document.getElementById('edit-ayah_nik')) mSiswa.ayah_nik = document.getElementById('edit-ayah_nik').value.trim();
-            if (document.getElementById('edit-ayah_pendidikan')) mSiswa.ayah_pendidikan = document.getElementById('edit-ayah_pendidikan').value.trim();
-            if (document.getElementById('edit-ayah_pekerjaan')) mSiswa.ayah_pekerjaan = document.getElementById('edit-ayah_pekerjaan').value.trim();
-            if (document.getElementById('edit-ayah_penghasilan')) mSiswa.ayah_penghasilan = document.getElementById('edit-ayah_penghasilan').value.trim();
-            if (document.getElementById('edit-ayah_disabilitas')) mSiswa.ayah_disabilitas = document.getElementById('edit-ayah_disabilitas').value.trim();
-            if (document.getElementById('edit-ayah_thn_lahir')) mSiswa.ayah_thn_lahir = document.getElementById('edit-ayah_thn_lahir').value.trim();
-            
-            if (document.getElementById('edit-ibu_nama')) mSiswa.ibu_nama = document.getElementById('edit-ibu_nama').value.trim();
-            if (document.getElementById('edit-ibu_nik')) mSiswa.ibu_nik = document.getElementById('edit-ibu_nik').value.trim();
-            if (document.getElementById('edit-ibu_pendidikan')) mSiswa.ibu_pendidikan = document.getElementById('edit-ibu_pendidikan').value.trim();
-            if (document.getElementById('edit-ibu_pekerjaan')) mSiswa.ibu_pekerjaan = document.getElementById('edit-ibu_pekerjaan').value.trim();
-            if (document.getElementById('edit-ibu_penghasilan')) mSiswa.ibu_penghasilan = document.getElementById('edit-ibu_penghasilan').value.trim();
-            if (document.getElementById('edit-ibu_disabilitas')) mSiswa.ibu_disabilitas = document.getElementById('edit-ibu_disabilitas').value.trim();
-            if (document.getElementById('edit-ibu_thn_lahir')) mSiswa.ibu_thn_lahir = document.getElementById('edit-ibu_thn_lahir').value.trim();
-            
-            if (document.getElementById('edit-wali_nama')) mSiswa.wali_nama = document.getElementById('edit-wali_nama').value.trim();
-            if (document.getElementById('edit-wali_nik')) mSiswa.wali_nik = document.getElementById('edit-wali_nik').value.trim();
-            if (document.getElementById('edit-wali_pendidikan')) mSiswa.wali_pendidikan = document.getElementById('edit-wali_pendidikan').value.trim();
-            if (document.getElementById('edit-wali_pekerjaan')) mSiswa.wali_pekerjaan = document.getElementById('edit-wali_pekerjaan').value.trim();
-            if (document.getElementById('edit-wali_penghasilan')) mSiswa.wali_penghasilan = document.getElementById('edit-wali_penghasilan').value.trim();
-            if (document.getElementById('edit-wali_disabilitas')) mSiswa.wali_disabilitas = document.getElementById('edit-wali_disabilitas').value.trim();
-            if (document.getElementById('edit-wali_thn_lahir')) mSiswa.wali_thn_lahir = document.getElementById('edit-wali_thn_lahir').value.trim();
-            break;
-
-        case "siswa-periodik":
-            if (document.getElementById('edit-bb')) mSiswa.bb = document.getElementById('edit-bb').value;
-            if (document.getElementById('edit-tb')) mSiswa.tb = document.getElementById('edit-tb').value;
-            if (document.getElementById('edit-hobi')) mSiswa.hobi = document.getElementById('edit-hobi').value.trim();
-            if (document.getElementById('edit-cita_cita')) mSiswa.cita_cita = document.getElementById('edit-cita_cita').value.trim();
-            break;
-
-        case "siswa-registrasi":
-            if (document.getElementById('edit-tgl_masuk')) mSiswa.tgl_masuk = document.getElementById('edit-tgl_masuk').value.trim();
-            if (document.getElementById('edit-sekolah_asal')) mSiswa.sekolah_asal = document.getElementById('edit-sekolah_asal').value.trim();
-            if (document.getElementById('edit-keterangan_siswa')) mSiswa.keterangan_siswa = document.getElementById('edit-keterangan_siswa').value.trim();
-            break;
-
-        case "siswa-kontak":
-            if (document.getElementById('edit-hp')) mSiswa.hp = document.getElementById('edit-hp').value.trim();
-            if (document.getElementById('edit-telp')) mSiswa.telp = document.getElementById('edit-telp').value.trim();
-            if (document.getElementById('edit-email')) mSiswa.email = document.getElementById('edit-email').value.trim();
-            break;
-    }
-
-    // 5. INJEKSIKAN KEMBALI HASIL MODIFIKASI KE DATABASE UTAMA PUSAT
-    masterData[masterIndex] = { ...mSiswa };
-
-    // 6. SINKRONISASI INSTAN PADA ARRAY AKTIF LAINNYA AGAR TIDAK JADI TIMPANG
-    if (indexAktif !== -1) {
-        sumberData[indexAktif] = { ...mSiswa };
-    }
-
-    if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
-        let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
-        if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
-    }
-
-    // 7. SEGARKAN TABEL SECARA REALTIME (Mendukung filter data & render tabel terpisah)
-    if (typeof filterData === "function") {
-        filterData(); // Jika memakai sistem pagination, biarkan ini yang bekerja melahirkan ulang filteredData
-    } else if (typeof dataFilteredAndSorted === "function") {
-        dataFilteredAndSorted(); 
+    const toast = document.createElement('div');
+    if (tipe === "success") {
+        toast.className = "bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 text-xs font-semibold transform translate-y-5 opacity-0 transition-all duration-300 border border-emerald-500";
+        toast.innerHTML = `<i class="fa-solid fa-circle-check text-sm"></i> <span>${pesan}</span>`;
     } else {
-        tampilkanTabelData(); 
+        toast.className = "bg-rose-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 text-xs font-semibold transform translate-y-5 opacity-0 transition-all duration-300 border border-rose-500";
+        toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-sm"></i> <span>${pesan}</span>`;
     }
-    
-    tutupModalEdit();
-    console.log(`Data murid "${namaAsli}" sukses diperbarui di database lokal.`);
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.remove('translate-y-5', 'opacity-0');
+    }, 10);
+
+    setTimeout(() => {
+        toast.classList.add('translate-y-5', 'opacity-0');
+        setTimeout(() => { toast.remove(); }, 300);
+    }, 3500);
 }
 
 function tampilkanTabelData() {
