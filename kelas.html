@@ -1878,56 +1878,56 @@ function simpanPerubahanSiswa(event) {
                 break;
         }
 
-        // 5. TAMPILKAN INDIKASI PROSES (Modal sengaja ditahan biar user tidak melakukan klik ganda)
+        // 5. TAMPILKAN INDIKASI PROSES KEPADA USER
         tampilkanToast("Sedang menyimpan ke Google Sheets, mohon tunggu...", "info");
 
-        // --- 🌐 INTEGRASI SINKRONISASI REALTIME KE GOOGLE SHEETS ---
-        if (typeof google !== "undefined" && google.script && google.script.run) {
-            let paketData = {
-                action: "EDIT_IDENTITAS",
-                rowIndex: masterIndex + 2, 
-                payload: mSiswa
-            };
+        // 🔥 URL WEB APP GOOGLE APPS SCRIPT BAPAK (Salin Tautan /exec Terbaru Bapak ke Sini)
+        const URL_WEB_APP = "https://script.google.com/macros/s/XXXXXXXXX/exec"; 
 
-            google.script.run
-                .withSuccessHandler(function(respons) {
-                    console.log("Respons dari server:", respons);
-                    if (respons && respons.status === "success") {
-                        // Jalankan sinkronisasi data lokal web apabila server sudah sukses menulis ke Sheets
-                        masterData[masterIndex] = { ...mSiswa };
-                        if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
-                        
-                        if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
-                            let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
-                            if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
-                        }
+        let paketData = {
+            action: "EDIT_IDENTITAS",
+            rowIndex: masterIndex + 2, 
+            payload: mSiswa
+        };
 
-                        // Refresh UI Tabel Panel Guru Bapak
-                        if (typeof filterData === "function") filterData();
-                        else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
+        // 🌐 PROSES TEMBAK API LINTAS SERVER (GitHub ke Google Sheets)
+        fetch(URL_WEB_APP, {
+            method: "POST",
+            redirect: "follow", // Wajib agar menangani pengalihan internal server Google macros
+            body: JSON.stringify(paketData)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Respons jaringan bermasalah.");
+            return response.json();
+        })
+        .then(respons => {
+            console.log("Respons dari server Google Sheets:", respons);
+            if (respons && respons.status === "success") {
+                
+                // Sinkronisasi data lokal web apabila basis data cloud spreadsheet sukses diperbarui
+                masterData[masterIndex] = { ...mSiswa };
+                if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
+                
+                if (typeof dataSiswa !== "undefined" && dataSiswa !== masterData) {
+                    let idxSiswa = dataSiswa.findIndex(item => String(item.nama).trim() === namaAsli);
+                    if (idxSiswa !== -1) dataSiswa[idxSiswa] = { ...mSiswa };
+                }
 
-                        // 🔥 MODAL KITA TUTUP DENGAN ANIMASI TRANSISI BAWAAN BAPAK SEKARANG
-                        tutupModalEdit(); 
-                        tampilkanToast(respons.message || "Data murid berhasil diperbarui!", "success");
-                    } else {
-                        // Jika server mengembalikan status gagal (contoh baris out of bounds)
-                        tampilkanToast(respons.message || "Gagal menyimpan perubahan ke spreadsheet.", "error");
-                    }
-                })
-                .withFailureHandler(function(err) {
-                    console.error("Koneksi gagal atau Error Apps Script:", err);
-                    tampilkanToast("Koneksi server terputus, silakan coba beberapa saat lagi.", "error");
-                })
-                .jembatanEditSiswa(paketData); 
-        } else {
-            // Mode fallback lokal apabila dijalankan di luar ekosistem Web App resmi Google (.exec)
-            masterData[masterIndex] = { ...mSiswa };
-            if (indexAktif !== -1) sumberData[indexAktif] = { ...mSiswa };
-            if (typeof filterData === "function") filterData();
-            
-            tutupModalEdit();
-            tampilkanToast(`[Lokal] Perubahan data ${mSiswa.nama} berhasil diterapkan sementara.`, "warning");
-        }
+                // Segarkan UI Tabel Panel Guru
+                if (typeof filterData === "function") filterData();
+                else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
+
+                // Tutup modal secara otomatis & tampilkan pesan sukses
+                tutupModalEdit(); 
+                tampilkanToast(respons.message || "Data murid berhasil diperbarui!", "success");
+            } else {
+                tampilkanToast(respons.message || "Gagal menyimpan perubahan ke spreadsheet.", "error");
+            }
+        })
+        .catch(err => {
+            console.error("Koneksi gagal atau Error API Fetch:", err);
+            tampilkanToast("Gagal terhubung ke Google Sheets. Silakan coba beberapa saat lagi.", "error");
+        });
 
     } catch (error) {
         console.error("Terjadi error runtime pada javascript web:", error);
