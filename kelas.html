@@ -15,7 +15,37 @@
         :root {
             --primary: #2563eb;
             --bg-main: #f8fafc;
-            --sidebar-bg: #ffffff;
+            --sidebar-bg: #ffffff;function bukaModalEdit(namaMurid) {
+    // 1. DETEKSI SUMBER DATA YANG SEDANG AKTIF
+    let sumberData = [];
+    if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
+        sumberData = dataFiltered;
+    } else if (typeof dataSiswa !== "undefined" && dataSiswa) {
+        sumberData = dataSiswa;
+    } else if (typeof dataListYgAktif !== "undefined") { 
+        sumberData = dataListYgAktif;
+    }
+
+    // 2. CARI INDEKS BERDASARKAN NAMA
+    let index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
+    
+    // Jika di data filter aktif tidak ketemu, cari langsung ke masterData pusat sebagai cadangan
+    if (index === -1 && typeof masterData !== "undefined") {
+        index = masterData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
+        if (index !== -1) {
+            sumberData = masterData; // Alihkan sumber ke master data jika ketemu
+        }
+    }
+
+    const murid = sumberData[index];
+    if (!murid) {
+        console.error("Gagal membuka modal: Murid bernama '" + namaMurid + "' tidak ditemukan.");
+        alert("Data murid tidak ditemukan!");
+        return;
+    }
+
+    // 3. AMANKAN ELEMEN UTAMA MODAL SEBELUM MERENDER ISI
+    const modalEl = document.getElementById('modalEditSiswa');
             --text-slate: #64748b;
         }
 
@@ -745,7 +775,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.anak_ke || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -769,7 +799,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.bujur || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -790,7 +820,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.disabilitas || 'Tidak'}</td>
                     <td class="p-3 whitespace-nowrap">${row.umur || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -824,7 +854,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.wali_disabilitas || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.wali_thn_lahir || '-'}</td>
                     <td class="p-3 text-center border-l whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -842,7 +872,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.hobi || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.cita_cita || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -860,7 +890,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.status_aktif || 'Aktif'}</td>
                     <td class="p-3 whitespace-nowrap">${row.keterangan_siswa || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -876,7 +906,7 @@ function renderTabelSiswa(dataList) {
                     <td class="p-3 whitespace-nowrap">${row.telp || '-'}</td>
                     <td class="p-3 whitespace-nowrap">${row.email || '-'}</td>
                     <td class="p-3 text-center whitespace-nowrap">
-                        <button onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700">
+                        <button type="button" onclick="bukaModalEdit('${item.nama}')">
     <i class="fa-solid fa-gear"></i>
 </button>
                     </td>
@@ -1307,7 +1337,7 @@ let indeksSiswaDipilih = null;
 let mapAplikasi = null;
 let penandaMap = null;
 
-function bukaModalEdit(index) {
+function bukaModalEdit(namaMurid) {
     // 1. DETEKSI SUMBER DATA YANG SEDANG AKTIF
     let sumberData = [];
     if (typeof dataFiltered !== "undefined" && dataFiltered && dataFiltered.length > 0) {
@@ -1318,10 +1348,20 @@ function bukaModalEdit(index) {
         sumberData = dataListYgAktif;
     }
 
-    // 2. AMBIL DATA MURID BERDASARKAN INDEKS
+    // 2. CARI INDEKS BERDASARKAN NAMA
+    let index = sumberData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
+    
+    // Jika di data filter aktif tidak ketemu, cari langsung ke masterData pusat sebagai cadangan
+    if (index === -1 && typeof masterData !== "undefined") {
+        index = masterData.findIndex(item => String(item.nama).trim() === String(namaMurid).trim());
+        if (index !== -1) {
+            sumberData = masterData; // Alihkan sumber ke master data jika ketemu
+        }
+    }
+
     const murid = sumberData[index];
     if (!murid) {
-        console.error("Gagal membuka modal: Data murid pada indeks " + index + " tidak ditemukan.");
+        console.error("Gagal membuka modal: Murid bernama '" + namaMurid + "' tidak ditemukan.");
         alert("Data murid tidak ditemukan!");
         return;
     }
@@ -1645,9 +1685,9 @@ function simpanPerubahanSiswa(event) {
             <td class="border px-4 py-2">${item.nama}</td>
             <td class="border px-4 py-2">${item.nisn || '-'}</td>
             <td class="border px-4 py-2 text-center">
-                <button type="button" onclick="bukaModalEdit(${index})" class="text-blue-500 hover:text-blue-700 mx-1">
-                    <i class="fa-solid fa-gear"></i>
-                </button>
+                <button type="button" onclick="bukaModalEdit('${item.nama}')">
+    <i class="fa-solid fa-gear"></i>
+</button>
             </td>
         </tr>`;
     });
