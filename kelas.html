@@ -1213,14 +1213,34 @@ function initCharts() {
         });
 
         // Penghasilan Orang Tua
-        ['ayah', 'ibu'].forEach(role => {
-            let png = String(s[`${role}_penghasilan`] || '').toLowerCase();
+       ['ayah', 'ibu'].forEach(role => {
+            let png = String(s[`${role}_penghasilan`] || '').toLowerCase().trim();
             let targetObj = role === 'ayah' ? dataDashboard.penghasilanAyah : dataDashboard.penghasilanIbu;
-            if (png.includes('kurang') || png.includes('<') || png.includes('500') || png.includes('1 juta')) targetObj.Kurang1Juta++;
-            else if (png.includes('1-2') || png.includes('1 juta - 2')) targetObj.Antara1_2Juta++;
-            else if (png.includes('2-5') || png.includes('2 juta - 5')) targetObj.Antara2_5Juta++;
-            else if (png.includes('lebih') || png.includes('>') || png.includes('5 juta')) targetObj.Lebih5Juta++;
-            else targetObj.TidakBerpenghasilan++;
+            
+            // 1. Deteksi Jika Tidak Berpenghasilan / Kosong / Strip
+            if (png === '' || png === '-' || png.includes('tidak') || png.includes('irt') || png.includes('rumah tangga')) {
+                targetObj.TidakBerpenghasilan++;
+            }
+            // 2. Deteksi Rentang 2 Juta - 5 Juta (Prioritas Atas)
+            else if (png.includes('2-5') || png.includes('2.000') || png.includes('2 juta') || png.includes('4.999')) {
+                targetObj.Antara2_5Juta++;
+            }
+            // 3. Deteksi Rentang 1 Juta - 2 Juta
+            else if (png.includes('1-2') || png.includes('1.000') || png.includes('1.999') || png.includes('1 juta - 2') || png.includes('1 juta - 1')) {
+                targetObj.Antara1_2Juta++;
+            }
+            // 4. Deteksi Lebih dari 5 Juta
+            else if (png.includes('lebih') || png.includes('>') || png.includes('5 juta') || png.includes('5.000')) {
+                targetObj.Lebih5Juta++;
+            }
+            // 5. Fallback Terakhir: Kurang dari 1 Juta / Kurang dari 500rb
+            else if (png.includes('kurang') || png.includes('<') || png.includes('500') || png.includes('rp')) {
+                targetObj.Kurang1Juta++;
+            }
+            // Jika ada teks aneh yang lolos, masukkan ke tidak berpenghasilan/belum diisi
+            else {
+                targetObj.TidakBerpenghasilan++;
+            }
         });
 
         // Bulan Lahir
