@@ -128,6 +128,82 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
+<div id="modalAction" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate__animated animate__zoomIn animate__faster">
+        <div id="modalHeader" class="p-4 text-white font-bold uppercase text-center shadow-md bg-blue-600">PROSES REGISTRASI</div>
+        <div class="p-6 space-y-4">
+            
+            <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <div>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Nama Murid</label>
+                    <p id="m-nama" class="font-bold text-gray-700 truncate">-</p>
+                </div>
+                <div>
+                    <label class="block text-[10px] text-gray-400 font-bold uppercase">Kelas Saat Ini</label>
+                    <p id="m-kelas" class="font-bold text-gray-700">-</p>
+                </div>
+            </div>
+
+            <div id="form-lulus" class="hidden space-y-3">
+                <div class="grid grid-cols-2 gap-4 text-xs bg-blue-50/50 p-2 rounded-lg border border-blue-100">
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NIS</label>
+                        <p id="m-nis" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 font-bold uppercase">NISN</label>
+                        <p id="m-nisn" class="font-bold text-gray-700">-</p>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-gray-400 font-bold uppercase">Tempat, Tanggal Lahir</label>
+                        <p id="m-ttl" class="font-bold text-gray-700">-</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tahun Ajaran</label>
+                        <input type="text" id="m-tapel" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="2025/2026">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase">Tanggal Lulus</label>
+                        <input type="date" id="m-tgl-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">No. SK Kelulusan</label>
+                    <input type="text" id="m-sk-lulus" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="421/001/SD-RT/2026">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase">Nomor Ijazah</label>
+                    <input type="text" id="m-ijazah" class="w-full border p-2 rounded-lg text-sm outline-none focus:border-green-500" placeholder="DN-28 DI 000xxxx">
+                </div>
+            </div>
+
+            <div id="form-naik-kelas" class="hidden space-y-4 py-4 text-center">
+                <div class="flex justify-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center animate-bounce">
+                        <i class="fas fa-arrow-up text-2xl text-blue-600"></i>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600 px-4">Murid ini akan diproses untuk <b>Naik Kelas</b> secara otomatis ke tingkat selanjutnya.</p>
+                <div class="bg-blue-600 p-3 rounded-xl shadow-lg mx-8">
+                    <p class="text-[10px] text-blue-200 font-bold uppercase">Kelas Tujuan</p>
+                    <p id="m-target-kelas" class="text-xl font-black text-white italic">MEMPROSES...</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-4">
+                <button onclick="closeModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold uppercase text-[10px] hover:bg-gray-200 transition">
+                    Batal
+                </button>
+                <button id="btnKonfirmasi" onclick="konfirmasiProses()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg transition active:scale-95">
+                    Konfirmasi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="modalEditSiswa" class="fixed inset-0 z-50 bg-gray-950 bg-opacity-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-200" style="display: none;">
     
     <div id="modalEditWrapper" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all transform scale-95 opacity-0 duration-200">
@@ -444,11 +520,8 @@
 
         <div id="section-siswa-registrasi" class="section-murid hidden bg-white rounded-xl border shadow-sm overflow-hidden animate-fade-in">
             <div class="p-4 border-b bg-amber-50/40 flex justify-end gap-2">
-    <button id="btn-naik-massal" onclick="prosesKenaikanMassal()" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase transition">
+    <button id="btn-naik-massal" onclick="prosesMasal('NAIK_SEMUA')" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase transition">
         <i class="fas fa-angles-up mr-1"></i> Naik Semua Kelas
-    </button>
-    <button id="btn-lulus-massal" onclick="prosesKelulusanMassal()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold uppercase transition hidden">
-        <i class="fas fa-graduation-cap mr-1"></i> Luluskan Kelas 6 Semua
     </button>
 </div>
             <div class="overflow-x-auto" style="max-height: 60vh;">
@@ -2226,167 +2299,221 @@ function tampilkanToast(pesan, tipe = "success") {
 // =========================================================================
 // 1. VARIABEL GLOBAL PENAMPUNG DATA REGISTRASI MUTASI SATUAN
 // =========================================================================
-let muridTerpilih = null;
-let jenisProsesTerpilih = "";
+// Variabel Control Global Sementara
+let selectedMuridId = null; 
 
 // =========================================================================
-// 2. FUNGSI AWAL SAAT TOMBOL DI TABEL DIKLIK (Menerima INDEX Rombel)
+// 1. FUNGSI MEMBUKA MODAL BERDASARKAN INDEX BARIS TABEL
 // =========================================================================
 function bukaModalRegistrasiViaIndex(jenisAksi, index) {
-    // Cari sumber array data yang sedang aktif dan termuat di tabel Bapak
+    // Penyelarasan penampung data aktif di aplikasi Pak Hikmat
     let targetData = [];
     if (typeof filteredData !== "undefined" && filteredData) targetData = filteredData;
     else if (typeof dataFiltered !== "undefined" && dataFiltered) targetData = dataFiltered;
     else if (typeof dataSiswa !== "undefined" && dataSiswa) targetData = dataSiswa;
     else if (typeof masterData !== "undefined") targetData = masterData;
 
-    // Ambil data objek murid berdasarkan index baris tabel
     let dataMurid = targetData[index];
     if (!dataMurid) {
-        console.error("Data murid pada index " + index + " tidak ditemukan.");
+        console.error("Data murid tidak ditemukan pada index: " + index);
         return;
     }
 
-    // Tampilkan notifikasi konfirmasi awal bawaan browser
-    let pesanKonfirmasi = jenisAksi === "LULUS" 
-        ? `Apakah Anda yakin ingin memproses kelulusan murid bernama ${dataMurid.nama}?` 
-        : `Apakah Anda yakin ingin memproses kenaikan kelas murid bernama ${dataMurid.nama}?`;
+    // Set ID Murid Unik (Gunakan .id atau .nis sesuai struktur kolom A Sheet Bapak)
+    selectedMuridId = dataMurid.id || dataMurid.nis || "";
+    
+    // Tampilkan data ringkas murid di bagian atas modal
+    if (document.getElementById("m-nama")) document.getElementById("m-nama").innerText = dataMurid.nama || "-";
+    if (document.getElementById("m-kelas")) document.getElementById("m-kelas").innerText = dataMurid.kelas || "-";
 
-    if (!confirm(pesanKonfirmasi)) return; // Berhenti jika user membatalkan (Klik Cancel)
-
-    // Kunci data murid terpilih ke penampung global sementara
-    muridTerpilih = dataMurid;
-    jenisProsesTerpilih = jenisAksi;
-
-    // Bersihkan/Sembunyikan semua kontainer form di dalam modal agar tidak tumpang tindih
+    // Reset dan sembunyikan semua form boks kontainer biar steril
     if (document.getElementById("form-lulus")) document.getElementById("form-lulus").classList.add("hidden");
     if (document.getElementById("form-naik-kelas")) document.getElementById("form-naik-kelas").classList.add("hidden");
 
-    // Tarik elemen pembungkus modal utama admin.html Bapak
-    const modalKontainerUtama = document.getElementById("modalEdit") || document.getElementById("modal-utama");
-
-    // Pasang Nama Murid Terpilih pada Judul Modal biar informatif
-    const labelNamaSiswaModal = document.getElementById("modalEditTitle") || document.getElementById("modal-title");
-    if (labelNamaSiswaModal) {
-        labelNamaSiswaModal.innerText = `${jenisAksi === 'LULUS' ? 'Proses Kelulusan' : 'Proses Kenaikan Kelas'} : ${dataMurid.nama}`;
-    }
+    const modalHeader = document.getElementById("modalHeader");
+    const btnKonfirmasi = document.getElementById("btnKonfirmasi");
 
     // -----------------------------------------------------------------
-    // CABANG OPSI A: KELULUSAN SATUAN
+    // CABANG A: AKSI KELULUSAN INDIVIDU
     // -----------------------------------------------------------------
     if (jenisAksi === "LULUS") {
-        if (document.getElementById("m-nis")) document.getElementById("m-nis").innerText = dataMurid.nis || dataMurid.id || "-";
-        if (document.getElementById("m-nisn")) document.getElementById("m-nisn").innerText = dataMurid.nisn || "-";
-        
-        let ttlTeks = `${dataMurid.tempat_lahir || '-'}, ${dataMurid.tgl_lahir || '-'}`;
-        if (document.getElementById("m-ttl")) document.getElementById("m-ttl").innerText = ttlTeks;
+        if (modalHeader) {
+            modalHeader.innerText = "PROSES KELULUSAN MURID";
+            modalHeader.className = "p-4 text-white font-bold uppercase text-center shadow-md bg-emerald-600";
+        }
+        if (btnKonfirmasi) {
+            btnKonfirmasi.innerText = "KONFIRMASI LULUS";
+            btnKonfirmasi.className = "flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg transition active:scale-95";
+        }
 
-        // Berikan nilai default siap pakai pada kolom input modal kelulusan
+        // Isi data pelengkap kelulusan
+        if (document.getElementById("m-nis")) document.getElementById("m-nis").innerText = dataMurid.nis || "-";
+        if (document.getElementById("m-nisn")) document.getElementById("m-nisn").innerText = dataMurid.nisn || "-";
+        if (document.getElementById("m-ttl")) {
+            document.getElementById("m-ttl").innerText = `${dataMurid.tmpt_lahir || '-'}, ${dataMurid.tgl_lahir || '-'}`;
+        }
+
+        // Beri nilai bawaan input
         if (document.getElementById("m-tapel")) document.getElementById("m-tapel").value = "2025/2026";
         if (document.getElementById("m-tgl-lulus")) document.getElementById("m-tgl-lulus").value = new Date().toISOString().split('T')[0];
         if (document.getElementById("m-sk-lulus")) document.getElementById("m-sk-lulus").value = "";
         if (document.getElementById("m-ijazah")) document.getElementById("m-ijazah").value = "";
 
-        // Buka form kelulusan
         if (document.getElementById("form-lulus")) document.getElementById("form-lulus").classList.remove("hidden");
     } 
     // -----------------------------------------------------------------
-    // CABANG OPSI B: KENAIKAN KELAS SATUAN
+    // CABANG B: AKSI KENAIKAN KELAS INDIVIDU
     // -----------------------------------------------------------------
     else if (jenisAksi === "NAIK_KELAS") {
-        // Otomatisasi teks kalkulasi target tingkatan kelas berikutnya
+        if (modalHeader) {
+            modalHeader.innerText = "PROSES KENAIKAN KELAS";
+            modalHeader.className = "p-4 text-white font-bold uppercase text-center shadow-md bg-blue-600";
+        }
+        if (btnKonfirmasi) {
+            btnKonfirmasi.innerText = "KONFIRMASI NAIK KELAS";
+            btnKonfirmasi.className = "flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] shadow-lg transition active:scale-95";
+        }
+
+        // Kalkulasi target kenaikan rombel secara otomatis
         let klsLama = String(dataMurid.kelas || "").trim();
         let angkaKelas = parseInt(klsLama) || 0;
-        let hurufKelas = klsLama.replace(/[0-9]/g, ''); // Ambil pararelnya (Misal: "A", "B", atau "")
-        
+        let hurufKelas = klsLama.replace(/[0-9]/g, ''); 
         let targetKelasTeks = angkaKelas > 0 ? `KELAS ${(angkaKelas + 1) + hurufKelas}` : "TINGKAT LANJUT";
 
         if (document.getElementById("m-target-kelas")) {
             document.getElementById("m-target-kelas").innerText = targetKelasTeks;
         }
 
-        // Buka form kenaikan kelas
         if (document.getElementById("form-naik-kelas")) document.getElementById("form-naik-kelas").classList.remove("hidden");
     }
 
-    // Munculkan jendela modal utama ke monitor
-    if (modalKontainerUtama) modalKontainerUtama.classList.remove("hidden");
+    // Tampilkan jendela modal aksi ke layar monitor
+    const modalAksi = document.getElementById("modalAction");
+    if (modalAksi) modalAksi.classList.remove("hidden");
 }
 
 // =========================================================================
-// 3. FUNGSI AKHIR SAAT TOMBOL "SIMPAN / KONFIRMASI" DI MODAL DIKLIK USER
+// 2. FUNGSI ASYNC KONFIRMASI SIMPAN DATA KE API GOOGLE SHEETS (INDIVIDU)
 // =========================================================================
-function konfirmasiProses() {
-    if (!muridTerpilih) return;
+async function konfirmasiProses() {
+    if (!selectedMuridId) return;
 
-    // Susun struktur awal paket kiriman data (Payload)
-    let paketData = {
-        action: jenisProsesTerpilih,
-        nis: muridTerpilih.id || muridTerpilih.nis || "" // Prioritaskan ID unik murid di kolom A
+    const btn = document.getElementById('btnKonfirmasi');
+    const txt = btn.innerText.toUpperCase();
+
+    let actionType = "";
+    if (txt.includes("LULUS")) actionType = "LULUS";
+    else if (txt.includes("NAIK")) actionType = "NAIK_KELAS";
+
+    if (!actionType) return alert("Jenis aksi tidak dikenali!");
+
+    // Menata muatan kiriman data paket (Payload JSON)
+    const payload = {
+        id: selectedMuridId,
+        action: actionType,
+        tapel: document.getElementById('m-tapel')?.value || "",
+        tglLulus: document.getElementById('m-tgl-lulus')?.value || "",
+        skLulus: document.getElementById('m-sk-lulus')?.value || "",
+        noIjazah: document.getElementById('m-ijazah')?.value || "",
+        tglKeluar: document.getElementById('m-tgl-keluar')?.value || "",
+        alasan: document.getElementById('m-alasan')?.value || "",
+        tujuan: document.getElementById('m-tujuan')?.value || ""
     };
 
-    // Jika aksinya kelulusan, rampas isian teks dari form input modal
-    if (jenisProsesTerpilih === "LULUS") {
-        paketData.tapel = document.getElementById("m-tapel") ? document.getElementById("m-tapel").value : "2025/2026";
-        paketData.tglLulus = document.getElementById("m-tgl-lulus") ? document.getElementById("m-tgl-lulus").value : "";
-        paketData.skLulus = (document.getElementById("m-sk-lulus") && document.getElementById("m-sk-lulus").value) ? document.getElementById("m-sk-lulus").value : "-";
-        paketData.noIjazah = (document.getElementById("m-ijazah") && document.getElementById("m-ijazah").value) ? document.getElementById("m-ijazah").value : "-";
+    // Validasi data wajib isi
+    if (actionType === "LULUS" && !payload.tapel) return alert("Tahun Ajaran Kelulusan harus diisi!");
 
-        if (!paketData.tapel || !paketData.tglLulus) {
-            alert("Tahun Ajaran Kelulusan dan Tanggal Lulus tidak boleh dikosongkan!");
-            return;
-        }
-    }
+    // Efek Animasi Loading Tombol
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Memproses...`;
 
-    // Tampilkan notifikasi loading/proses jika fungsi toast tersedia
-    if (typeof tampilkanToast === "function") {
-        tampilkanToast("Sedang memperbarui database Sekolah...", "info");
-    }
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        });
+        
+        const res = await response.json();
 
-    // Kirim paket data ke URL Gerbang API Google Apps Script (doPost)
-    fetch(API_URL, {
-        method: "POST",
-        mode: "cors",
-        headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(paketData)
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Koneksi internet bermasalah atau API internal server sibuk.");
-        return res.json();
-    })
-    .then(respons => {
-        if (respons && respons.status === "success") {
-            if (typeof tampilkanToast === "function") {
-                tampilkanToast(respons.message || "Data murid berhasil diproses!", "success");
-            } else {
-                alert(respons.message || "Sukses memperbarui data!");
-            }
-
-            // Jalankan fungsi penutup modal bawaan aplikasi web admin Bapak
-            if (typeof closeModal === "function") closeModal();
-            else if (typeof tutupModal === "function") tutupModal();
-            else {
-                const modalKontainerUtama = document.getElementById("modalEdit") || document.getElementById("modal-utama");
-                if (modalKontainerUtama) modalKontainerUtama.classList.add("hidden");
-            }
-
-            // Bersihkan variabel memori global setelah berhasil
-            muridTerpilih = null;
-            jenisProsesTerpilih = "";
-
-            // Tarik ulang database Sheets dan render tabel agar perubahan rombel langsung kelihatan
-            if (typeof ambilDataDariSheets === "function") ambilDataDariSheets();
-            else if (typeof tampilkanTabelData === "function") tampilkanTabelData();
+        if (res.status === "success") {
+            alert(`✅ Berhasil di-update: ${actionType.replace('_', ' ')}`);
+            closeModal();
+            
+            // Memanggil fungsi refresh database di web Bapak
+            if (typeof loadData === "function") loadData();
+            else if (typeof ambilDataDariSheets === "function") ambilDataDariSheets();
         } else {
-            alert(respons.message || "Gagal memperbarui database Google Sheets.");
+            alert("❌ Gagal: " + res.message);
         }
-    })
-    .catch(err => {
+    } catch (err) {
         console.error(err);
-        alert("Gagal terhubung ke server cloud Google. Silakan periksa jaringan internet sekolah.");
-    });
+        alert("❌ Gagal terhubung dengan server Google Apps Script.");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        selectedMuridId = null; // Kosongkan kunci memori kembali
+    }
+}
+
+// =========================================================================
+// 3. FUNGSI UNTUK PROSES MASAL (NAIK SEMUA KELAS SEKALIGUS)
+// =========================================================================
+async function prosesMasal(jenisAksi) {
+    if (jenisAksi === "NAIK_SEMUA") {
+        let konfirmasiMasal = confirm("⚠️ PERINGATAN UTAMA:\n\nApakah Anda yakin ingin MENAIKKAN KELAS SEMUA MURID AKTIF secara massal?\n\n*Catatan: Murid Kelas 1 s.d Kelas 5 otomatis naik 1 tingkat. Murid Kelas 6 tidak akan ikut terpengaruh fungsi ini.");
+        if (!konfirmasiMasal) return;
+
+        const btnMasal = document.getElementById('btn-naik-massal');
+        const originalMasalHTML = btnMasal ? btnMasal.innerHTML : "";
+        
+        if (btnMasal) {
+            btnMasal.disabled = true;
+            btnMasal.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Memproses Kenaikan Masal...`;
+        }
+
+        const payloadMasal = {
+            action: "NAIK_SEMUA" // Kode pemicu case switch di backend Google Apps Script Bapak
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payloadMasal)
+            });
+            
+            const res = await response.json();
+
+            if (res.status === "success") {
+                alert(`✅ SUKSES MASAL:\n${res.message || 'Semua tingkatan kelas berhasil dinaikkan satu tingkat!'}`);
+                if (typeof loadData === "function") loadData();
+                else if (typeof ambilDataDariSheets === "function") ambilDataDariSheets();
+            } else {
+                alert("❌ Gagal Memproses Masal: " + res.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("❌ Hubungan server cloud terputus saat memproses kenaikan kelas masal.");
+        } finally {
+            if (btnMasal) {
+                btnMasal.disabled = false;
+                btnMasal.innerHTML = originalMasalHTML;
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 4. FUNGSI PENUTUP MODAL AKSI REGISTRASI
+// =========================================================================
+function closeModal() {
+    const modalAksi = document.getElementById("modalAction");
+    if (modalAksi) modalAksi.classList.add("hidden");
+    selectedMuridId = null;
 }
 </script>
 </body>
