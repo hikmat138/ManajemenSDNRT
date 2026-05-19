@@ -1462,57 +1462,68 @@ function bukaModalEdit(namaMurid) {
             </div>`;
     } 
     else if (currentMenu === "siswa-alamat") {
-        htmlInput = `
-            <div class="md:col-span-2 font-semibold text-sm text-blue-600 border-b pb-1 mb-2">Data Alamat & Domisili</div>
-            <div class="md:col-span-2">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Jalan</label>
-                <input type="text" id="edit-alamat" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">RT</label>
-                <input type="text" id="edit-rt" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">RW</label>
-                <input type="text" id="edit-rw" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Kelurahan / Desa</label>
-                <input type="text" id="edit-kelurahan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Kecamatan</label>
-                <input type="text" id="edit-kecamatan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Kode Pos</label>
-                <input type="text" id="edit-kodepos" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Tempat Tinggal</label>
-                <input type="text" id="edit-jns_tinggal" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Jarak Rumah ke Sekolah (Km)</label>
-                <input type="text" id="edit-jarak" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+    htmlInput = `
+        <div class="md:col-span-2 font-semibold text-sm text-blue-600 border-b pb-1 mb-2">Data Alamat & Domisili</div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Alamat Jalan</label>
+            <input type="text" id="edit-alamat" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">RT</label>
+            <input type="text" id="edit-rt" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">RW</label>
+            <input type="text" id="edit-rw" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Kelurahan / Desa</label>
+            <input type="text" id="edit-kelurahan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Kecamatan</label>
+            <input type="text" id="edit-kecamatan" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Kode Pos</label>
+            <input type="text" id="edit-kodepos" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Jenis Tempat Tinggal</label>
+            <input type="text" id="edit-jns_tinggal" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+        </div>
+        
+        <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Jarak Rumah ke Sekolah</label>
+            <select id="edit-jarak" class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-50 focus:bg-white outline-none">
+                <option value="">-- Pilih Estimasi Jarak --</option>
+                <option value="Kurang dari 1 KM">Kurang dari 1 KM</option>
+                <option value="Lebih dari 1 KM">Lebih dari 1 KM</option>
+            </select>
+        </div>
+        
+        <div class="md:col-span-2 mt-2">
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Cari Lokasi / Nama Tempat</label>
+            <div class="flex gap-2 mb-2">
+                <input type="text" id="cari-peta-alamat" placeholder="Ketik nama kampung, jalan, atau desa... (Contoh: Ranca Tales Serang)" class="w-full px-3 py-2 border rounded-lg text-sm bg-white outline-none focus:ring-1 focus:ring-blue-500">
+                <button type="button" onclick="cariAlamatKePeta()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition active:scale-95">Cari</button>
             </div>
             
-            <div class="md:col-span-2 mt-2">
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Lokasi Rumah Murid (Geser Pin Peta)</label>
-                <div id="mapBoxSiswa" class="w-full h-52 bg-gray-100 rounded-lg border relative z-10"></div>
-                <p class="text-[10px] text-gray-400 mt-1">*Klik pada peta atau geser pin tepat di atap rumah murid.</p>
-            </div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Lokasi Rumah Murid (Geser Pin Peta)</label>
+            <div id="mapBoxSiswa" class="w-full h-52 bg-gray-100 rounded-lg border relative z-10"></div>
+            <p class="text-[10px] text-gray-400 mt-1">*Klik pada peta, cari alamat, atau geser pin tepat di atap rumah murid.</p>
+        </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Lintang (Latitude)</label>
-                <input type="text" id="edit-lintang" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Bujur (Longitude)</label>
-                <input type="text" id="edit-bujur" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
-            </div>
-        `;
-    }
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 mb-1">Lintang (Latitude)</label>
+            <input type="text" id="edit-lintang" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
+        </div>
+        <div>
+            <label class="block text-xs font-semibold text-gray-500 mb-1">Bujur (Longitude)</label>
+            <input type="text" id="edit-bujur" readonly class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-500 outline-none select-none">
+        </div>
+    `;
+}
     else if (currentMenu === "siswa-keadaan") {
         htmlInput = `
             <div class="md:col-span-2 font-semibold text-sm text-blue-600 border-b pb-1 mb-2">Data Keadaan & PIP Murid</div>
@@ -1786,10 +1797,65 @@ function initPetaModalSiswa(lat, lng) {
         petaModalInstance.panTo(kordinatKlik);
     });
 
+    // 🔥 FITUR TAMBAHAN: Biar user bisa tekan tombol 'Enter' saat mengetik alamat langsung mencari
+    const inputCariTeks = document.getElementById('cari-peta-alamat');
+    if (inputCariTeks) {
+        // Kosongkan kotak pencarian setiap kali peta di-load ulang untuk murid baru
+        inputCariTeks.value = ""; 
+        
+        inputCariTeks.onkeypress = function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                cariAlamatKePeta();
+            }
+        };
+    }
+
     // Validasi ulang ukuran box agar rendering Leaflet presisi tidak pecah kotak-kotak
     setTimeout(() => {
         petaModalInstance.invalidateSize();
     }, 50);
+}
+
+// =========================================================================
+// 🔥 ENGINE PENCARI ALAMAT (GEOLOCATION NOMINATIM API)
+// =========================================================================
+function cariAlamatKePeta() {
+    const inputKataKunci = document.getElementById('cari-peta-alamat');
+    if (!inputKataKunci || !inputKataKunci.value.trim()) {
+        alert("Silakan ketik alamat atau nama lokasi yang ingin dicari terlebih dahulu!");
+        return;
+    }
+
+    const queryAlamat = encodeURIComponent(inputKataKunci.value.trim());
+    const urlNominatim = `https://nominatim.openstreetmap.org/search?format=json&q=${queryAlamat}&limit=1`;
+
+    fetch(urlNominatim)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const letakLat = parseFloat(data[0].lat);
+                const letakLon = parseFloat(data[0].lon);
+
+                // 1. Update nilai teks input Lintang & Bujur di layar
+                if (document.getElementById('edit-lintang')) document.getElementById('edit-lintang').value = letakLat.toFixed(6);
+                if (document.getElementById('edit-bujur')) document.getElementById('edit-bujur').value = letakLon.toFixed(6);
+
+                // 2. Terbangkan peta dan geser pin utama ke titik hasil pencarian
+                if (petaModalInstance && penandaPetaInstance) {
+                    petaModalInstance.setView([letakLat, letakLon], 16); // Tingkat zoom otomatis ke area 16
+                    penandaPetaInstance.setLatLng([letakLat, letakLon]);
+                } else {
+                    alert("Gagal menggeser komponen peta, silakan buka ulang menu alamat.");
+                }
+            } else {
+                alert("Alamat atau lokasi tidak ditemukan. Coba ketik nama kampung/jalan yang lebih spesifik.");
+            }
+        })
+        .catch(error => {
+            console.error("Error Geocoding:", error);
+            alert("Terjadi gangguan koneksi saat mencari alamat murid.");
+        });
 }
 function simpanPerubahanSiswa(event) {
     if (event) event.preventDefault(); 
