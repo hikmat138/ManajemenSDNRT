@@ -805,8 +805,8 @@ window.onload = loadData();
     if(document.getElementById('stat-tendik')) document.getElementById('stat-tendik').innerText = jmlTendik;
 
     // Filter masuk (tambahkan cek nama agar akurat)
-    const masuk = masterData.filter(s => s.nama && s.tgl_masuk && s.tgl_masuk !== '-' && String(s.status_aktif).toLowerCase() === 'pindahan').length;
-    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = masuk;
+    const jmlMasuk = masterDataMutasiMasuk.filter(m => m.nama).length;
+    if(document.getElementById('stat-masuk')) document.getElementById('stat-masuk').innerText = jmlMasuk;
 
     // Keluar (filter juga baris kosongnya)
     const jmlKeluar = masterDataMutasiKeluar.filter(m => m.nama).length;
