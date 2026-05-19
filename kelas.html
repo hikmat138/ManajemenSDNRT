@@ -1213,31 +1213,34 @@ function initCharts() {
         });
 
         // Penghasilan Orang Tua
-       ['ayah', 'ibu'].forEach(role => {
-            let png = String(s[`${role}_penghasilan`] || '').toLowerCase().trim();
+      ['ayah', 'ibu'].forEach(role => {
+            // Hilangkan semua spasi, titik, koma, dan simbol Rp agar murni membaca teks/angka inti
+            let pngRaw = String(s[`${role}_penghasilan`] || '').toLowerCase();
+            let png = pngRaw.replace(/[\s\.\,rp\-]/g, ''); 
+
             let targetObj = role === 'ayah' ? dataDashboard.penghasilanAyah : dataDashboard.penghasilanIbu;
             
-            // 1. Deteksi Jika Tidak Berpenghasilan / Kosong / Strip
-            if (png === '' || png === '-' || png.includes('tidak') || png.includes('irt') || png.includes('rumah tangga')) {
+            // 1. Cek Apakah Kosong, Strip, atau Tidak Berpenghasilan
+            if (png === '' || pngRaw.includes('tidak') || pngRaw.includes('irt') || pngRaw.includes('rumah tangga')) {
                 targetObj.TidakBerpenghasilan++;
             }
-            // 2. Deteksi Rentang 2 Juta - 5 Juta (Prioritas Atas)
-            else if (png.includes('2-5') || png.includes('2.000') || png.includes('2 juta') || png.includes('4.999')) {
+            // 2. Cek Rentang 2 Juta - 4.999.999 / 5 Juta (Mencari angka 2-5, 2juta, 2000000, atau 4999)
+            else if (pngRaw.includes('2-5') || png.includes('2juta') || png.includes('2000000') || png.includes('4999999') || pngRaw.includes('2 juta')) {
                 targetObj.Antara2_5Juta++;
             }
-            // 3. Deteksi Rentang 1 Juta - 2 Juta
-            else if (png.includes('1-2') || png.includes('1.000') || png.includes('1.999') || png.includes('1 juta - 2') || png.includes('1 juta - 1')) {
+            // 3. Cek Rentang 1 Juta - 1.999.999 / 2 Juta
+            else if (pngRaw.includes('1-2') || png.includes('1juta') || png.includes('1000000') || png.includes('1999999') || pngRaw.includes('1 juta')) {
                 targetObj.Antara1_2Juta++;
             }
-            // 4. Deteksi Lebih dari 5 Juta
-            else if (png.includes('lebih') || png.includes('>') || png.includes('5 juta') || png.includes('5.000')) {
+            // 4. Cek Rentang Lebih dari 5 Juta
+            else if (pngRaw.includes('lebih') || pngRaw.includes('>') || png.includes('5juta') || png.includes('5000000')) {
                 targetObj.Lebih5Juta++;
             }
-            // 5. Fallback Terakhir: Kurang dari 1 Juta / Kurang dari 500rb
-            else if (png.includes('kurang') || png.includes('<') || png.includes('500') || png.includes('rp')) {
+            // 5. Cek Rentang Kurang dari 1 Juta / Kurang dari 500rb
+            else if (pngRaw.includes('kurang') || pngRaw.includes('<') || png.includes('500') || png.includes('juta')) {
                 targetObj.Kurang1Juta++;
             }
-            // Jika ada teks aneh yang lolos, masukkan ke tidak berpenghasilan/belum diisi
+            // 6. Jaga-jaga jika ada data aneh, lempar ke Tidak Berpenghasilan
             else {
                 targetObj.TidakBerpenghasilan++;
             }
